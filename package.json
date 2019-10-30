@@ -51,10 +51,14 @@
     }
   },
   "dependencies": {
-    "vue": "^2.5.16",
     "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.3",
+    "material-design-icons": "^3.0.1",
+    "request": "^2.88.0",
+    "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
+    "vuetify": "^2.1.7",
     "vuex": "^3.0.1",
     "vuex-electron": "^1.0.0"
   },
