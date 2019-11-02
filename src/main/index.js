@@ -18,14 +18,13 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
-    useContentSize: true,
-    width: 1000,
-    webPreferences : {
-      nodeIntegration :  true  // agrega esto
-    }
+    show: false,
+    useContentSize: true,    
+    frame: false, 
   })
-
+  mainWindow.maximize()
+  mainWindow.show()
+  
   mainWindow.loadURL(winURL)
 
   mainWindow.on('closed', () => {

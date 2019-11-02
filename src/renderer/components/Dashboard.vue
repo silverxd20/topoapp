@@ -41,7 +41,7 @@
                 <img class="imagenlogo d-block mx-auto" src="../assets/cashLogo.png" alt />
               </div>
               <div>
-                <h1 id="saldo" class="text-center">{{saldo}}</h1>
+                <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
               </div>
               <div>
                 <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
@@ -105,7 +105,7 @@ export default {
     return {
       ReviewTasks: "-",
       approvedTasks: "-",
-      saldo: "-",
+      saldo: "",
       loader: "spinner-border spinner-border-sm",
       db: "",
       idnum: "0",
@@ -270,23 +270,20 @@ export default {
         var part1 = $(".jsx-2539128144")
           .text()
           .split(" ");
-        console.log("Muestra el contenido de part1");
-        console.log(part1);
+ 
         //...................Validaciones del array..........................
 
         //validando el saldo de dinero........................
         if (part1[16] == 5) {
           //no se por que razon sale 5 pero resuelve el conflicto y entrega el saldo real
           var part2 = part1[17].split("E");
-          console.log(part2);
           var SaldoCuenta = part2[0].split("$");
-          console.log(SaldoCuenta[1]);
+          console.log("Saldo: "+SaldoCuenta[1]+" $");
         } else {
           //Obtiene el saldo $
           var part2 = part1[16].split("E");
-          console.log(part2);
           var SaldoCuenta = part2[0].split("$");
-          console.log(SaldoCuenta[1]);
+          console.log("Saldo: "+SaldoCuenta[1]+" $");
         }
 
         //validando el total de tareas aprobadas y pendientes por que el array se mueve.
@@ -296,24 +293,32 @@ export default {
           var part2 = part1[18].split("T");
           var part3 = part2[0].split("s");
           var part4 = part3[1].split("+");
-          console.log(part4);
-          if (part4[0].length == 1) {
+ 
+          if (part4.length == 1) {
             var saldoPendientes = parseInt(0);
             var saldoAprobadas = parseInt(0);
-          } else {
+            console.log("Tareas pendientes: "+saldoPendientes+" en 1");
+            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 1");
+          } else if (part4.length == 2){
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
+            console.log("Tareas pendientes: "+saldoPendientes+" en 0");
+            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 0");
           }
         } else {
           //Si no se mueve en el array obtiene las tareas aprobadas y pendientes.
           var part2 = part1[17].split("T");
           var part3 = part2[0].split("s");
           var part4 = part3[1].split("+");
-          console.log(part4);
-          if (part4[0].length == 1) {
+
+          if (part4.length == 1) {
             var saldoPendientes = parseInt(0);
             var saldoAprobadas = parseInt(0);
-          } else {
+            console.log("Tareas pendientes: "+saldoPendientes+" en 1");
+            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 1");
+          } else if (part4.length == 2) {
+            console.log("Tareas pendientes: "+saldoPendientes+" en 0");
+            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 0");
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
           }
@@ -325,14 +330,20 @@ export default {
         //Suma el saldo del dinero
         if (this.saldoTotal == "0") {
           this.saldoTotal = parseFloat(SaldoCuenta[1]);
+          console.log("index: "+index + "TotalFor: "+ resta)
+          if (index == resta) {
+            //Muesta el saldo lo muestra en el sistema
+          this.saldo = parseFloat(this.saldoTotal).toFixed(2);
+          }
           console.log(this.saldoTotal);
         } else {
           this.saldoTotal = this.saldoTotal + parseFloat(SaldoCuenta[1]);
           console.log(this.saldoTotal);
             
+            console.log("index: "+index + "TotalFor: "+ resta)
           if (index == resta) {
             //Muesta el saldo lo muestra en el sistema
-          this.saldo = "$" + parseFloat(this.saldoTotal).toFixed(2);
+          this.saldo = parseFloat(this.saldoTotal).toFixed(2);
           console.log(this.saldo);
           }
           
@@ -341,13 +352,13 @@ export default {
         //Suma las tareas aprobadas
         if (this.aprobadasTotal == "0") {
           this.aprobadasTotal = parseInt(saldoAprobadas);
-          this.approvedTasks = "" + this.aprobadasTotal;
+          this.approvedTasks = this.aprobadasTotal;
           console.log(this.approvedTasks);
         } else {
           this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas);
           
           if (index == resta) {
-           this.approvedTasks = "" + this.aprobadasTotal; 
+           this.approvedTasks = this.aprobadasTotal; 
           }
           console.log(this.approvedTasks);
         }
@@ -355,17 +366,20 @@ export default {
         //Suma las tareas pendientes
         if (this.pendientesTotal == "0") {
           this.pendientesTotal = parseInt(saldoPendientes);
-          this.ReviewTasks = "" + this.pendientesTotal;
+          this.ReviewTasks = this.pendientesTotal;
         } else {
           this.pendientesTotal =
             this.pendientesTotal + parseInt(saldoPendientes);
+            console.log("Pendiente total: "+this.pendientesTotal)
             if (index == resta) {
-             this.ReviewTasks = "" + this.pendientesTotal;
+             this.ReviewTasks = this.pendientesTotal;
             console.log("saldo pendiente")
             console.log(this.ReviewTasks);
           }
          
         }
+      }else {
+      console.log("Error: "+error +" Status Code: "+response.statusCode)
       }
     },
 
