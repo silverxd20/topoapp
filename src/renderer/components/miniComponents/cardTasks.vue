@@ -33,7 +33,7 @@ To
 
 <script>
 export default {
-    name:"cardTasks",
+    name:"cardtasks",
     data() {
         return {
             

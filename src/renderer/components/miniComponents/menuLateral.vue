@@ -43,6 +43,7 @@
 
 <script>
   export default {
+    name:"menuLateral",
     data () {
       return {
         drawer: true,
