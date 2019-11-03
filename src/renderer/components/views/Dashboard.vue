@@ -46,6 +46,7 @@
                 </div>
                 <div>
                   <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
+                  <v-progress-circular color="dark" indeterminate  size="20"></v-progress-circular>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
@@ -56,8 +57,9 @@
         </div>
       </div>
 
-      <div :v-show="showLoadingTasks" class="text-center divBuscandoTasks">
-        <v-progress-circular :size="40" color="dark" indeterminate></v-progress-circular>
+  <!-- Oculta o muestra el mensaje y loader de las tareas -->
+      <div v-show="showLoadingTasks" class="text-center divBuscandoTasks">
+        <v-progress-circular color="dark" indeterminate  size="40"></v-progress-circular>
         <h4>Buscando trabajos disponibles</h4>
       </div>
 
@@ -212,6 +214,7 @@ export default {
                 }
                 //Cuando termine el bucle quita el loader y el mensaje
                 if (index == this.forLengthJWtCuentas) {
+                  console.log("dentro del final del length bucle");
                   this.showLoadingTasks = false;
                 }
               } catch (error) {
