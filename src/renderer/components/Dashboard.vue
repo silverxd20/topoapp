@@ -1,7 +1,7 @@
 <template>
   <div>
     <!--Barra Superior Minimizar y Cerrar-->
-    <barraSuperior></barraSuperior>
+    <barraSuperior class="sticky-top"></barraSuperior>
     <!--Menú lateral-->
     <!--<menuLateral></menuLateral>-->
     <!-- ------------------------------Datos del dashboard--------------------------- -->
@@ -13,7 +13,7 @@
               <h3 class="text-light">Bienvenido: Leo</h3>
             </div>
             <div class="col-sm-6 d-flex justify-content-end">
-              <img id="SignOut" class="imgSignOut" src="../assets/signout.svg" alt />
+              <img id="SignOut" @click="btnSignOut()" class="imgSignOut" src="../assets/signout.svg" alt />
             </div>
           </div>
         </div>
@@ -66,41 +66,38 @@
       </div>
 
       <!--Parte de las tareas-->
-      <div class="row">
-        <div class="col-sm-12 mt-5">
-          <div>
-            <h3 id="test" class>Tareas disponibles en LocalWorker</h3>
-            <ol class="list-group" id="myList"></ol>
-            <button id="btnActualizar" class="btn btn-primary mt-2" type="button" disabled>
-              <span
-                id="loader"
-                class="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              Cargando Tareas...
-            </button>
-            <h6 class="text-danger" id="btnFailCuenta"></h6>
-          </div>
-        </div>
-      </div>
+      <v-container class="cont-Tareas" grid-list-xs>
+        <v-layout row wrap>
+          <v-flex xs4>
+            <cardTasks></cardTasks>
+          </v-flex>
+          <v-flex xs4>
+            <cardTasks></cardTasks>
+          </v-flex>
+          <v-flex xs4>
+            <cardTasks></cardTasks>
+          </v-flex>
+        </v-layout>
+      </v-container>
+
     </div>
   </div>
 </template>
 
 <script>
 import barraSuperior from "./barraSuperior/barraSuperior";
-import menuLateral from "./miniComponents/menuLateral";
+import cardTasks from "./miniComponents/cardTasks";
+
 let { remote } = require("electron");
 const cheerio = require("cheerio");
 const request = require("request");
 
 export default {
   name: "dashboard",
-  created() {
+  mounted() {
     this.firebaseInit();
   },
-  components: { barraSuperior, menuLateral },
+  components: { barraSuperior, cardTasks },
   data() {
     return {
       ReviewTasks: "-",
@@ -130,6 +127,8 @@ export default {
     };
   },
   methods: {
+
+    //......................EVENT LISTENERS.......................................
     firebaseInit() {
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
@@ -158,6 +157,7 @@ export default {
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
                   // this.getAvailableTasks(this.arraySession);
                   this.getDatosCuentas(this.arraySession);
+                  this.getAvailableTasks(this.arraySession)
                 }
               });
             });
@@ -165,45 +165,11 @@ export default {
       });
     },
 
-    btnSignOut() {
-      firebase
-        .auth()
-        .signOut()
-        .then(user => {
-          //Envia al usuario al login
-          this.$router.push({ path: "Login" });
-        });
-    },
-    //......................EVENT LISTENERS.......................................
-
-    //Evento que permite hacer click en la lista y obtener su numero de ID
-    listaHtml(e) {
-      var visitorId;
-      if (e.target && e.target.nodeName == "LI") {
-        visitorId = e.target.id;
-
-        //Abre la tarea
-        OpenTask(visitorId);
-      }
-    },
-
-    // Evento Listener del boton actualizar
-    btnActualizar(e) {
-      //createBrowserWindow();
-      listaHtml.innerHTML = "";
-      idnum = 0;
-      node.id = idnum;
-      btnActualizar.disabled = true;
-      btnActualizar.innerHTML = "Cargando tareas...";
-      this.getAvailableTasks(arraySession);
-    },
     //..........................FUNCIONES...........................................
 
     // 1) Funcion que inicia solicitando las tareas disponibles
     async getAvailableTasks(arraySession) {
-      //Activa el loader
-      this.loader = "spinner-border spinner-border-sm";
-
+  
       //Recorre el array del token de session de las cuentas
       for (let index = 0; index < arraySession.length; index++) {
         console.log("Array seassion");
@@ -221,41 +187,30 @@ export default {
 
         try {
           //Fetch que pregunta por las tareas disponibles
+          
           let resp = await fetch(
             "https://api-internal.scale.com/internal/v2/tasks/pending_combined?limit=1",
             headersGetTasks
           );
           let json = await resp.json();
-          console.log("Respuesta de la solicitud");
+          console.log("Respuesta de la solicitud get tasks");
           console.log(json);
           //Comprueba si la tarea es normal o de tipo revisor
           if (json[0].assignmentType === "subtask") {
             //Comprueba si no se atraviesa un lidar en el panel de tasks clasicas
             if (json[0].type === "lidarsegmentation") {
-              this.addToList(
-                json[0].type + " atravesada en classic: " + json[0].project.name
-              );
-              //Detiene el loader
-              this.stopLoader(index, total);
+         
+            //Si alguna cuenta tiene lidar y se atraviesa en clasic, manejarlo aqui
             } else {
-              this.addToList(json[0].type);
-              //Detiene el loader
-              this.stopLoader(index, total);
+         
+              //No hay lidar atravesada
             }
           } else if (json[0].assignmentType == "course") {
             //En caso de que salga un curso aqui no manejmos
             console.log("Esto es un curso: " + json[0].tittle);
           } else {
             //Si el tipo de tarea es de Revisor
-            this.addToList(
-              "Revisor: " +
-                json[0].taskType +
-                " - " +
-                json[0].subtask.project.name
-            );
 
-            //Detiene el loader
-            this.stopLoader(index, total);
           }
         } catch (error) {
           console.log("hubo un error: " + error);
@@ -266,11 +221,11 @@ export default {
     //2) Funcion que obtiene el saldo, las tareas aprobadas y pendientes
     async CalculaDatos(error, response, body, index, cookiejwtParametro) {
       if (!error && response.statusCode == 200) {
-        const $ = cheerio.load(body);
+        const $ = await cheerio.load(body);
         var part1 = $(".jsx-2539128144")
           .text()
           .split(" ");
- 
+          console.log(part1)
         //...................Validaciones del array..........................
 
         //validando el saldo de dinero........................
@@ -294,9 +249,9 @@ export default {
           var part3 = part2[0].split("s");
           var part4 = part3[1].split("+");
  
-          if (part4.length == 1) {
             var saldoPendientes = parseInt(0);
             var saldoAprobadas = parseInt(0);
+          if (part4.length == 1) {
             console.log("Tareas pendientes: "+saldoPendientes+" en 1");
             console.log("Tareas Aprobadas: "+saldoAprobadas+" en 1");
           } else if (part4.length == 2){
@@ -317,10 +272,10 @@ export default {
             console.log("Tareas pendientes: "+saldoPendientes+" en 1");
             console.log("Tareas Aprobadas: "+saldoAprobadas+" en 1");
           } else if (part4.length == 2) {
-            console.log("Tareas pendientes: "+saldoPendientes+" en 0");
-            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 0");
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
+            console.log("Tareas pendientes: "+saldoPendientes+" en 0");
+            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 0");
           }
         }
 
@@ -329,7 +284,7 @@ export default {
 
         //Suma el saldo del dinero
         if (this.saldoTotal == "0") {
-          this.saldoTotal = parseFloat(SaldoCuenta[1]);
+          this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           console.log("index: "+index + "TotalFor: "+ resta)
           if (index == resta) {
             //Muesta el saldo lo muestra en el sistema
@@ -337,7 +292,7 @@ export default {
           }
           console.log(this.saldoTotal);
         } else {
-          this.saldoTotal = this.saldoTotal + parseFloat(SaldoCuenta[1]);
+          this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           console.log(this.saldoTotal);
             
             console.log("index: "+index + "TotalFor: "+ resta)
@@ -353,14 +308,14 @@ export default {
         if (this.aprobadasTotal == "0") {
           this.aprobadasTotal = parseInt(saldoAprobadas);
           this.approvedTasks = this.aprobadasTotal;
-          console.log(this.approvedTasks);
+          
         } else {
           this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas);
           
           if (index == resta) {
            this.approvedTasks = this.aprobadasTotal; 
           }
-          console.log(this.approvedTasks);
+
         }
 
         //Suma las tareas pendientes
@@ -368,9 +323,8 @@ export default {
           this.pendientesTotal = parseInt(saldoPendientes);
           this.ReviewTasks = this.pendientesTotal;
         } else {
-          this.pendientesTotal =
-            this.pendientesTotal + parseInt(saldoPendientes);
-            console.log("Pendiente total: "+this.pendientesTotal)
+          this.pendientesTotal = this.pendientesTotal + parseInt(saldoPendientes);
+
             if (index == resta) {
              this.ReviewTasks = this.pendientesTotal;
             console.log("saldo pendiente")
@@ -407,21 +361,11 @@ export default {
           //LLama la funcion que calcula y procesa los datos
           this.CalculaDatos(error, response, body, index, cookiejwtParametro.length)
           });
-          
+  
       }
     }, // fin de la function get saldo cuentas
 
-    // 3) Funcion que agrega un elemento a la lista de tareas
-    addToList(params) {
-      node = document.createElement("LI");
-      node.id = idnum++;
-      node.className = "list-group-item list-group-item-action";
-      var textnode = document.createTextNode(idnum + ". " + params);
-      node.appendChild(textnode);
-      listaHtml.appendChild(node);
-    },
-
-    // 4) Funcion que abre la tarea disponible
+    // 3) Funcion que abre la tarea disponible
     OpenTask(valueCookieParametro) {
       let parteSinJWT = arraySession[valueCookieParametro].split(" "); // deja la cookie sin el jwt
 
@@ -437,15 +381,16 @@ export default {
       );
     },
 
-    // 5) Funcion que detiene el loader
-    stopLoader(index, total) {
-      if (index == total) {
-        //detiene el loader
-        loader.className = "";
-        btnActualizar.innerHTML = "Actualizar";
-        btnActualizar.disabled = false;
-      }
-    }
+    //4) Boton que desconecta la session del usuario
+    btnSignOut() {
+      firebase
+        .auth()
+        .signOut()
+        .then(user => {
+          //Envia al usuario al login
+          this.$router.push({ path: "Login" });
+        });
+    },
   }
 };
 </script>
@@ -466,17 +411,18 @@ export default {
 }
 
 .divCardDatos {
-  border-radius: 12px 12px 12px 12px;
+  border-radius: 50px 50px 50px 50px;
   box-shadow: 0px 4px 6px 0px rgb(49, 49, 49);
-  height: 180px;
-  width: 250px;
+  height: 190px;
+  width: 240px;
   position: absolute;
 }
 
 .divRowDatos {
   position: relative;
   z-index: 1;
-  height: 220px;
+  height: 200px;
+ 
 }
 
 .fondoImg {
@@ -495,5 +441,9 @@ export default {
 }
 .list-group-item-action {
   cursor: pointer;
+}
+
+.cont-Tareas{
+  margin-top: 60px
 }
 </style>

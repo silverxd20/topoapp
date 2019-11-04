@@ -43,6 +43,7 @@
               >
               <input
                 v-model="valorPass"
+                @keyup.enter="btnLogin()"
                 type="password"
                 class="form-control"
                 placeholder="Password"
@@ -56,7 +57,6 @@
                 class="btn btn-success"
                 type="button"
               >
-                <img aria-hidden="true" src="../assets/check.png" />
                 <span :class="spinner" role="status" aria-hidden="true"></span>
                 Login
               </button>
@@ -84,7 +84,6 @@ export default {
   components: { SystemInformation,barraSuperior },
   data() {
     return {
-      statusCheck: "ON",
       spinner: "",
       mensaje: "",
       valorEmail: "",
@@ -106,13 +105,15 @@ export default {
 
     //Inicia el app de firebase
     firebaseInit() {
-      firebase.initializeApp(this.firebaseConfig);
+      if (!firebase.apps.length) {
+        // Initialize Firebase
+        firebase.initializeApp(this.firebaseConfig);
+      }
     },
 
     // LOGIN
     btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
-      this.statusCheck = "ON";
 
       firebase
         .auth()
@@ -121,7 +122,7 @@ export default {
           if (user) {
             //Oculta el spinner
             this.spinner = "";
-            this.$router.push({ path: "Dashboard" });
+            this.$router.push({ path: "BaseDashboard" });
             console.log(user);
           }
         })
@@ -133,7 +134,6 @@ export default {
           if (errorCode == "auth/invalid-email") {
             //Si el usuario es incorrecto
             this.mensaje = "El Correo es inválido.";
-            this.statusCheck = "OFF";
             this.spinner = "";
           }
 
@@ -146,21 +146,19 @@ export default {
           if (errorCode == "auth/network-request-failed") {
             //Si no hay internet emite este mensaje
             this.mensaje = "No tienes conexion a internet.";
-            this.statusCheck = "OFF";
             this.spinner = "";
           }
 
           if (errorCode == "auth/user-not-found") {
             //Si no hay internet emite este mensaje
             this.mensaje = "El Usuario no está registrado.";
-            this.statusCheck = "OFF";
             this.spinner = "";
           }
 
           if (errorCode == "auth/wrong-password") {
             //Si no hay internet emite este mensaje
             this.mensaje = "La contraseña es incorrecta.";
-            this.statusCheck = "OFF";
+
             this.spinner = "";
           }
         });
@@ -187,12 +185,6 @@ export default {
 .img2 {
   width: 350px;
   height: 350px;
-}
-
-#imgcheck {
-  width: 15px;
-  height: 15px;
-  display: none;
 }
 
 .logo {

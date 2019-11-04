@@ -16,7 +16,7 @@
 const { remote } = require("electron");
 
 export default {
-  name: "barrasuperior",
+  name: "barraSuperior",
   data() {
     return {
       winPrincial: remote.getCurrentWindow()
