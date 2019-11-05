@@ -16,9 +16,9 @@ export default new Router({
       component: require('@/components/Dashboard').default
     },
     {
-      path: '/BaseDashboard',
-      name: 'basedashboard',
-      component: require('@/components/BaseDashboard').default
+      path: '/videoCursos',
+      name: 'videocursos',
+      component: require('@/components/videoCursos').default
     },
     {
       path: '*',

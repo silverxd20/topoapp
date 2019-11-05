@@ -1,25 +1,11 @@
 <template>
   <div>
-    <!--Barra Superior Minimizar y Cerrar-->
-    <barraSuperior class="sticky-top"></barraSuperior>
-    <!--Menú lateral-->
-    <!--<menuLateral></menuLateral>-->
     <!-- ------------------------------Datos del dashboard--------------------------- -->
     <div class="divCompleto">
       <div class="container-fluid fondoImg">
-        <div class="container-fluid">
-          <div class="row pt-5">
-            <div class="col-sm-6 d-flex justify-content-start">
-              <h3 class="text-light">Bienvenido: Leo</h3>
-            </div>
-            <div class="col-sm-6 d-flex justify-content-end">
-              <img id="SignOut" @click="btnSignOut()" class="imgSignOut" src="../assets/signout.svg" alt />
-            </div>
-          </div>
-        </div>
-
+ 
         <!--Parte de los datos-->
-        <div class="row divRowDatos pt-5">
+        <div class="row divRowDatos">
           <div class="col-sm-4 borde">
             <!--Tareas aprobadas-->
             <div class="divCardDatos bg-light pt-3">
@@ -403,6 +389,7 @@ export default {
 .divCompleto {
   height: 100%;
   width: 100%;
+  background-color: rgb(241, 239, 235)
 }
 
 .imgSignOut {

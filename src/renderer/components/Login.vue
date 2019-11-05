@@ -1,9 +1,6 @@
 <template>
   <div class="divtodo">
-    <!--Barra del menu Minimizar y Cerrar-->
-    <barraSuperior></barraSuperior>
-
-    <div class="container-fluid contenedor align-items-center" id="contenedor">
+    <div class="container contenedor align-items-center" id="contenedor">
       <div class="row d-flex justify-content-center align-items-center">
         <!--Mensaje-->
         <div class="">
@@ -73,15 +70,14 @@
 
 <script>
 import SystemInformation from "./LandingPage/SystemInformation";
-import barraSuperior from './barraSuperior/barraSuperior';
 const { remote } = require("electron");
 
 export default {
-  name: "login",
+  name: "Login",
   created() {
     this.firebaseInit();
   },
-  components: { SystemInformation,barraSuperior },
+  components: { SystemInformation },
   data() {
     return {
       spinner: "",
@@ -122,7 +118,7 @@ export default {
           if (user) {
             //Oculta el spinner
             this.spinner = "";
-            this.$router.push({ path: "BaseDashboard" });
+            this.$router.push({ path: "Dashboard" });
             console.log(user);
           }
         })
