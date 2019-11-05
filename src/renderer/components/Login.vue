@@ -70,6 +70,7 @@
 
 <script>
 import SystemInformation from "./LandingPage/SystemInformation";
+import {mapState} from 'vuex';
 const { remote } = require("electron");
 
 export default {
@@ -85,19 +86,11 @@ export default {
       valorEmail: "",
       valorPass: "",
       winPrincial: remote.getCurrentWindow(),
-      firebaseConfig: {
-        apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
-        authDomain: "remodesktop-9b704.firebaseapp.com",
-        databaseURL: "https://remodesktop-9b704.firebaseio.com",
-        projectId: "remodesktop-9b704",
-        storageBucket: "",
-        messagingSenderId: "450738698352",
-        appId: "1:450738698352:web:1bcc2c00ab77337171dcb5",
-        measurementId: "G-2Q69C2TFFR"
-      }
     };
   },
   methods: {
+    //Trae la configuracion de firebase desde el store de vuex
+    ...mapState(["firebaseConfig"]),
 
     //Inicia el app de firebase
     firebaseInit() {

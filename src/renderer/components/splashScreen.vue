@@ -18,6 +18,7 @@ export default {
         }
     },
   methods: {
+      //Trae la configuracion de firebase desde el store de vuex
       ...mapState(["firebaseConfig"]),
      firebaseInit() {
       if (!firebase.apps.length) {
