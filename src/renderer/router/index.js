@@ -26,6 +26,11 @@ export default new Router({
       component: require('@/components/videoCursos').default
     },
     {
+      path: '/preguntasFrecuentes',
+      name: 'preguntasfrecuentes',
+      component: require('@/components/preguntasFrecuentes').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

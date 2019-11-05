@@ -1,14 +1,21 @@
 <template>
   <div>
     <v-app>
-      
       <v-app-bar clipped-left height="25" app dark>
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
       </v-app-bar>
 
       <!--navigation-drawer-->
-      <v-navigation-drawer app clipped expand-on-hover permanent dark mini-variant-width="50px">
+      <v-navigation-drawer
+        :permanent="Drawer"
+        app
+        value
+        clipped
+        expand-on-hover
+        dark
+        mini-variant-width="50px"
+      >
         <template v-slot:prepend>
           <v-list>
             <v-list-item>
@@ -30,20 +37,28 @@
 
         <v-list nav dense>
           <!-- Link de Dashboard-->
-            <v-list-item @click="btnDashboard()" link>
-              <v-list-item-icon>
-                <v-icon>mdi-monitor-dashboard</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>Dashboard</v-list-item-title>
-            </v-list-item>
+          <v-list-item @click="btnDashboard()" link>
+            <v-list-item-icon>
+              <v-icon>mdi-monitor-dashboard</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Dashboard</v-list-item-title>
+          </v-list-item>
 
           <!-- Link de Entrenamiento-->
-            <v-list-item @click="btnVideoCursos()" link>
-              <v-list-item-icon>
-                <v-icon>mdi-library-video</v-icon>
-              </v-list-item-icon>
-              <v-list-item-title>Entrenamiento</v-list-item-title>
-            </v-list-item>
+          <v-list-item @click="btnVideoCursos()" link>
+            <v-list-item-icon>
+              <v-icon>mdi-library-video</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Entrenamiento</v-list-item-title>
+          </v-list-item>
+
+          <!-- Link de Preguntas frecuentes-->
+          <v-list-item @click="btnPreguntasFrecuentes()" link>
+            <v-list-item-icon>
+              <v-icon>mdi-comment-question-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Preguntas frecuentes</v-list-item-title>
+          </v-list-item>
         </v-list>
 
         <!-- Boton desconectarse-->
@@ -58,8 +73,8 @@
       </v-navigation-drawer>
 
       <!-- contenido de la aplicacion, las vistas aqui-->
-      <v-content app>     
-          <router-view></router-view>
+      <v-content app>
+        <router-view></router-view>
       </v-content>
     </v-app>
   </div>
@@ -67,9 +82,10 @@
 
 <script>
 import barraSuperior from "./components/barraSuperior/barraSuperior";
+import {mapState} from 'vuex';
 
 export default {
-  created() {
+  mounted() {
     this.firebaseInit();
   },
   components: {
@@ -77,6 +93,7 @@ export default {
   },
   data() {
     return {
+      Drawer: true,
       firebaseConfig: {
         apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
         authDomain: "remodesktop-9b704.firebaseapp.com",
@@ -86,10 +103,15 @@ export default {
         messagingSenderId: "450738698352",
         appId: "1:450738698352:web:1bcc2c00ab77337171dcb5",
         measurementId: "G-2Q69C2TFFR"
-      },
-    }
+      }
+    };
+  },
+  computed: {
+        //Muestra el valor de drawer en el store vuex
+    ...mapState(["toggledrawer"])
   },
   methods: {
+
     //..................Funciones....................
 
     //1) Boton que desconecta la session del usuario
@@ -101,16 +123,21 @@ export default {
           console.log(user);
           //Envia al usuario al login
           this.$router.push({ path: "Login" });
+          this.toogleDrawer = false;
         });
     },
 
     //Boton que envia hacia el dashboard
-    btnDashboard(){
+    btnDashboard() {
       this.$router.push({ path: "Dashboard" });
     },
     //Boton que envia hacia los cursos
-    btnVideoCursos(){
+    btnVideoCursos() {
       this.$router.push({ path: "videoCursos" });
+    },
+    //Boton que envia hacia las preguntas frecuentes
+    btnPreguntasFrecuentes() {
+      this.$router.push({ path: "preguntasFrecuentes" });
     },
     //..................listeners....................
 

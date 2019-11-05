@@ -1,5 +1,5 @@
 const state = {
-  main: 0,
+  toggledrawer: true,
   firebaseConfig: {
     apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
     authDomain: "remodesktop-9b704.firebaseapp.com",
@@ -13,11 +13,11 @@ const state = {
 }
 
 const mutations = {
-  DECREMENT_MAIN_COUNTER (state) {
-    state.main--
+  ocultaDrawer (state) {
+    state.toggledrawer = false
   },
-  INCREMENT_MAIN_COUNTER (state) {
-    state.main++
+  muestraDrawer (state) {
+    state.toggledrawer = true
   }
 }
 
