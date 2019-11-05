@@ -7,6 +7,11 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'splashscreen',
+      component: require('@/components/splashScreen').default
+    },
+    {
+      path: '/Login',
       name: 'login',
       component: require('@/components/Login').default
     },
