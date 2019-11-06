@@ -8,27 +8,27 @@ export default new Router({
     {
       path: '/',
       name: 'splashscreen',
-      component: require('@/components/splashScreen').default
+      component: require('@/components/views/splashScreen').default
     },
     {
       path: '/Login',
       name: 'login',
-      component: require('@/components/Login').default
+      component: require('@/components/views/Login').default
     },
     {
       path: '/Dashboard',
       name: 'dashboard',
-      component: require('@/components/Dashboard').default
+      component: require('@/components/views/Dashboard').default
     },
     {
       path: '/videoCursos',
       name: 'videocursos',
-      component: require('@/components/videoCursos').default
+      component: require('@/components/views/videoCursos').default
     },
     {
       path: '/preguntasFrecuentes',
       name: 'preguntasfrecuentes',
-      component: require('@/components/preguntasFrecuentes').default
+      component: require('@/components/views/preguntasFrecuentes').default
     },
     {
       path: '*',

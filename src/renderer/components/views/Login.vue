@@ -6,7 +6,7 @@
         <div class="">
           <img
             class="mr-5 d-flex justify-content-center"
-            src="../assets/localworker.png"
+            src="../../assets/localworker.png"
           />
           <h4 class="text-light mr-5 d-flex justify-content-center">
             Haz tareas, gana dinero!
@@ -14,14 +14,14 @@
           <!--Imagen izquierda-->
           <img
             class="img2 d-flex justify-content-center"
-            src="../assets/worker.png"
+            src="../../assets/worker.png"
           />
         </div>
 
         <div class="d-inline">
           <form class="form pt-3 pl-5 pr-5 mt-3 mb-3 bg-dark">
             <!--Logo-->
-            <img src="../assets/joblogo.png" class="rounded mx-auto d-block" />
+            <img src="../../assets/joblogo.png" class="rounded mx-auto d-block" />
             <div class="form-group">
               <label class="text-light" for="exampleInputEmail1"
                 >Email address</label
@@ -69,7 +69,6 @@
 </template>
 
 <script>
-import SystemInformation from "./LandingPage/SystemInformation";
 import {mapState} from 'vuex';
 const { remote } = require("electron");
 
@@ -78,7 +77,6 @@ export default {
   created() {
     this.firebaseInit();
   },
-  components: { SystemInformation },
   data() {
     return {
       spinner: "",

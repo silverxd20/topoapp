@@ -14,7 +14,7 @@
     ></v-progress-circular>
   </div>
   <div class="d-flex justify-content-center mt-5 h-100 d-inline-block">
-    <img class="imgScreen" src="../assets/toposatScreen.png">
+    <img class="imgScreen" src="../../assets/toposatScreen.png">
   </div>
 </div>
 

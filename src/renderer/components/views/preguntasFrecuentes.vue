@@ -2,7 +2,7 @@
 <div class="divFondo">
   <v-row justify="center">
       <div class="divPreguntas">
-          <img class=" mx-auto d-block imgPregunta" src="../assets/preguntas.png" alt="">
+          <img class=" mx-auto d-block imgPregunta" src="../../assets/preguntas.png" alt="">
           <h2 class="d-flex justify-content-center text-light">Preguntas frecuentes</h2>
       </div>
     <v-expansion-panels popout>

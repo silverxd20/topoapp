@@ -11,7 +11,7 @@
             <!--Tareas aprobadas-->
             <div class="divCardDatos bg-light pt-3">
               <div>
-                <img class="imagenlogo d-block mx-auto p-1" src="../assets/tareasAprobadas.png" alt />
+                <img class="imagenlogo d-block mx-auto p-1" src="../../assets/tareasAprobadas.png" alt />
               </div>
               <div>
                 <h1 id="approvedTasks" class="text-center">{{approvedTasks}}</h1>
@@ -25,7 +25,7 @@
             <!--Saldo-->
             <div class="divCardDatos bg-light pt-3">
               <div>
-                <img class="imagenlogo d-block mx-auto" src="../assets/cashLogo.png" alt />
+                <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
               </div>
               <div>
                 <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
@@ -39,7 +39,7 @@
             <!--Tareas en revision-->
             <div class="divCardDatos bg-light pt-3">
               <div>
-                <img class="imagenlogo d-block mx-auto" src="../assets/tareasRevision.png" alt />
+                <img class="imagenlogo d-block mx-auto" src="../../assets/tareasRevision.png" alt />
               </div>
               <div>
                 <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
@@ -73,8 +73,8 @@
 </template>
 
 <script>
-import barraSuperior from "./barraSuperior/barraSuperior";
-import cardTasks from "./miniComponents/cardTasks";
+import barraSuperior from "./../barraSuperior/barraSuperior";
+import cardTasks from "./../miniComponents/cardTasks";
 import {mapState, mapMutations} from 'vuex';
 
 let { remote } = require("electron");
@@ -418,7 +418,7 @@ export default {
 }
 
 .fondoImg {
-  background-image: url(../assets/fondoHombreMujerPc.jpg);
+  background-image: url(../../assets/fondoHombreMujerPc.jpg);
   background-size: cover;
   height: 210px;
 }
