@@ -2,10 +2,11 @@
   <div>
     <!-- ------------------------------Datos del dashboard--------------------------- -->
     <div class="divCompleto">
-      <div class="container-fluid fondoImg">
+      <div class=" fondoImg">
  
         <!--Parte de los datos-->
-        <div class="row divRowDatos">
+        <div class="container divRowDatos ">
+          <div class="row d-flex justify-content-center pl-5">
           <div class="col-sm-4 borde">
             <!--Tareas aprobadas-->
             <div class="divCardDatos bg-light pt-3">
@@ -47,6 +48,7 @@
                 <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -403,7 +405,7 @@ export default {
 .divCardDatos {
   border-radius: 50px 50px 50px 50px;
   box-shadow: 0px 4px 6px 0px rgb(49, 49, 49);
-  height: 190px;
+  height: 180px;
   width: 240px;
   position: absolute;
 }
@@ -411,13 +413,14 @@ export default {
 .divRowDatos {
   position: relative;
   z-index: 1;
-  height: 200px;
- 
+  height: 190px;
+  padding-top: 50px;
 }
 
 .fondoImg {
   background-image: url(../assets/fondoHombreMujerPc.jpg);
   background-size: cover;
+  height: 210px;
 }
 
 ::-webkit-scrollbar {
