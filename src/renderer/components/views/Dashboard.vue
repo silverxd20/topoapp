@@ -2,53 +2,56 @@
   <div>
     <!-- ------------------------------Datos del dashboard--------------------------- -->
     <div class="divCompleto">
-      <div class=" fondoImg">
- 
+      <div class="fondoImg">
         <!--Parte de los datos-->
-        <div class="container divRowDatos ">
+        <div class="container divRowDatos">
           <div class="row d-flex justify-content-center pl-5">
-          <div class="col-sm-4 borde">
-            <!--Tareas aprobadas-->
-            <div class="divCardDatos bg-light pt-3">
-              <div>
-                <img class="imagenlogo d-block mx-auto p-1" src="../../assets/tareasAprobadas.png" alt />
-              </div>
-              <div>
-                <h1 id="approvedTasks" class="text-center">{{approvedTasks}}</h1>
-              </div>
-              <div>
-                <p class="text-center text-secondary font-weight-bold">Tareas aprobadas</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-4 borde">
-            <!--Saldo-->
-            <div class="divCardDatos bg-light pt-3">
-              <div>
-                <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
-              </div>
-              <div>
-                <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
-              </div>
-              <div>
-                <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
+            <div class="col-sm-4 borde">
+              <!--Tareas aprobadas-->
+              <div class="divCardDatos bg-light pt-3">
+                <div>
+                  <img
+                    class="imagenlogo d-block mx-auto p-1"
+                    src="../../assets/tareasAprobadas.png"
+                    alt
+                  />
+                </div>
+                <div>
+                  <h1 id="approvedTasks" class="text-center">{{approvedTasks}}</h1>
+                </div>
+                <div>
+                  <p class="text-center text-secondary font-weight-bold">Tareas aprobadas</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-sm-4 borde">
-            <!--Tareas en revision-->
-            <div class="divCardDatos bg-light pt-3">
-              <div>
-                <img class="imagenlogo d-block mx-auto" src="../../assets/tareasRevision.png" alt />
-              </div>
-              <div>
-                <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
-              </div>
-              <div>
-                <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
+            <div class="col-sm-4 borde">
+              <!--Saldo-->
+              <div class="divCardDatos bg-light pt-3">
+                <div>
+                  <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
+                </div>
+                <div>
+                  <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
+                </div>
+                <div>
+                  <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
+                </div>
               </div>
             </div>
-          </div>
+            <div class="col-sm-4 borde">
+              <!--Tareas en revision-->
+              <div class="divCardDatos bg-light pt-3">
+                <div>
+                  <img class="imagenlogo d-block mx-auto" src="../../assets/tareasRevision.png" alt />
+                </div>
+                <div>
+                  <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
+                </div>
+                <div>
+                  <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -56,18 +59,12 @@
       <!--Parte de las tareas-->
       <v-container class="cont-Tareas" grid-list-xs>
         <v-layout row wrap>
-          <v-flex xs4>
-            <cardTasks></cardTasks>
-          </v-flex>
-          <v-flex xs4>
-            <cardTasks></cardTasks>
-          </v-flex>
-          <v-flex xs4>
-            <cardTasks></cardTasks>
+          <v-flex xs4 v-for='(tasks, index) of jsonTarea' :key="index">
+            <!-- Tarjeta de las tareas -->
+            <cardTasks :propJsonTask="tasks"></cardTasks>
           </v-flex>
         </v-layout>
       </v-container>
-
     </div>
   </div>
 </template>
@@ -75,7 +72,7 @@
 <script>
 import barraSuperior from "./../barraSuperior/barraSuperior";
 import cardTasks from "./../miniComponents/cardTasks";
-import {mapState, mapMutations} from 'vuex';
+import { mapState, mapMutations } from "vuex";
 
 let { remote } = require("electron");
 const cheerio = require("cheerio");
@@ -89,6 +86,8 @@ export default {
   components: { barraSuperior, cardTasks },
   data() {
     return {
+      indexRetry: "0",
+      jsonTarea: [],
       ReviewTasks: "-",
       approvedTasks: "-",
       saldo: "",
@@ -104,15 +103,15 @@ export default {
       arraySession: [],
       sesion: "",
       firebaseConfig: {
-    apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
-    authDomain: "remodesktop-9b704.firebaseapp.com",
-    databaseURL: "https://remodesktop-9b704.firebaseio.com",
-    projectId: "remodesktop-9b704",
-    storageBucket: "",
-    messagingSenderId: "450738698352",
-    appId: "1:450738698352:web:1bcc2c00ab77337171dcb5",
-    measurementId: "G-2Q69C2TFFR"
-  }
+        apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
+        authDomain: "remodesktop-9b704.firebaseapp.com",
+        databaseURL: "https://remodesktop-9b704.firebaseio.com",
+        projectId: "remodesktop-9b704",
+        storageBucket: "",
+        messagingSenderId: "450738698352",
+        appId: "1:450738698352:web:1bcc2c00ab77337171dcb5",
+        measurementId: "G-2Q69C2TFFR"
+      }
     };
   },
   methods: {
@@ -147,7 +146,7 @@ export default {
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
                   // this.getAvailableTasks(this.arraySession);
                   this.getDatosCuentas(this.arraySession);
-                  this.getAvailableTasks(this.arraySession)
+                  this.getAvailableTasks(this.arraySession);
                 }
               });
             });
@@ -159,52 +158,71 @@ export default {
 
     // 1) Funcion que inicia solicitando las tareas disponibles
     async getAvailableTasks(arraySession) {
-  
+
       //Recorre el array del token de session de las cuentas
       for (let index = 0; index < arraySession.length; index++) {
         console.log("Array seassion");
         console.log(arraySession[index]);
-        let headersGetTasks = {
-          method: "GET",
-          mode: "no-cors",
-          headers: {
-            authorization: arraySession[index],
-            origin: "https://www.remotasks.com"
-          }
+        //Headers de la solicitud http
+        let headers = {
+          authorization: arraySession[index],
+          Origin: "https://www.remotasks.com",
+          "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
         };
-
+        //Url de la solicitud http
+        let urlPedirTarea = "https://api-internal.scale.com/internal/v2/tasks/pending_combined?limit=1"
         var total = arraySession.length - 1;
 
         try {
-          //Fetch que pregunta por las tareas disponibles
-          
-          let resp = await fetch(
-            "https://api-internal.scale.com/internal/v2/tasks/pending_combined?limit=1",
-            headersGetTasks
-          );
-          let json = await resp.json();
-          console.log("Respuesta de la solicitud get tasks");
-          console.log(json);
+//................................................................................ 
+         //Envia la solicitud para obtener los datos con libreria request
+      let resp = await request({url: urlPedirTarea,headers}, (error, response, body) => {
+          //Muestra por log el array obtenido de la solicitud
+          console.log("Respuesta de la solicitud que obtiene las tareas");     
+          console.log(JSON.parse(body)[0]);
+
+          let jsonRespTarea = JSON.parse(body)[0]
           //Comprueba si la tarea es normal o de tipo revisor
-          if (json[0].assignmentType === "subtask") {
-            //Comprueba si no se atraviesa un lidar en el panel de tasks clasicas
-            if (json[0].type === "lidarsegmentation") {
-         
-            //Si alguna cuenta tiene lidar y se atraviesa en clasic, manejarlo aqui
+          if (jsonRespTarea.assignmentType === "subtask") {
+            //Es una tarea normal, se enviará al data.
+            console.log("Es una tarea clasica")
+            this.jsonTarea.push(jsonRespTarea)
+            console.log(this.jsonTarea)
+
+            //IF interno que comprueba si hay una lidar en el panel de tasks clasicas
+            if (jsonRespTarea.type === "lidarsegmentation") {
+              //Si alguna cuenta tiene lidar y se atraviesa en clasic, manejarlo aqui
+              console.log("Hay una lidar segmentacion atravesada en clasic")
             } else {
-         
               //No hay lidar atravesada
             }
-          } else if (json[0].assignmentType == "course") {
-            //En caso de que salga un curso aqui no manejmos
-            console.log("Esto es un curso: " + json[0].tittle);
-          } else {
-            //Si el tipo de tarea es de Revisor
 
+          } else if (jsonRespTarea.assignmentType == "course") {
+            //En caso de que salga un curso aqui no manejmos
+            console.log("Esto es un curso: " + jsonRespTarea.title);
+
+          } else if (jsonRespTarea.assignmentType == "task_attempt"){
+            //Si el tipo de tarea es de Revisor, se enviará al data.
+            console.log("Tarea de tipo revisor: " + jsonRespTarea);
+            this.jsonTarea.push(jsonRespTarea.subtask)
+            console.log(this.jsonTarea)
           }
+        });
+//................................................................................         
         } catch (error) {
+          //Si hay un error intenta de nuevo.
           console.log("hubo un error: " + error);
-        }
+          index = index -1
+          this.indexRetry = this.indexRetry++
+
+          //En caso de intentar 3 veces mas fallidas se sale del bucle y emite un mensaje
+          if (this.indexRetry == total) {
+            index = arraySession.length
+            this.indexRetry = "0"
+            console.log("Se intento 3 veces y falló")
+          }
+
+        }// FIN DEL CATCH
       }
     },
 
@@ -215,7 +233,7 @@ export default {
         var part1 = $(".jsx-2539128144")
           .text()
           .split(" ");
-          console.log(part1)
+        console.log(part1);
         //...................Validaciones del array..........................
 
         //validando el saldo de dinero........................
@@ -223,12 +241,12 @@ export default {
           //no se por que razon sale 5 pero resuelve el conflicto y entrega el saldo real
           var part2 = part1[17].split("E");
           var SaldoCuenta = part2[0].split("$");
-          console.log("Saldo: "+SaldoCuenta[1]+" $");
+          console.log("Saldo: " + SaldoCuenta[1] + " $");
         } else {
           //Obtiene el saldo $
           var part2 = part1[16].split("E");
           var SaldoCuenta = part2[0].split("$");
-          console.log("Saldo: "+SaldoCuenta[1]+" $");
+          console.log("Saldo: " + SaldoCuenta[1] + " $");
         }
 
         //validando el total de tareas aprobadas y pendientes por que el array se mueve.
@@ -238,17 +256,17 @@ export default {
           var part2 = part1[18].split("T");
           var part3 = part2[0].split("s");
           var part4 = part3[1].split("+");
- 
-            var saldoPendientes = parseInt(0);
-            var saldoAprobadas = parseInt(0);
+
+          var saldoPendientes = parseInt(0);
+          var saldoAprobadas = parseInt(0);
           if (part4.length == 1) {
-            console.log("Tareas pendientes: "+saldoPendientes+" en 1");
-            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 1");
-          } else if (part4.length == 2){
+            console.log("Tareas pendientes: " + saldoPendientes + " en 1");
+            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 1");
+          } else if (part4.length == 2) {
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
-            console.log("Tareas pendientes: "+saldoPendientes+" en 0");
-            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 0");
+            console.log("Tareas pendientes: " + saldoPendientes + " en 0");
+            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 0");
           }
         } else {
           //Si no se mueve en el array obtiene las tareas aprobadas y pendientes.
@@ -259,53 +277,52 @@ export default {
           if (part4.length == 1) {
             var saldoPendientes = parseInt(0);
             var saldoAprobadas = parseInt(0);
-            console.log("Tareas pendientes: "+saldoPendientes+" en 1");
-            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 1");
+            console.log("Tareas pendientes: " + saldoPendientes + " en 1");
+            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 1");
           } else if (part4.length == 2) {
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
-            console.log("Tareas pendientes: "+saldoPendientes+" en 0");
-            console.log("Tareas Aprobadas: "+saldoAprobadas+" en 0");
+            console.log("Tareas pendientes: " + saldoPendientes + " en 0");
+            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 0");
           }
         }
 
         //..............Sumatoria del saldo de todas los datos.............
-        let resta = cookiejwtParametro -1
+        let resta = cookiejwtParametro - 1;
 
         //Suma el saldo del dinero
         if (this.saldoTotal == "0") {
-          this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
-          console.log("index: "+index + "TotalFor: "+ resta)
+          this.saldoTotal =
+            parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
+          console.log("index: " + index + "TotalFor: " + resta);
           if (index == resta) {
             //Muesta el saldo lo muestra en el sistema
-          this.saldo = parseFloat(this.saldoTotal).toFixed(2);
+            this.saldo = parseFloat(this.saldoTotal).toFixed(2);
           }
           console.log(this.saldoTotal);
         } else {
-          this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
+          this.saldoTotal =
+            parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           console.log(this.saldoTotal);
-            
-            console.log("index: "+index + "TotalFor: "+ resta)
+
+          console.log("index: " + index + "TotalFor: " + resta);
           if (index == resta) {
             //Muesta el saldo lo muestra en el sistema
-          this.saldo = parseFloat(this.saldoTotal).toFixed(2);
-          console.log(this.saldo);
+            this.saldo = parseFloat(this.saldoTotal).toFixed(2);
+            console.log(this.saldo);
           }
-          
         }
 
         //Suma las tareas aprobadas
         if (this.aprobadasTotal == "0") {
           this.aprobadasTotal = parseInt(saldoAprobadas);
           this.approvedTasks = this.aprobadasTotal;
-          
         } else {
           this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas);
-          
-          if (index == resta) {
-           this.approvedTasks = this.aprobadasTotal; 
-          }
 
+          if (index == resta) {
+            this.approvedTasks = this.aprobadasTotal;
+          }
         }
 
         //Suma las tareas pendientes
@@ -313,17 +330,17 @@ export default {
           this.pendientesTotal = parseInt(saldoPendientes);
           this.ReviewTasks = this.pendientesTotal;
         } else {
-          this.pendientesTotal = this.pendientesTotal + parseInt(saldoPendientes);
+          this.pendientesTotal =
+            this.pendientesTotal + parseInt(saldoPendientes);
 
-            if (index == resta) {
-             this.ReviewTasks = this.pendientesTotal;
-            console.log("saldo pendiente")
+          if (index == resta) {
+            this.ReviewTasks = this.pendientesTotal;
+            console.log("saldo pendiente");
             console.log(this.ReviewTasks);
           }
-         
         }
-      }else {
-      console.log("Error: "+error +" Status Code: "+response.statusCode)
+      } else {
+        console.log("Error: " + error + " Status Code: " + response.statusCode);
       }
     },
 
@@ -342,16 +359,22 @@ export default {
         let cookieRequest = request.cookie(authJWT);
 
         //Envia la solicitud para obtener los datos
-       let resp = await request(
+        let resp = await request(
           {
             url: "https://www.remotasks.com/dashboard",
             headers: { Cookie: cookieRequest }
           },
-           (error, response, body)=> {
-          //LLama la funcion que calcula y procesa los datos
-          this.CalculaDatos(error, response, body, index, cookiejwtParametro.length)
-          });
-  
+          (error, response, body) => {
+            //LLama la funcion que calcula y procesa los datos
+            this.CalculaDatos(
+              error,
+              response,
+              body,
+              index,
+              cookiejwtParametro.length
+            );
+          }
+        );
       }
     }, // fin de la function get saldo cuentas
 
@@ -379,9 +402,9 @@ export default {
         .then(user => {
           //Envia al usuario al login
           this.$router.push({ path: "Login" });
-          this.ocultaDrawer()
+          this.ocultaDrawer();
         });
-    },
+    }
   }
 };
 </script>
@@ -394,7 +417,7 @@ export default {
 .divCompleto {
   height: 100%;
   width: 100%;
-  background-color: rgb(241, 239, 235)
+  background-color: rgb(241, 239, 235);
 }
 
 .imgSignOut {
@@ -436,7 +459,7 @@ export default {
   cursor: pointer;
 }
 
-.cont-Tareas{
-  margin-top: 60px
+.cont-Tareas {
+  margin-top: 60px;
 }
 </style>

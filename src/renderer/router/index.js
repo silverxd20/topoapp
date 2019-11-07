@@ -6,7 +6,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/splashscreen',
       name: 'splashscreen',
       component: require('@/components/views/splashScreen').default
     },
@@ -29,6 +29,11 @@ export default new Router({
       path: '/preguntasFrecuentes',
       name: 'preguntasfrecuentes',
       component: require('@/components/views/preguntasFrecuentes').default
+    },
+    {
+      path: '/',
+      name: 'test',
+      component: require('@/components/test').default
     },
     {
       path: '*',
