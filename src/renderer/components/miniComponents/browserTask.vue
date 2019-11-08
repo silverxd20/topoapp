@@ -1,12 +1,17 @@
 <template>
-    <div>
-        <iframe src="https://www.google.com" height="400px" width="300px" frameborder="0"></iframe>
+    <div >
+      <webview style="display:inline-flex; width:100%; height:400px" id="webview" src="https://remotasks.com/tasks" nodeintegration></webview>
     </div>
 </template>
 
 <script>
     export default {
-        
+        methods: {
+          name() {
+           
+
+          }
+        },
     }
 </script>
 

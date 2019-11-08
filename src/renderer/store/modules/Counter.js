@@ -1,4 +1,5 @@
 const state = {
+  nombre: "leo",
   toggledrawer: true,
   firebaseConfig: {
     apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
@@ -29,6 +30,7 @@ const actions = {
 }
 
 export default {
+  namespace:true,
   state,
   mutations,
   actions

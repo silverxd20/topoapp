@@ -8,7 +8,7 @@
 
       <!--navigation-drawer-->
       <v-navigation-drawer
-        :permanent="Drawer"
+        :permanent="toggledrawer"
         app
         value
         clipped
@@ -82,7 +82,7 @@
 
 <script>
 import barraSuperior from "./components/barraSuperior/barraSuperior";
-import {mapState} from 'vuex';
+import {mapState,mapMutations} from 'vuex';
 
 export default {
   mounted() {
@@ -93,24 +93,16 @@ export default {
   },
   data() {
     return {
-      Drawer: true,
-      firebaseConfig: {
-        apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
-        authDomain: "remodesktop-9b704.firebaseapp.com",
-        databaseURL: "https://remodesktop-9b704.firebaseio.com",
-        projectId: "remodesktop-9b704",
-        storageBucket: "",
-        messagingSenderId: "450738698352",
-        appId: "1:450738698352:web:1bcc2c00ab77337171dcb5",
-        measurementId: "G-2Q69C2TFFR"
-      }
+     
     };
   },
   computed: {
-        //Muestra el valor de drawer en el store vuex
-    ...mapState(["toggledrawer"])
+        //Muestra el valor de drawer en el store vuex y conf firebase
+    ...mapState(["toggledrawer", "firebaseConfig"])
   },
   methods: {
+    //Oculta el drawer desde el el store
+ ...mapMutations(["ocultaDrawer"]),
 
     //..................Funciones....................
 
@@ -121,9 +113,10 @@ export default {
         .signOut()
         .then(user => {
           console.log(user);
+          //Oculta el drawer desde vuex
+          this.ocultaDrawer();
           //Envia al usuario al login
           this.$router.push({ path: "Login" });
-          this.toogleDrawer = false;
         });
     },
 

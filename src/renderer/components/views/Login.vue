@@ -69,7 +69,8 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {mapState, mapMutations} from 'vuex';
+
 const { remote } = require("electron");
 
 export default {
@@ -86,9 +87,12 @@ export default {
       winPrincial: remote.getCurrentWindow(),
     };
   },
-  methods: {
-    //Trae la configuracion de firebase desde el store de vuex
+  computed: {
     ...mapState(["firebaseConfig"]),
+  },
+  methods: {
+      // muestra el panel lateral desde el store vuex
+      ...mapMutations(["muestraDrawer"]),
 
     //Inicia el app de firebase
     firebaseInit() {
@@ -109,6 +113,7 @@ export default {
           if (user) {
             //Oculta el spinner
             this.spinner = "";
+            this.muestraDrawer()
             this.$router.push({ path: "Dashboard" });
             console.log(user);
           }

@@ -12,15 +12,13 @@
       </v-img>
       </div>
 
-      <v-card-subtitle class="pb-0">Number 10</v-card-subtitle>
-
       <v-card-text class="text--primary">
         <div v-if="propJsonTask.project.name">{{propJsonTask.project.name}}</div>
         <div v-else>Tarea de Revisor</div>
       </v-card-text>
 
       <v-card-actions>
-        <v-btn color="blue lighten-2" text>
+        <v-btn @click="abreTarea()" color="blue lighten-2" text>
           Iniciar
         </v-btn>
 
@@ -42,6 +40,9 @@ export default {
     
     methods: {
         //metodos aqui
+        abreTarea(){
+          this.$router.push({path: "browserTask"})
+        }
     },
 };
 </script>

@@ -72,7 +72,7 @@
 <script>
 import barraSuperior from "./../barraSuperior/barraSuperior";
 import cardTasks from "./../miniComponents/cardTasks";
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 
 let { remote } = require("electron");
 const cheerio = require("cheerio");
@@ -102,20 +102,12 @@ export default {
       mainSeasson: "",
       arraySession: [],
       sesion: "",
-      firebaseConfig: {
-        apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
-        authDomain: "remodesktop-9b704.firebaseapp.com",
-        databaseURL: "https://remodesktop-9b704.firebaseio.com",
-        projectId: "remodesktop-9b704",
-        storageBucket: "",
-        messagingSenderId: "450738698352",
-        appId: "1:450738698352:web:1bcc2c00ab77337171dcb5",
-        measurementId: "G-2Q69C2TFFR"
-      }
     };
   },
+  computed: {
+    ...mapState(["firebaseConfig"]),
+  },
   methods: {
-    ...mapMutations(["ocultaDrawer"]),
 
     //......................EVENT LISTENERS.......................................
     firebaseInit() {
@@ -393,18 +385,6 @@ export default {
         }
       );
     },
-
-    //4) Boton que desconecta la session del usuario
-    btnSignOut() {
-      firebase
-        .auth()
-        .signOut()
-        .then(user => {
-          //Envia al usuario al login
-          this.$router.push({ path: "Login" });
-          this.ocultaDrawer();
-        });
-    }
   }
 };
 </script>
