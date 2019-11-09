@@ -8,6 +8,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
     toggledrawer: false,
+    userAuthData: [{
+      nombre: "...",
+      apellido: " ",
+      email: "..."
+    }],
+    db: "",
     firebaseConfig: {
       apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
       authDomain: "remodesktop-9b704.firebaseapp.com",
@@ -26,13 +32,40 @@ export default new Vuex.Store({
     },
     muestraDrawer (state) {
       state.toggledrawer = true
-    }
+    },
+    showUserAuthData(state, payload){
+      state.userAuthData = payload
+    }, 
+    clearUserData(state){
+      state.userAuthData = {
+        nombre: "...",
+        apellido: "",
+        email: "..."
+      }
+    },
   },
   
   actions: {
-    someAsyncTask ({ commit }) {
-      // do something async
-      commit('INCREMENT_MAIN_COUNTER')
+   async getUserAuthData({commit}, payload){
+      if (!firebase.apps.length) {
+        // Initialize Firebase
+        firebase.initializeApp(this.firebaseConfig);
+      }
+      this.db = firebase.firestore();
+
+      var docRef = this.db.collection("usuarios").doc(payload.uid);
+      docRef.get().then((doc)=> {
+      if (doc.exists) {
+
+      commit("showUserAuthData",doc.data())
+      } else {
+      // doc.data() will be undefined in this case
+      console.log('No hay documentos')
+      }
+      }).catch(function(error) {
+      console.log('Error getting document:', error);
+      });
+      
     }
   }
 

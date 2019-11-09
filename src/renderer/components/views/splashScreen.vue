@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import {mapMutations, mapState} from 'vuex';
+import {mapMutations, mapState, mapActions} from 'vuex';
 
 export default {
     mounted() {
@@ -42,6 +42,7 @@ export default {
   methods: {
       //Oculta y muestra el panel lateral desde el store vuex
       ...mapMutations(["ocultaDrawer", "muestraDrawer"]),
+      ...mapActions(["getUserAuthData"]),
       
      firebaseInit() {
       if (!firebase.apps.length) {
@@ -51,11 +52,12 @@ export default {
      },
 
      //Listener que observa si tienes la session activa o no para redireccionar 
-    MonitorDeSession() {
+   async MonitorDeSession() {
         
       //LISTENER DE CAMBIO DE SESSION
       firebase.auth().onAuthStateChanged((user)=> {
         if (user) {
+          this.getUserAuthData(user)
         //Si ya tiene la session abierta pasa al dashboard
           this.$router.push({ path: "Dashboard"})
           this.muestraDrawer()

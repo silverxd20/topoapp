@@ -20,16 +20,15 @@
           <v-list>
             <v-list-item>
               <v-list-item-avatar>
-                <v-img src="https://randomuser.me/api/portraits/women/85.jpg"></v-img>
+                <img src="https://img.icons8.com/color/64/000000/user-location.png">
               </v-list-item-avatar>
             </v-list-item>
-
-            <v-list-item link two-line>
+                       
               <v-list-item-content>
-                <v-list-item-title>Leonardo Galindo</v-list-item-title>
-                <v-list-item-subtitle>Leo@gmail.com</v-list-item-subtitle>
+                <v-list-item-title class="pl-3">{{userAuthData.nombre+" "+userAuthData.apellido}}</v-list-item-title>
+                <v-list-item-subtitle class="pl-3">{{userAuthData.email}}</v-list-item-subtitle>
               </v-list-item-content>
-            </v-list-item>
+            
           </v-list>
         </template>
 
@@ -98,11 +97,11 @@ export default {
   },
   computed: {
         //Muestra el valor de drawer en el store vuex y conf firebase
-    ...mapState(["toggledrawer", "firebaseConfig"])
+    ...mapState(["toggledrawer", "firebaseConfig", "userAuthData"])
   },
   methods: {
     //Oculta el drawer desde el el store
- ...mapMutations(["ocultaDrawer"]),
+ ...mapMutations(["ocultaDrawer","clearUserData"]),
 
     //..................Funciones....................
 
@@ -115,6 +114,8 @@ export default {
           console.log(user);
           //Oculta el drawer desde vuex
           this.ocultaDrawer();
+          //Limpia los datos del usuario anterior
+          this.clearUserData()
           //Envia al usuario al login
           this.$router.push({ path: "Login" });
         });

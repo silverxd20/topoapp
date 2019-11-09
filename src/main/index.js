@@ -21,6 +21,7 @@ function createWindow () {
     show: false,
     useContentSize: true,    
     frame: false, 
+    backgroundColor: "#f1efeb"
   })
   mainWindow.maximize()
   mainWindow.show()

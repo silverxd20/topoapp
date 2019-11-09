@@ -31,7 +31,7 @@
                   <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
                 </div>
                 <div>
-                  <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
+                  <h1 id="saldo" class="text-center">{{"$"+saldoTotal}}</h1>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
@@ -56,10 +56,15 @@
         </div>
       </div>
 
+      <div :v-show="showLoadingTasks" class="text-center divBuscandoTasks">
+        <v-progress-circular :size="40" color="dark" indeterminate></v-progress-circular>
+        <h4>Buscando trabajos disponibles</h4>
+      </div>
+
       <!--Parte de las tareas-->
       <v-container class="cont-Tareas" grid-list-xs>
         <v-layout row wrap>
-          <v-flex xs4 v-for='(tasks, index) of jsonTarea' :key="index">
+          <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
             <!-- Tarjeta de las tareas -->
             <cardTasks :propJsonTask="tasks"></cardTasks>
           </v-flex>
@@ -86,29 +91,26 @@ export default {
   components: { barraSuperior, cardTasks },
   data() {
     return {
+      showLoadingTasks: true,
       indexRetry: "0",
       jsonTarea: [],
       ReviewTasks: "-",
       approvedTasks: "-",
-      saldo: "",
-      loader: "spinner-border spinner-border-sm",
+      forLengthJWtCuentas: "0",
       db: "",
-      idnum: "0",
-      headersGetTasks: null,
-      node: "",
+      saldo: "",
       saldoTotal: "0",
       aprobadasTotal: "",
       pendientesTotal: "",
       mainSeasson: "",
       arraySession: [],
-      sesion: "",
+      sesion: ""
     };
   },
   computed: {
-    ...mapState(["firebaseConfig"]),
+    ...mapState(["firebaseConfig"])
   },
   methods: {
-
     //......................EVENT LISTENERS.......................................
     firebaseInit() {
       this.mainSeasson = remote.getCurrentWindow();
@@ -150,6 +152,8 @@ export default {
 
     // 1) Funcion que inicia solicitando las tareas disponibles
     async getAvailableTasks(arraySession) {
+      //Muestra el mensaje y loader de buscando tareas
+      this.showLoadingTasks = true;
 
       //Recorre el array del token de session de las cuentas
       for (let index = 0; index < arraySession.length; index++) {
@@ -159,62 +163,77 @@ export default {
         let headers = {
           authorization: arraySession[index],
           Origin: "https://www.remotasks.com",
-          "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+          "user-agent":
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
         };
         //Url de la solicitud http
-        let urlPedirTarea = "https://api-internal.scale.com/internal/v2/tasks/pending_combined?limit=1"
-        var total = arraySession.length - 1;
+        let urlPedirTarea =
+          "https://api-internal.scale.com/internal/v2/tasks/pending_combined?limit=1";
+        this.forLengthJWtCuentas = arraySession.length - 1;
+        console.log("Index: " + index + " / " + this.forLengthJWtCuentas);
 
         try {
-//................................................................................ 
-         //Envia la solicitud para obtener los datos con libreria request
-      let resp = await request({url: urlPedirTarea,headers}, (error, response, body) => {
-          //Muestra por log el array obtenido de la solicitud
-          console.log("Respuesta de la solicitud que obtiene las tareas");     
-          console.log(JSON.parse(body)[0]);
+          //................................................................................
+          //Envia la solicitud para obtener los datos con libreria request
+          let resp = await request(
+            { url: urlPedirTarea, headers },
+            (error, response, body) => {
+              //Muestra por log el array obtenido de la solicitud
+              console.log("Respuesta de la solicitud que obtiene las tareas");
+              console.log(JSON.parse(body)[0]);
 
-          let jsonRespTarea = JSON.parse(body)[0]
-          //Comprueba si la tarea es normal o de tipo revisor
-          if (jsonRespTarea.assignmentType === "subtask") {
-            //Es una tarea normal, se enviará al data.
-            console.log("Es una tarea clasica")
-            this.jsonTarea.push(jsonRespTarea)
-            console.log(this.jsonTarea)
+              //Try catch dentro de request para capturar cuando no halla tarea
+              try {
+                let jsonRespTarea = JSON.parse(body)[0];
+                //Comprueba si la tarea es normal o de tipo revisor
+                if (jsonRespTarea.assignmentType == "subtask") {
+                  //Es una tarea normal, se enviará al data.
+                  console.log("Es una tarea clasica");
+                  this.jsonTarea.push(jsonRespTarea);
+                  console.log(this.jsonTarea);
 
-            //IF interno que comprueba si hay una lidar en el panel de tasks clasicas
-            if (jsonRespTarea.type === "lidarsegmentation") {
-              //Si alguna cuenta tiene lidar y se atraviesa en clasic, manejarlo aqui
-              console.log("Hay una lidar segmentacion atravesada en clasic")
-            } else {
-              //No hay lidar atravesada
+                  //IF interno que comprueba si hay una lidar en el panel de tasks clasicas
+                  if (jsonRespTarea.type == "lidarsegmentation") {
+                    //Si alguna cuenta tiene lidar y se atraviesa en clasic, manejarlo aqui
+                    console.log(
+                      "Hay una lidar segmentacion atravesada en clasic"
+                    );
+                  } else {
+                    //No hay lidar atravesada
+                  }
+                } else if (jsonRespTarea.assignmentType == "course") {
+                  //En caso de que salga un curso aqui no manejmos
+                  console.log("Esto es un curso: " + jsonRespTarea.title);
+                } else if (jsonRespTarea.assignmentType == "task_attempt") {
+                  //Si el tipo de tarea es de Revisor, se enviará al data.
+                  console.log("Tarea de tipo revisor: " + jsonRespTarea);
+                  this.jsonTarea.push(jsonRespTarea.subtask);
+                  console.log(this.jsonTarea);
+                }
+                //Cuando termine el bucle quita el loader y el mensaje
+                if (index == this.forLengthJWtCuentas) {
+                  this.showLoadingTasks = false;
+                }
+              } catch (error) {
+                console.log("Error dentro de request: " + error);
+                console.log("No hay tareas en una cuenta");
+              }
             }
-
-          } else if (jsonRespTarea.assignmentType == "course") {
-            //En caso de que salga un curso aqui no manejmos
-            console.log("Esto es un curso: " + jsonRespTarea.title);
-
-          } else if (jsonRespTarea.assignmentType == "task_attempt"){
-            //Si el tipo de tarea es de Revisor, se enviará al data.
-            console.log("Tarea de tipo revisor: " + jsonRespTarea);
-            this.jsonTarea.push(jsonRespTarea.subtask)
-            console.log(this.jsonTarea)
-          }
-        });
-//................................................................................         
+          );
+          //................................................................................
         } catch (error) {
           //Si hay un error intenta de nuevo.
           console.log("hubo un error: " + error);
-          index = index -1
-          this.indexRetry = this.indexRetry++
+          index = index - 1;
+          this.indexRetry = this.indexRetry++;
 
           //En caso de intentar 3 veces mas fallidas se sale del bucle y emite un mensaje
           if (this.indexRetry == total) {
-            index = arraySession.length
-            this.indexRetry = "0"
-            console.log("Se intento 3 veces y falló")
+            index = arraySession.length;
+            this.indexRetry = "0";
+            console.log("Se intento 3 veces y falló");
           }
-
-        }// FIN DEL CATCH
+        } // FIN DEL CATCH
       }
     },
 
@@ -283,26 +302,15 @@ export default {
         let resta = cookiejwtParametro - 1;
 
         //Suma el saldo del dinero
-        if (this.saldoTotal == "0") {
-          this.saldoTotal =
-            parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
-          console.log("index: " + index + "TotalFor: " + resta);
-          if (index == resta) {
-            //Muesta el saldo lo muestra en el sistema
-            this.saldo = parseFloat(this.saldoTotal).toFixed(2);
-          }
-          console.log(this.saldoTotal);
-        } else {
-          this.saldoTotal =
-            parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
-          console.log(this.saldoTotal);
 
-          console.log("index: " + index + "TotalFor: " + resta);
-          if (index == resta) {
-            //Muesta el saldo lo muestra en el sistema
-            this.saldo = parseFloat(this.saldoTotal).toFixed(2);
-            console.log(this.saldo);
-          }
+        this.saldoTotal =
+          parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
+
+        console.log("index: " + index + "TotalFor: " + resta);
+        if (index == resta) {
+          //Muesta el saldo lo muestra en el sistema
+          this.saldo = parseFloat(this.saldoTotal).toFixed(2);
+          console.log(this.saldoTotal);
         }
 
         //Suma las tareas aprobadas
@@ -384,12 +392,16 @@ export default {
           mainSeasson.loadURL("https://www.remotasks.com/tasks");
         }
       );
-    },
+    }
   }
 };
 </script>
 
 <style scoped>
+.divBuscandoTasks {
+  padding-top: 80px;
+}
+
 .imagenlogo {
   height: 50px;
   width: 50px;
@@ -397,7 +409,7 @@ export default {
 .divCompleto {
   height: 100%;
   width: 100%;
-  background-color: rgb(241, 239, 235);
+  background-color: #f1efeb;
 }
 
 .imgSignOut {

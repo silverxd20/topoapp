@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import {mapState, mapMutations} from 'vuex';
+import {mapState, mapMutations, mapActions} from 'vuex';
 
 const { remote } = require("electron");
 
@@ -92,7 +92,9 @@ export default {
   },
   methods: {
       // muestra el panel lateral desde el store vuex
-      ...mapMutations(["muestraDrawer"]),
+      ...mapMutations(["muestraDrawer","showUserAuthData"]),
+      //Traer las funciones de actions en el store
+      ...mapActions(["getUserAuthData"]),
 
     //Inicia el app de firebase
     firebaseInit() {
@@ -103,7 +105,7 @@ export default {
     },
 
     // LOGIN
-    btnLogin() {
+   async btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
 
       firebase
@@ -114,8 +116,9 @@ export default {
             //Oculta el spinner
             this.spinner = "";
             this.muestraDrawer()
+            this.getUserAuthData(user)
             this.$router.push({ path: "Dashboard" });
-            console.log(user);
+            
           }
         })
         .catch(error => {
