@@ -2,7 +2,9 @@
   <div>
     <v-card class="mx-auto" max-width="300" py-3>
       <div>
+        <!-- si la imagen es de tarea normal -->
       <v-img
+      v-if="propJsonTask.assignmentType == 'subtask'"
         class="white--text align-end"
         height="200px"
         :src="propJsonTask.params.attachment"
@@ -10,11 +12,22 @@
         <v-card-title v-if="propJsonTask.type == 'segmentannotation'">Segmentación de imagen</v-card-title>
         <v-card-title v-if="propJsonTask.type == 'annotation'">Anotacion de cuadros 2D</v-card-title>
       </v-img>
+
+      <!-- si la imagen es de revisor -->
+      <v-img
+      v-if="propJsonTask.assignmentType == 'task_attempt'"
+        class="white--text align-end"
+        height="200px"
+        :src="propJsonTask.subtask.params.attachment"
+      >
+       <v-card-title v-if="propJsonTask.subtask.type == 'segmentannotation'">Segmentación de imagen</v-card-title>
+        <v-card-title v-if="propJsonTask.subtask.type == 'annotation'">Anotacion de cuadros 2D</v-card-title>
+      </v-img>
       </div>
 
       <v-card-text class="text--primary">
-        <div v-if="propJsonTask.project.name">{{propJsonTask.project.name}}</div>
-        <div v-else>Tarea de Revisor</div>
+        <div v-if="propJsonTask.assignmentType == 'subtask'">Trabajo clasico</div>
+        <div v-if="propJsonTask.assignmentType == 'task_attempt'">Trabajo de Revisor</div>
       </v-card-text>
 
       <v-card-actions>
@@ -34,6 +47,10 @@ let { remote } = require("electron");
 export default {
     name:"cardtasks",
     props:["propJsonTask","propArraySession","propIndex"],
+    created () {
+      this.test();
+    },
+
     data() {
         return {
             indexCard: this.propIndex
@@ -41,6 +58,10 @@ export default {
     },
     
     methods: {
+      test(){
+        console.log("Valor de propJsonTask")
+        console.log(this.propJsonTask)
+      },
         //metodos aqui
         abreTarea(){
           this.$router.push({path: "browserTask"})

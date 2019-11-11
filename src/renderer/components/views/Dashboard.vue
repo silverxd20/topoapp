@@ -159,20 +159,16 @@ export default {
 
       //Recorre el array del token de session de las cuentas
       for (let index in await arraySession) {
-        console.log("Array seassion");
-        console.log(arraySession[index]);
         //Headers de la solicitud http
         let headers = {
           authorization: arraySession[index],
           Origin: "https://www.remotasks.com",
-          "user-agent":
-            "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+          "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
         };
         //Url de la solicitud http
         let urlPedirTarea =
           "https://api-internal.scale.com/internal/v2/tasks/pending_combined?limit=1";
         this.forLengthJWtCuentas = arraySession.length - 1;
-        console.log("Index: " + index + " / " + this.forLengthJWtCuentas);
 
         try {
           //................................................................................
@@ -191,7 +187,6 @@ export default {
                   //Es una tarea normal, se enviará al data.
                   console.log("Es una tarea clasica");
                   this.jsonTarea.push(jsonRespTarea);
-                  console.log(this.jsonTarea);
 
                   //IF interno que comprueba si hay una lidar en el panel de tasks clasicas
                   if (jsonRespTarea.type == "lidarsegmentation") {
@@ -208,12 +203,10 @@ export default {
                 } else if (jsonRespTarea.assignmentType == "task_attempt") {
                   //Si el tipo de tarea es de Revisor, se enviará al data.
                   console.log("Tarea de tipo revisor: " + jsonRespTarea);
-                  this.jsonTarea.push(jsonRespTarea.subtask);
-                  console.log(this.jsonTarea);
+                  this.jsonTarea.push(jsonRespTarea);
                 }
                 //Cuando termine el bucle quita el loader y el mensaje
                 if (index == this.forLengthJWtCuentas) {
-                  console.log("dentro del final del length bucle");
                   this.showLoadingTasks = false;
                 }
               } catch (error) {
@@ -244,7 +237,8 @@ export default {
         var part1 = $(".jsx-2539128144")
           .text()
           .split(" ");
-        console.log(part1);
+          let nameCuenta = part1[2].split("!")
+        console.log("Nombre de la cuenta: "+nameCuenta[0]);
         //...................Validaciones del array..........................
 
         //validando el saldo de dinero........................
@@ -271,13 +265,13 @@ export default {
           var saldoPendientes = parseInt(0);
           var saldoAprobadas = parseInt(0);
           if (part4.length == 1) {
-            console.log("Tareas pendientes: " + saldoPendientes + " en 1");
-            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 1");
+            console.log("Tareas pendientes: " + saldoPendientes);
+            console.log("Tareas Aprobadas: " + saldoAprobadas);
           } else if (part4.length == 2) {
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
-            console.log("Tareas pendientes: " + saldoPendientes + " en 0");
-            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 0");
+            console.log("Tareas pendientes: " + saldoPendientes);
+            console.log("Tareas Aprobadas: " + saldoAprobadas);
           }
         } else {
           //Si no se mueve en el array obtiene las tareas aprobadas y pendientes.
@@ -288,13 +282,13 @@ export default {
           if (part4.length == 1) {
             var saldoPendientes = parseInt(0);
             var saldoAprobadas = parseInt(0);
-            console.log("Tareas pendientes: " + saldoPendientes + " en 1");
-            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 1");
+            console.log("Tareas pendientes: " + saldoPendientes);
+            console.log("Tareas Aprobadas: " + saldoAprobadas);
           } else if (part4.length == 2) {
             var saldoPendientes = part4[1];
             var saldoAprobadas = part4[0];
-            console.log("Tareas pendientes: " + saldoPendientes + " en 0");
-            console.log("Tareas Aprobadas: " + saldoAprobadas + " en 0");
+            console.log("Tareas pendientes: " + saldoPendientes);
+            console.log("Tareas Aprobadas: " + saldoAprobadas);
           }
         }
 
@@ -304,7 +298,6 @@ export default {
         //Suma el saldo del dinero
         this.saldoTotal =
           parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
-        console.log("index: " + index + "TotalFor: " + resta);
         if (index == resta) {
           //Muesta el saldo lo muestra en el sistema
           this.saldo = parseFloat(this.saldoTotal).toFixed(2);
@@ -356,8 +349,7 @@ export default {
         var authJWT = part2 + "=" + part1[1];
         let count = 0
         //Envia la solicitud para obtener los datos
-        let response = await request(
-          
+        let response = await request(      
            "https://www.remotasks.com/dashboard",
             {method: 'GET', 
             headers: { 
@@ -366,15 +358,13 @@ export default {
               "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
              }}
           );
-          //LLama la funcion que calcula y procesa los datos
-                console.log("index antes de llamar CalculaDatos: "+ indice)              
+          //LLama la funcion que calcula y procesa los datos             
                   this.CalculaDatos(                    
                     response,
                     response.body,
                     indice,
                     cookiejwtParametro.length
                   );
-            console.log(response)
       }
     }, // fin de la function get saldo cuentas
 
