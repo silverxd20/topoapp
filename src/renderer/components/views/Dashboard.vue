@@ -159,7 +159,6 @@ export default {
 
       //Recorre el array del token de session de las cuentas
       for (let index in await arraySession) {
-         console.log("ESTO ES DENTRO DE AVAILABLE TASKS")
         console.log("Array seassion");
         console.log(arraySession[index]);
         //Headers de la solicitud http
@@ -350,8 +349,6 @@ export default {
       this.pendientesTotal = parseInt("0");
 
       for (let indice in await cookiejwtParametro) {
-        console.log("ESTO ES DENTRO DE DATOS CUENTAS")
-        console.log(indice)
         //Convierte el JWT fdsb... entrante en jwt=fdsb...
         let cookies = cookiejwtParametro[indice];
         var part1 = cookies.split(" ");
@@ -363,7 +360,11 @@ export default {
           
            "https://www.remotasks.com/dashboard",
             {method: 'GET', 
-            headers: { Cookie: authJWT }}
+            headers: { 
+              Cookie: authJWT,
+              Origin: "https://www.remotasks.com",
+              "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+             }}
           );
           //LLama la funcion que calcula y procesa los datos
                 console.log("index antes de llamar CalculaDatos: "+ indice)              
