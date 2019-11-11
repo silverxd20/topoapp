@@ -1,4 +1,4 @@
-import { app, BrowserWindow, webFrame } from 'electron'
+import { app, BrowserWindow, BrowserView} from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -26,12 +26,27 @@ function createWindow () {
 
   mainWindow.maximize()
   mainWindow.show()
-
   mainWindow.loadURL(winURL)
+
+ /* let view = new BrowserView()
+  mainWindow.setBrowserView(view)
+
+  view.setBounds({ x: 0, y: 25, width: 500, height: 500 })
+  view.webContents.loadURL('https://electronjs.org')
+  view.webContents.on("did-finish-load",()=>{
+    console.log("Ya se cargo la página")
+    view.setAutoResize({
+      horizontal: true,
+      vertical: true,
+      width: true,
+      height: true,
+    })
+  })
+ // mainWindow.loadURL(winURL)
   //mainWindow.loadURL("https://www.google.com")
 
   //El codigo de bajo inserta css en una URL experiementar luego
- /* mainWindow.webContents.on('did-finish-load', function() {
+  mainWindow.webContents.on('did-finish-load', function() {
     mainWindow.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
 
     });*/
