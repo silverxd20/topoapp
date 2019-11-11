@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, webFrame } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -20,13 +20,21 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     useContentSize: true,    
-    frame: false, 
+    frame: true, 
     backgroundColor: "#f1efeb"
   })
+
   mainWindow.maximize()
   mainWindow.show()
-  
+
   mainWindow.loadURL(winURL)
+  //mainWindow.loadURL("https://www.google.com")
+
+  //El codigo de bajo inserta css en una URL experiementar luego
+ /* mainWindow.webContents.on('did-finish-load', function() {
+    mainWindow.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
+
+    });*/
 
   mainWindow.on('closed', () => {
     mainWindow = null

@@ -31,7 +31,7 @@
                   <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
                 </div>
                 <div>
-                  <h1 id="saldo" class="text-center">{{"$"+saldoTotal}}</h1>
+                  <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
@@ -46,7 +46,6 @@
                 </div>
                 <div>
                   <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
-                  <v-progress-circular color="dark" indeterminate  size="20"></v-progress-circular>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
@@ -57,9 +56,9 @@
         </div>
       </div>
 
-  <!-- Oculta o muestra el mensaje y loader de las tareas -->
+      <!-- Oculta o muestra el mensaje y loader de las tareas -->
       <div v-show="showLoadingTasks" class="text-center divBuscandoTasks">
-        <v-progress-circular color="dark" indeterminate  size="40"></v-progress-circular>
+        <v-progress-circular color="dark" indeterminate size="40"></v-progress-circular>
         <h4>Buscando trabajos disponibles</h4>
       </div>
 
@@ -68,7 +67,7 @@
         <v-layout row wrap>
           <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
             <!-- Tarjeta de las tareas -->
-            <cardTasks :propJsonTask="tasks"></cardTasks>
+            <cardTasks :propJsonTask="tasks" :propArraySession="arraySession" :propIndex="index"></cardTasks>
           </v-flex>
         </v-layout>
       </v-container>
@@ -83,16 +82,18 @@ import { mapState } from "vuex";
 
 let { remote } = require("electron");
 const cheerio = require("cheerio");
-const request = require("request");
+//const request = require("request");
+let request = require('async-request'), response;
 
 export default {
   name: "dashboard",
-  mounted() {
+  created() {
     this.firebaseInit();
   },
   components: { barraSuperior, cardTasks },
   data() {
     return {
+      parteSinJWT: "",
       showLoadingTasks: true,
       indexRetry: "0",
       jsonTarea: [],
@@ -114,7 +115,7 @@ export default {
   },
   methods: {
     //......................EVENT LISTENERS.......................................
-    firebaseInit() {
+   async firebaseInit() {
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
       if (!firebase.apps.length) {
@@ -131,6 +132,7 @@ export default {
             .collection("tokens")
             .get()
             .then(querySnapshot => {
+              
               querySnapshot.forEach(doc => {
                 //busca el ID del usuario para traer sus JWT
                 if (doc.id == user.uid) {
@@ -142,7 +144,7 @@ export default {
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
                   // this.getAvailableTasks(this.arraySession);
                   this.getDatosCuentas(this.arraySession);
-                  this.getAvailableTasks(this.arraySession);
+                  //this.getAvailableTasks(this.arraySession);
                 }
               });
             });
@@ -159,6 +161,7 @@ export default {
 
       //Recorre el array del token de session de las cuentas
       for (let index = 0; index < arraySession.length; index++) {
+         console.log("ESTO ES DENTRO DE AVAILABLE TASKS")
         console.log("Array seassion");
         console.log(arraySession[index]);
         //Headers de la solicitud http
@@ -221,8 +224,7 @@ export default {
                 console.log("Error dentro de request: " + error);
                 console.log("No hay tareas en una cuenta");
               }
-            }
-          );
+            });
           //................................................................................
         } catch (error) {
           //Si hay un error intenta de nuevo.
@@ -241,8 +243,8 @@ export default {
     },
 
     //2) Funcion que obtiene el saldo, las tareas aprobadas y pendientes
-    async CalculaDatos(error, response, body, index, cookiejwtParametro) {
-      if (!error && response.statusCode == 200) {
+    async CalculaDatos(response, body, index, cookiejwtParametro) {
+      if (response.statusCode == 200) {
         const $ = await cheerio.load(body);
         var part1 = $(".jsx-2539128144")
           .text()
@@ -305,10 +307,8 @@ export default {
         let resta = cookiejwtParametro - 1;
 
         //Suma el saldo del dinero
-
         this.saldoTotal =
           parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
-
         console.log("index: " + index + "TotalFor: " + resta);
         if (index == resta) {
           //Muesta el saldo lo muestra en el sistema
@@ -353,37 +353,38 @@ export default {
       this.aprobadasTotal = parseInt("0");
       this.pendientesTotal = parseInt("0");
 
-      for (let index = 0; index < cookiejwtParametro.length; index++) {
+      for (let indice in await cookiejwtParametro) {
+        console.log("ESTO ES DENTRO DE DATOS CUENTAS")
+        console.log(indice)
         //Convierte el JWT fdsb... entrante en jwt=fdsb...
-        let cookies = cookiejwtParametro[index];
+        let cookies = cookiejwtParametro[indice];
         var part1 = cookies.split(" ");
         var part2 = part1[0].toString().toLowerCase();
         var authJWT = part2 + "=" + part1[1];
-        let cookieRequest = request.cookie(authJWT);
-
+        let count = 0
         //Envia la solicitud para obtener los datos
-        let resp = await request(
-          {
-            url: "https://www.remotasks.com/dashboard",
-            headers: { Cookie: cookieRequest }
-          },
-          (error, response, body) => {
-            //LLama la funcion que calcula y procesa los datos
-            this.CalculaDatos(
-              error,
-              response,
-              body,
-              index,
-              cookiejwtParametro.length
-            );
-          }
-        );
+        let response = await request(
+          
+           "https://www.remotasks.com/dashboard",
+            {method: 'GET', 
+            headers: { Cookie: authJWT }}
+          );
+          //LLama la funcion que calcula y procesa los datos
+                console.log("index antes de llamar CalculaDatos: "+ indice)              
+                  this.CalculaDatos(                    
+                    response,
+                    response.body,
+                    indice,
+                    cookiejwtParametro.length
+                  );
+            console.log(response)
       }
     }, // fin de la function get saldo cuentas
 
     // 3) Funcion que abre la tarea disponible
-    OpenTask(valueCookieParametro) {
-      let parteSinJWT = arraySession[valueCookieParametro].split(" "); // deja la cookie sin el jwt
+    OpenTask() {
+
+      let parteSinJWT = this.arraySession[1].split(" "); // deja la cookie sin el jwt
 
       this.sesion.cookies.set(
         {
@@ -392,7 +393,12 @@ export default {
           value: parteSinJWT[1]
         },
         error => {
-          mainSeasson.loadURL("https://www.remotasks.com/tasks");
+         
+          this.mainSeasson.loadURL("https://www.remotasks.com/tasks");
+          this.mainSeasson.webContents.on('did-finish-load', function() {
+          this.mainSeasson.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
+
+    });
         }
       );
     }

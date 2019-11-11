@@ -18,7 +18,7 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn @click="abreTarea()" color="blue lighten-2" text>
+        <v-btn @click="OpenTask()" color="blue lighten-2" text>
           Iniciar
         </v-btn>
 
@@ -29,12 +29,14 @@
 To
 
 <script>
+let { remote } = require("electron");
+
 export default {
     name:"cardtasks",
-    props:["propJsonTask"],
+    props:["propJsonTask","propArraySession","propIndex"],
     data() {
         return {
-            
+            indexCard: this.propIndex
         }
     },
     
@@ -42,7 +44,31 @@ export default {
         //metodos aqui
         abreTarea(){
           this.$router.push({path: "browserTask"})
+        },
+
+        // 1) Funcion que abre la tarea disponible
+    OpenTask() {
+      let parteSinJWT = this.propArraySession[this.indexCard].split(" ");
+      let mainSeasson = remote.getCurrentWindow();
+      let sesion = mainSeasson.webContents.session;
+      console.log(this.propArraySession)
+      console.log(this.indexCard)
+      sesion.cookies.set(
+        {
+          url: "https://www.remotasks.com/",
+          name: "jwt",
+          value: parteSinJWT[1]
+        },
+        error => {
+         
+          mainSeasson.loadURL("https://www.remotasks.com/tasks");
+          mainSeasson.webContents.on('did-finish-load', function() {
+          mainSeasson.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
+
+    });
         }
+      );
+    }
     },
 };
 </script>
