@@ -131,8 +131,7 @@ export default {
           this.db
             .collection("tokens")
             .get()
-            .then(querySnapshot => {
-              
+            .then(querySnapshot => {             
               querySnapshot.forEach(doc => {
                 //busca el ID del usuario para traer sus JWT
                 if (doc.id == user.uid) {
@@ -142,9 +141,8 @@ export default {
                   console.log(this.arraySession);
 
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
-                  // this.getAvailableTasks(this.arraySession);
                   this.getDatosCuentas(this.arraySession);
-                  //this.getAvailableTasks(this.arraySession);
+                  this.getAvailableTasks(this.arraySession);
                 }
               });
             });
@@ -160,7 +158,7 @@ export default {
       this.showLoadingTasks = true;
 
       //Recorre el array del token de session de las cuentas
-      for (let index = 0; index < arraySession.length; index++) {
+      for (let index in await arraySession) {
          console.log("ESTO ES DENTRO DE AVAILABLE TASKS")
         console.log("Array seassion");
         console.log(arraySession[index]);
@@ -180,16 +178,15 @@ export default {
         try {
           //................................................................................
           //Envia la solicitud para obtener los datos con libreria request
-          let resp = await request(
-            { url: urlPedirTarea, headers },
-            (error, response, body) => {
+          let resp = await request(urlPedirTarea,{method:"GET", headers})
+            
               //Muestra por log el array obtenido de la solicitud
               console.log("Respuesta de la solicitud que obtiene las tareas");
-              console.log(JSON.parse(body)[0]);
+              console.log(JSON.parse(resp.body)[0]);
 
               //Try catch dentro de request para capturar cuando no halla tarea
               try {
-                let jsonRespTarea = JSON.parse(body)[0];
+                let jsonRespTarea = JSON.parse(resp.body)[0];
                 //Comprueba si la tarea es normal o de tipo revisor
                 if (jsonRespTarea.assignmentType == "subtask") {
                   //Es una tarea normal, se enviará al data.
@@ -223,8 +220,7 @@ export default {
               } catch (error) {
                 console.log("Error dentro de request: " + error);
                 console.log("No hay tareas en una cuenta");
-              }
-            });
+              };
           //................................................................................
         } catch (error) {
           //Si hay un error intenta de nuevo.
