@@ -67,8 +67,7 @@ export default {
       let parteSinJWT = this.propArraySession[this.indexCard].split(" ");
       let mainSeasson = electron.remote.getCurrentWindow();
       let sesion = mainSeasson.webContents.session;
-      console.log(this.propArraySession);
-      console.log(this.indexCard);
+  
       sesion.cookies.set(
         {
           url: "https://www.remotasks.com/",
@@ -84,7 +83,6 @@ export default {
           view.setBounds({ x: 0, y: 25, width: boundsJson.width, height: heightExacto });
           view.webContents.loadURL("https://www.remotasks.com/tasks");
           this.browserId(view.id)
-          console.log(view.id)
           view.webContents.on('did-finish-load', function() {
             this.showBackDash()
           //mainSeasson.insertCSS('html,body{ overflow: hidden !important; }');

@@ -67,7 +67,7 @@
         <v-layout row wrap>
           <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
             <!-- Tarjeta de las tareas -->
-            <cardTasks :propJsonTask="tasks" :propArraySession="arraySession" :propIndex="index"></cardTasks>
+            <cardTasks :propJsonTask="tasks" :propArraySession="arraySessionParaTareasCards" :propIndex="index"></cardTasks>
           </v-flex>
         </v-layout>
       </v-container>
@@ -107,6 +107,7 @@ export default {
       pendientesTotal: "",
       mainSeasson: "",
       arraySession: [],
+      arraySessionParaTareasCards: [],
       sesion: ""
     };
   },
@@ -141,7 +142,7 @@ export default {
                   console.log(this.arraySession);
 
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
-                  this.getDatosCuentas(this.arraySession);
+                  //this.getDatosCuentas(this.arraySession);
                   this.getAvailableTasks(this.arraySession);
                 }
               });
@@ -176,7 +177,7 @@ export default {
           let resp = await request(urlPedirTarea,{method:"GET", headers})
             
               //Muestra por log el array obtenido de la solicitud
-              console.log("Respuesta de la solicitud que obtiene las tareas");
+              console.log("Solicitud #: "+index);
               console.log(JSON.parse(resp.body)[0]);
               let jsonRespTarea = JSON.parse(resp.body)[0];
 
@@ -188,7 +189,9 @@ export default {
                 if (jsonRespTarea.assignmentType == "subtask") {
                   //Es una tarea normal, se enviará al data.
                   console.log("Es una tarea clasica");
+                  console.log("................................................")
                   this.jsonTarea.push(jsonRespTarea);
+                  this.arraySessionParaTareasCards.push(arraySession[index])
 
                   //IF interno que comprueba si hay una lidar en el panel de tasks clasicas
                   if (jsonRespTarea.type == "lidarsegmentation") {
@@ -202,10 +205,13 @@ export default {
                 } else if (jsonRespTarea.assignmentType == "course") {
                   //En caso de que salga un curso aqui no manejmos
                   console.log("Esto es un curso: " + jsonRespTarea.title);
+                  console.log("................................................")
                 } else if (jsonRespTarea.assignmentType == "task_attempt") {
                   //Si el tipo de tarea es de Revisor, se enviará al data.
                   console.log("Tarea de tipo revisor: " + jsonRespTarea);
+                  console.log("................................................")
                   this.jsonTarea.push(jsonRespTarea);
+                  this.arraySessionParaTareasCards.push(arraySession[index])
                 }
                 //Cuando termine el bucle quita el loader y el mensaje
                 if (index == this.forLengthJWtCuentas) {
@@ -225,7 +231,7 @@ export default {
           console.log("hubo un error: " + error);
           index = index - 1;
           this.indexRetry = this.indexRetry++;
-
+          console.log("Reintentado tarea por: "+this.indexRetry+" vez")
           //En caso de intentar 3 veces mas fallidas se sale del bucle y emite un mensaje
           if (this.indexRetry == total) {
             index = arraySession.length;
