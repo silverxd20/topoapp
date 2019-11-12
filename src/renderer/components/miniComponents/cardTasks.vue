@@ -84,7 +84,7 @@ export default {
           view.webContents.loadURL("https://www.remotasks.com/tasks");
           this.browserId(view.id)
           view.webContents.on('did-finish-load', function() {
-            this.showBackDash()
+            //this.showBackDash()
           //mainSeasson.insertCSS('html,body{ overflow: hidden !important; }');
           //view.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
     });

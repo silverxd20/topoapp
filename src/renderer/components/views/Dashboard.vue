@@ -142,7 +142,7 @@ export default {
                   console.log(this.arraySession);
 
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
-                  //this.getDatosCuentas(this.arraySession);
+                  this.getDatosCuentas(this.arraySession);
                   this.getAvailableTasks(this.arraySession);
                 }
               });

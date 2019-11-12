@@ -2,8 +2,9 @@
   <div>
     <v-app>
       <v-app-bar clipped-left height="25" app dark>
-        <div v-show="false" class="btnback d-inline">
+        <div class="btnback d-inline">
           <v-btn
+          v-show="toggleBackDash"
             @click="btnBackToDashboard()"
             elevation="0"
             width="10"
@@ -106,7 +107,9 @@ export default {
     barraSuperior
   },
   data() {
-    return {};
+    return {
+      toggleBackDash: false
+    };
   },
   computed: {
     //Muestra el valor de drawer en el store vuex y conf firebase
@@ -143,7 +146,7 @@ export default {
     btnBackToDashboard() {
       let view = new BrowserView.fromId(this.browserViewId);
       view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-      this.hideBackDash();
+      //this.hideBackDash();
       this.btnDashboard();
     },
     //Boton que envia hacia el dashboard
