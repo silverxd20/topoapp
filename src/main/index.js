@@ -20,7 +20,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     show: false,
     useContentSize: true,    
-    frame: true, 
+    frame: false, 
     backgroundColor: "#f1efeb"
   })
 

@@ -2,6 +2,20 @@
   <div>
     <v-app>
       <v-app-bar clipped-left height="25" app dark>
+        <div v-show="false" class="btnback d-inline">
+          <v-btn
+            @click="btnBackToDashboard()"
+            elevation="0"
+            width="10"
+            height="22"
+            rounded
+            color="transparent"
+            class="btnback d-inline"
+          >
+            <v-icon height="22">mdi-keyboard-backspace</v-icon>
+          </v-btn>
+          <p class="d-inline" pt-3>Dashboard</p>
+        </div>
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
       </v-app-bar>
@@ -20,15 +34,14 @@
           <v-list>
             <v-list-item>
               <v-list-item-avatar>
-                <img src="https://img.icons8.com/color/64/000000/user-location.png">
+                <img src="https://img.icons8.com/color/64/000000/user-location.png" />
               </v-list-item-avatar>
             </v-list-item>
-                       
-              <v-list-item-content>
-                <v-list-item-title class="pl-3">{{userAuthData.nombre+" "+userAuthData.apellido}}</v-list-item-title>
-                <v-list-item-subtitle class="pl-3">{{userAuthData.email}}</v-list-item-subtitle>
-              </v-list-item-content>
-            
+
+            <v-list-item-content>
+              <v-list-item-title class="pl-3">{{userAuthData.nombre+" "+userAuthData.apellido}}</v-list-item-title>
+              <v-list-item-subtitle class="pl-3">{{userAuthData.email}}</v-list-item-subtitle>
+            </v-list-item-content>
           </v-list>
         </template>
 
@@ -72,8 +85,8 @@
       </v-navigation-drawer>
 
       <!-- contenido de la aplicacion, las vistas aqui-->
-      <v-content app>
-        <router-view></router-view>
+      <v-content app>         
+            <router-view></router-view>      
       </v-content>
     </v-app>
   </div>
@@ -81,7 +94,9 @@
 
 <script>
 import barraSuperior from "./components/barraSuperior/barraSuperior";
-import {mapState,mapMutations} from 'vuex';
+import { mapState, mapMutations } from "vuex";
+const electron = require("electron");
+const BrowserView = electron.remote.BrowserView;
 
 export default {
   mounted() {
@@ -91,17 +106,21 @@ export default {
     barraSuperior
   },
   data() {
-    return {
-     
-    };
+    return {};
   },
   computed: {
-        //Muestra el valor de drawer en el store vuex y conf firebase
-    ...mapState(["toggledrawer", "firebaseConfig", "userAuthData"])
+    //Muestra el valor de drawer en el store vuex y conf firebase
+    ...mapState([
+      "BackDashboard",
+      "toggledrawer",
+      "firebaseConfig",
+      "userAuthData",
+      "browserViewId"
+    ])
   },
   methods: {
     //Oculta el drawer desde el el store
- ...mapMutations(["ocultaDrawer","clearUserData"]),
+    ...mapMutations(["ocultaDrawer", "clearUserData", "hideBackDash"]),
 
     //..................Funciones....................
 
@@ -115,12 +134,18 @@ export default {
           //Oculta el drawer desde vuex
           this.ocultaDrawer();
           //Limpia los datos del usuario anterior
-          this.clearUserData()
+          this.clearUserData();
           //Envia al usuario al login
           this.$router.push({ path: "Login" });
         });
     },
-
+    //Boton que envia hacia el dashboard
+    btnBackToDashboard() {
+      let view = new BrowserView.fromId(this.browserViewId);
+      view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+      this.hideBackDash();
+      this.btnDashboard();
+    },
     //Boton que envia hacia el dashboard
     btnDashboard() {
       this.$router.push({ path: "Dashboard" });
@@ -147,6 +172,6 @@ export default {
 };
 </script>
 
-<style>
-/* CSS */
+<style scoped>
+
 </style>

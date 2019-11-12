@@ -178,10 +178,12 @@ export default {
               //Muestra por log el array obtenido de la solicitud
               console.log("Respuesta de la solicitud que obtiene las tareas");
               console.log(JSON.parse(resp.body)[0]);
+              let jsonRespTarea = JSON.parse(resp.body)[0];
 
+              if(jsonRespTarea != null){
               //Try catch dentro de request para capturar cuando no halla tarea
               try {
-                let jsonRespTarea = JSON.parse(resp.body)[0];
+                                
                 //Comprueba si la tarea es normal o de tipo revisor
                 if (jsonRespTarea.assignmentType == "subtask") {
                   //Es una tarea normal, se enviará al data.
@@ -209,10 +211,14 @@ export default {
                 if (index == this.forLengthJWtCuentas) {
                   this.showLoadingTasks = false;
                 }
+              
               } catch (error) {
                 console.log("Error dentro de request: " + error);
                 console.log("No hay tareas en una cuenta");
               };
+            }else{
+              console.log("Es undefined: "+jsonRespTarea)
+            }  
           //................................................................................
         } catch (error) {
           //Si hay un error intenta de nuevo.
@@ -406,6 +412,7 @@ export default {
   height: 100%;
   width: 100%;
   background-color: #f1efeb;
+
 }
 
 .imgSignOut {
@@ -434,15 +441,6 @@ export default {
   height: 210px;
 }
 
-::-webkit-scrollbar {
-  background-color: #616161;
-  width: 0.8em;
-}
-
-::-webkit-scrollbar-thumb:window-inactive,
-::-webkit-scrollbar-thumb {
-  background: rgb(48, 48, 48);
-}
 .list-group-item-action {
   cursor: pointer;
 }

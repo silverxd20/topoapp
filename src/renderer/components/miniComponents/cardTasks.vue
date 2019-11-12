@@ -20,10 +20,10 @@
           height="200px"
           :src="propJsonTask.subtask.params.attachment"
         >
-          <v-card-title
-            v-if="propJsonTask.subtask.type == 'segmentannotation'"
-          >Segmentación de imagen</v-card-title>
-          <v-card-title v-if="propJsonTask.subtask.type == 'annotation'">Anotacion de cuadros 2D</v-card-title>
+          <v-card-title v-if="propJsonTask.type == 'segmentannotation'">Segmentación de imagen</v-card-title>
+          <v-card-title v-if="propJsonTask.type == 'annotation'">Anotacion de cuadros 2D</v-card-title>
+         <v-card-title v-if="propJsonTask.type == 'categorization'">Categorización</v-card-title>
+
         </v-img>
       </div>
 
@@ -41,6 +41,7 @@
 To
 
 <script>
+import {mapMutations} from 'vuex';
 const electron = require('electron');
 const BrowserView= electron.remote.BrowserView;
 
@@ -53,9 +54,9 @@ export default {
       indexCard: this.propIndex
     };
   },
-
+  
   methods: {
-    
+    ...mapMutations(["browserId","showBackDash"]),
     //metodos aqui
     abreTarea() {
       this.$router.push({ path: "browserTask" });
@@ -76,16 +77,19 @@ export default {
         },
         error => {
 
+          let boundsJson = mainSeasson.getContentBounds()
+          let heightExacto = boundsJson.height - 25
           let view = new BrowserView();
           mainSeasson.setBrowserView(view);
-          view.setBounds({ x: 0, y: 25, width: 900, height: 500 });
+          view.setBounds({ x: 0, y: 25, width: boundsJson.width, height: heightExacto });
           view.webContents.loadURL("https://www.remotasks.com/tasks");
-
-          /* mainSeasson.loadURL("https://www.remotasks.com/tasks");
-          mainSeasson.webContents.on('did-finish-load', function() {
-          mainSeasson.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
-
-    });*/
+          this.browserId(view.id)
+          console.log(view.id)
+          view.webContents.on('did-finish-load', function() {
+            this.showBackDash()
+          //mainSeasson.insertCSS('html,body{ overflow: hidden !important; }');
+          //view.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
+    });
         }
       );
     }

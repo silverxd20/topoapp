@@ -7,12 +7,14 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+    BackDashboard: false,  
+    browserViewId:"0",
     toggledrawer: false,
-    userAuthData: [{
+    userAuthData: {
       nombre: "...",
       apellido: " ",
       email: "..."
-    }],
+    },
     db: "",
     firebaseConfig: {
       apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
@@ -27,6 +29,15 @@ export default new Vuex.Store({
   },
   
   mutations: {
+    showBackDash (state) {
+      state.showBackDashboard = true
+    },
+    hideBackDash (state) {
+      state.showBackDashboard = false
+    },
+    browserId (state,payload) {
+      state.browserViewId = payload
+    },
     ocultaDrawer (state) {
       state.toggledrawer = false
     },

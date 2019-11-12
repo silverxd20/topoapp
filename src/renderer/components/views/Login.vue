@@ -70,7 +70,6 @@
 
 <script>
 import {mapState, mapMutations, mapActions} from 'vuex';
-
 const { remote } = require("electron");
 
 export default {
