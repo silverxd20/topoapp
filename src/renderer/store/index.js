@@ -7,7 +7,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-    BackDashboard: false,  
+    toggleBackToDashboard: "divBtnback d-inline",  
     browserViewId:"0",
     toggledrawer: false,
     userAuthData: {
@@ -30,10 +30,12 @@ export default new Vuex.Store({
   
   mutations: {
     showBackDash (state) {
-      state.showBackDashboard = true
+      //Aplica otro nombre a la clase deje de ocultar y muestre el back to dashboard
+      state.toggleBackToDashboard = "divBtnbackON"
     },
     hideBackDash (state) {
-      state.showBackDashboard = false
+      //Aplica el nombre de la clase correcto para que oculte el back to dashboard
+      state.toggleBackToDashboard = "divBtnback d-inline"
     },
     browserId (state,payload) {
       state.browserViewId = payload

@@ -20,25 +20,25 @@ export default new Router({
       name: 'dashboard',
       component: require('@/components/views/Dashboard').default
     },
-    {
+    /*{
       path: '/videoCursos',
       name: 'videocursos',
       component: require('@/components/views/videoCursos').default
-    },
+    },*/
     {
       path: '/preguntasFrecuentes',
       name: 'preguntasfrecuentes',
       component: require('@/components/views/preguntasFrecuentes').default
     },
     {
-      path: '/browserTask',
-      name: 'browserTask',
-      component: require('@/components/miniComponents/browserTask').default
-    },
-    {
       path: '/test',
       name: 'test',
       component: require('@/components/test').default
+    },
+    {
+      path: '/taskWait',
+      name: 'taskWait',
+      component: require('@/components/miniComponents/taskWait').default
     },
     {
       path: '*',

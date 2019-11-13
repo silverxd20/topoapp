@@ -2,9 +2,8 @@
   <div>
     <v-app>
       <v-app-bar clipped-left height="25" app dark>
-        <div class="btnback d-inline">
+        <div :class="toggleBackToDashboard">
           <v-btn
-          v-show="toggleBackDash"
             @click="btnBackToDashboard()"
             elevation="0"
             width="10"
@@ -34,8 +33,8 @@
         <template v-slot:prepend>
           <v-list>
             <v-list-item>
-              <v-list-item-avatar>
-                <img src="https://img.icons8.com/color/64/000000/user-location.png" />
+              <v-list-item-avatar >
+                <img src="../renderer/assets/userLocation.png" />
               </v-list-item-avatar>
             </v-list-item>
 
@@ -57,13 +56,13 @@
             <v-list-item-title>Dashboard</v-list-item-title>
           </v-list-item>
 
-          <!-- Link de Entrenamiento-->
+          <!-- Link de Entrenamiento
           <v-list-item @click="btnVideoCursos()" link>
             <v-list-item-icon>
               <v-icon>mdi-library-video</v-icon>
             </v-list-item-icon>
             <v-list-item-title>Entrenamiento</v-list-item-title>
-          </v-list-item>
+          </v-list-item>-->
 
           <!-- Link de Preguntas frecuentes-->
           <v-list-item @click="btnPreguntasFrecuentes()" link>
@@ -114,7 +113,7 @@ export default {
   computed: {
     //Muestra el valor de drawer en el store vuex y conf firebase
     ...mapState([
-      "BackDashboard",
+      "toggleBackToDashboard",
       "toggledrawer",
       "firebaseConfig",
       "userAuthData",
@@ -123,7 +122,7 @@ export default {
   },
   methods: {
     //Oculta el drawer desde el el store
-    ...mapMutations(["ocultaDrawer", "clearUserData", "hideBackDash"]),
+    ...mapMutations(["ocultaDrawer","muestraDrawer", "clearUserData", "hideBackDash"]),
 
     //..................Funciones....................
 
@@ -146,7 +145,8 @@ export default {
     btnBackToDashboard() {
       let view = new BrowserView.fromId(this.browserViewId);
       view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-      //this.hideBackDash();
+      this.hideBackDash();
+      this.muestraDrawer();
       this.btnDashboard();
     },
     //Boton que envia hacia el dashboard
@@ -154,9 +154,9 @@ export default {
       this.$router.push({ path: "Dashboard" });
     },
     //Boton que envia hacia los cursos
-    btnVideoCursos() {
+    /*btnVideoCursos() {
       this.$router.push({ path: "videoCursos" });
-    },
+    },*/
     //Boton que envia hacia las preguntas frecuentes
     btnPreguntasFrecuentes() {
       this.$router.push({ path: "preguntasFrecuentes" });
@@ -176,5 +176,8 @@ export default {
 </script>
 
 <style scoped>
+.divBtnback{
+ visibility: hidden
 
+}
 </style>
