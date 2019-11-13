@@ -59,8 +59,9 @@ export default {
         if (user) {
           this.getUserAuthData(user)
         //Si ya tiene la session abierta pasa al dashboard
-          this.$router.push({ path: "Dashboard"})
           this.muestraDrawer()
+          this.$router.push({ path: "Dashboard"})
+          console.log("Luego del push dashboard")
         } else {
         //Si no tiene ninguna session lo enví al login    
          this.$router.push({ path: "Login"})

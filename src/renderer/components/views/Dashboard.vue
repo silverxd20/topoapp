@@ -117,11 +117,13 @@ export default {
     };
   },
   computed: {
-    ...mapState(["firebaseConfig"])
+    ...mapState(["firebaseConfig", "userAuthData"])
   },
   methods: {
     //......................EVENT LISTENERS.......................................
     async firebaseInit() {
+      console.log("User data")
+      console.log(this.userAuthData)
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
       if (!firebase.apps.length) {
@@ -328,8 +330,9 @@ export default {
           this.saldoTotal =
             parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           if (index == resta) {
+           let SaldoConPorcentaje = this.saldoTotal * 100 / 100
             //Muesta el saldo lo muestra en el sistema
-            this.saldo = parseFloat(this.saldoTotal).toFixed(2);
+            this.saldo = parseFloat(SaldoConPorcentaje).toFixed(2);
             console.log(this.saldoTotal);
           }
 
@@ -375,11 +378,11 @@ export default {
               "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
           }
         });
-        console.log("respCuentaUsuario")
-        console.log(respCuentaUsuario)
 
         if(respCuentaUsuario.statusCode == "401"){
           console.log("El usuario perdio el token de session")
+        }else if(respCuentaUsuario.statusCode == "200"){
+         console.log("No tiene tareas esta cuenta desde el catch") 
         }
       }
     },

@@ -2,11 +2,11 @@
   <div>
     <!--Barra del menu Minimizar y Cerrar-->
     <div class="d-flex justify-content-end divBarraMenu">
-      <div @click="btnMinimizar()" id="Minimizar" class="">
-        <p class="divMinimizar text-light font-weight-bold text-center mb-3">_</p>
+      <div @click="btnMinimizar()" id="divMinimizar" class="">
+        <p class="MinimizarIcon text-light font-weight-bold text-center">_</p>
       </div>
-      <div @click="btnCerrar()" id="Cerrar" class="bg-danger">
-        <p class="divCerrar text-light text-center">x</p>
+      <div @click="btnCerrar()" id="Cerrar">
+        <p class="text-light text-center">x</p>
       </div>
     </div>
   </div>
@@ -44,22 +44,21 @@ export default {
   background-color: #424242
 }
 
-#Minimizar {
+#divMinimizar {
   width: 60px;
 }
 
-#Minimizar:hover {
+#divMinimizar:hover {
   background-color: #616161;
   cursor: default;
 }
 
 #Cerrar {
   width: 60px;
-  background-color: #e60101;
-  padding-top: 2px;
+  background-color: #e62f2f;
 }
 #Cerrar:hover {
-  background-color: #e62f2f;
+  background-color: #d30000;
   cursor: default;
 }
 

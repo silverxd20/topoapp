@@ -3,11 +3,10 @@
     <div class="container contenedor align-items-center" id="contenedor">
       <div class="row d-flex justify-content-center align-items-center">
         <!--Mensaje-->
-        <div class="">
-          <img
-            class="mr-5 d-flex justify-content-center"
-            src="../../assets/localworker.png"
-          />
+        <div class="mr-5">
+          <h1 class="topo d-flex justify-content-center">
+          𝐓𝐨𝐩𝐨𝐬𝐚𝐭 𝐯𝐞𝐜𝐭𝐨𝐫
+          </h1>
           <h4 class="text-light mr-5 d-flex justify-content-center">
             Haz tareas, gana dinero!
           </h4>
@@ -115,8 +114,10 @@ export default {
             //Oculta el spinner
             this.spinner = "";
             this.muestraDrawer()
-            this.getUserAuthData(user)
+            let resp2 = this.getUserAuthData(user)
+            console.log(resp2)
             this.$router.push({ path: "Dashboard" });
+            console.log("Luego del push dashboard")
             
           }
         })
@@ -209,6 +210,10 @@ export default {
     #00a6e7
   );
   height: 100%;
+}
+.topo{
+  font-size: 60px;
+  color: rgb(66, 66, 66)
 }
 
 </style>

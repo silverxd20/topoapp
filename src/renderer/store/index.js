@@ -48,6 +48,7 @@ export default new Vuex.Store({
     },
     showUserAuthData(state, payload){
       state.userAuthData = payload
+      console.log("Datos de usuarios metidos al store")
     }, 
     clearUserData(state){
       state.userAuthData = {
@@ -66,18 +67,23 @@ export default new Vuex.Store({
       }
       this.db = firebase.firestore();
 
-      var docRef = this.db.collection("usuarios").doc(payload.uid);
-      docRef.get().then((doc)=> {
+      var docRef = await this.db.collection("usuarios").doc(payload.uid);
+      let resp = await docRef.get().then((doc)=> {
       if (doc.exists) {
 
       commit("showUserAuthData",doc.data())
+      return 1
       } else {
       // doc.data() will be undefined in this case
       console.log('No hay documentos')
+      return 0
       }
       }).catch(function(error) {
       console.log('Error getting document:', error);
+      return 0
       });
+
+      console.log(resp)
       
     }
   }
