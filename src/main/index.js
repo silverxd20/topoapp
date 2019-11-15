@@ -13,6 +13,7 @@ if (process.env.NODE_ENV !== "development") {
 let mainWindow;
 let instructionsWindow;
 let urlInstrucciones
+let urlProxified
 const winURL = process.env.NODE_ENV === "development" ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
 function createWindow() {
@@ -28,12 +29,12 @@ function createWindow() {
 
   mainWindow.maximize();
   mainWindow.show();
-  mainWindow.loadURL(winURL);
+  mainWindow.webContents.loadURL(winURL);
 
   //Listener del evento close de la ventana principal
   mainWindow.on("closed", event => {
     console.log("Cerrado");
-    instructionsWindow.hide();
+    instructionsWindow.destroy();
   });
 
   //.........................segunda ventana instrucciones..............
@@ -42,7 +43,8 @@ function createWindow() {
     show: false,
     useContentSize: true,
     frame: true,
-    backgroundColor: "#f1efeb"
+    backgroundColor: "#f1efeb",
+    javascript: true
   });
   //Quita el menu
   instructionsWindow.setMenu(null);
@@ -52,10 +54,19 @@ function createWindow() {
   //Muestra la ventana de instrucciones
   ipcMain.on("show-instrucciones", (event, url) => {
     urlInstrucciones = url
-    instructionsWindow.webContents.loadURL(urlInstrucciones);
+    urlProxified = "http://translate.google.com/translate?hl=&sl=en&tl=es&u="+urlInstrucciones+"&sandbox=1"
+    instructionsWindow.webContents.loadURL(urlProxified);
     instructionsWindow.maximize();
     instructionsWindow.show();
   });
+
+  instructionsWindow.webContents.on("dom-ready", (e)=>{
+    instructionsWindow.webContents.insertCSS("#clp-btn { visibility: hidden !important; }");
+    instructionsWindow.webContents.insertCSS("#wtgbr { margin-top: -60px !important; }");
+    instructionsWindow.webContents.insertCSS("#contentframe { top: 37px !important; }");
+    instructionsWindow.webContents.insertCSS("#gt-appbar { padding: 3px 38px !important; }")
+    instructionsWindow.webContents.insertCSS("#gt-sl, #gt-tl { pointer-events: none !important; }")
+  })
 
   //Listener cuando da click al daskboard
   ipcMain.on("click-dashboard", e => {
@@ -75,8 +86,8 @@ function createWindow() {
 
   //Si falla la carga
   instructionsWindow.webContents.on("did-fail-load",(e)=>{
-    console.log("Falló en cargar,Reintentando")
-    instructionsWindow.webContents.loadURL(urlInstrucciones);
+    console.log("Reintentando conexión con las instruccines")
+    instructionsWindow.webContents.loadURL(urlProxified);
   })
 }
 app.on("ready", createWindow);
