@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="mx-auto" max-width="300" py-3>
+    <v-card class="mx-auto" max-width="300">
       <div>
         <!-- si la imagen es de tarea normal -->
         <v-img
@@ -27,12 +27,42 @@
           :src="propJsonTask.subtask.params.attachment"
         >
           <div class="divCategory">
-            <v-card-title v-if="propJsonTask.type == 'segmentannotation' || propJsonTask.taskType == 'segmentannotation'">Segmentación de imagen</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'annotation' || propJsonTask.taskType == 'annotation'">Anotación de cuadros 2D</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'categorization' || propJsonTask.taskType == 'categorization'">Categorización</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'videoboxannotation' || propJsonTask.taskType == 'videoboxannotation'">Anotación de videobox 2D</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'polygonannotation' || propJsonTask.taskType == 'polygonannotation'">Anotación de poligones</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'cuboidannotation' || propJsonTask.taskType == 'cuboidannotation'">Anotación de Cubos 3D</v-card-title>
+            <v-card-title
+              v-if="propJsonTask.type == 'segmentannotation' || propJsonTask.taskType == 'segmentannotation'"
+            >Segmentación de imagen</v-card-title>
+            <v-card-title
+              v-if="propJsonTask.type == 'annotation' || propJsonTask.taskType == 'annotation'"
+            >Anotación de cuadros 2D</v-card-title>
+            <v-card-title
+              v-if="propJsonTask.type == 'categorization' || propJsonTask.taskType == 'categorization'"
+            >Categorización</v-card-title>
+            <v-card-title
+              v-if="propJsonTask.type == 'videoboxannotation' || propJsonTask.taskType == 'videoboxannotation'"
+            >Anotación de videobox 2D</v-card-title>
+            <v-card-title
+              v-if="propJsonTask.type == 'polygonannotation' || propJsonTask.taskType == 'polygonannotation'"
+            >Anotación de poligones</v-card-title>
+            <v-card-title
+              v-if="propJsonTask.type == 'cuboidannotation' || propJsonTask.taskType == 'cuboidannotation'"
+            >Anotación de Cubos 3D</v-card-title>
+          </div>
+        </v-img>
+
+        <!-- si la imagen es de tarea normal -->
+        <v-img
+          pa-2
+          v-if="propJsonTask.assignmentType == 'course'"
+          class="white--text align-end"
+          height="200px"
+          src="src\renderer\assets\curso.jpg"
+        >
+          <div class="divCategory">
+            <v-card-title v-if="propJsonTask.type == 'segmentannotation'">Segmentación de imagen</v-card-title>
+            <v-card-title v-if="propJsonTask.type == 'annotation'">Anotacion de cuadros 2D</v-card-title>
+            <v-card-title v-if="propJsonTask.type == 'categorization'">Categorización</v-card-title>
+            <v-card-title v-if="propJsonTask.type == 'videoboxannotation'">Anotacion de videobox 2D</v-card-title>
+            <v-card-title v-if="propJsonTask.type == 'polygonannotation'">Anotacion de poligones</v-card-title>
+            <v-card-title v-if="propJsonTask.type == 'cuboidannotation'">Anotación de Cubos 3D</v-card-title>
           </div>
         </v-img>
       </div>
@@ -40,6 +70,7 @@
       <v-card-text class="text--primary">
         <div v-if="propJsonTask.assignmentType == 'subtask'">Trabajo normal</div>
         <div v-if="propJsonTask.assignmentType == 'task_attempt'">Trabajo de Revisor</div>
+        <div v-if="propJsonTask.assignmentType == 'course'">{{"Curso: "+propJsonTask.title}}</div>
       </v-card-text>
 
       <v-card-actions>
@@ -53,6 +84,7 @@ To
 <script>
 import { mapMutations } from "vuex";
 const electron = require("electron");
+const { ipcRenderer } = require('electron')
 const BrowserView = electron.remote.BrowserView;
 
 export default {
@@ -66,7 +98,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["browserId", "showBackDash","ocultaDrawer"]),
+    ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
     abreTarea() {
       this.$router.push({ path: "browserTask" });
@@ -77,7 +109,7 @@ export default {
       let parteSinJWT = this.propArraySession[this.indexCard].split(" ");
       let mainSeasson = electron.remote.getCurrentWindow();
       let sesion = mainSeasson.webContents.session;
-      this.ocultaDrawer()
+      this.ocultaDrawer();
       this.$router.push({ path: "taskWait" });
 
       sesion.cookies.set(
@@ -101,12 +133,47 @@ export default {
           this.browserId(view.id);
           this.showBackDash();
 
-          view.webContents.on("did-start-loading", () => {
-            //mainSeasson.insertCSS('html,body{ overflow: hidden !important; }');
-            //view.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
+          let urlPart1
+          //obtiene el url de ls instrucciones
+          if (this.propJsonTask.subtask) {
+            urlPart1 = this.propJsonTask.subtask.instruction.split('"')
+          }else{
+            urlPart1 = this.propJsonTask.instruction.split('"')         
+          }
+
+          let urlInstrucciones = urlPart1[1]
+          ipcRenderer.send("show-instrucciones", urlInstrucciones)
+
+          view.webContents.on("did-finish-load", () => {
+            console.log("Se inicio la carga del sitio");
+            view.webContents.insertCSS(
+              "html,body{ background-color: #FF0000 !important;}"
+            );
           });
         }
       );
+    },
+
+    openInstructions() {
+      let win = new BrowserWindow({
+        show: false,
+        frame: false,
+        useContentSize: true
+      });
+      win.maximize();
+      win.show();
+      win.webContents.loadURL("https://www.google.com/");
+
+      win.webContents.on("did-finish-load", () => {
+        console.log("Finalizó la carga del sitio");
+        view.webContents.insertCSS(
+          "html,body{ background-color: #FF0000 !important;}"
+        );
+      });
+
+      win.on("closed", () => {
+        win = null;
+      });
     }
   }
 };

@@ -114,8 +114,10 @@ export default {
             //Oculta el spinner
             this.spinner = "";
             this.muestraDrawer()
-            let resp2 = this.getUserAuthData(user)
-            console.log(resp2)
+            //console.log("antes de get auth")
+            //this.getUserAuthData(user)
+            console.log("Respuesta traida de get auth")
+            console.log(this.getUserAuthData(user))
             this.$router.push({ path: "Dashboard" });
             console.log("Luego del push dashboard")
             

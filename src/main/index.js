@@ -1,74 +1,97 @@
-import { app, BrowserWindow, BrowserView} from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
-if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+if (process.env.NODE_ENV !== "development") {
+  global.__static = require("path")
+    .join(__dirname, "/static")
+    .replace(/\\/g, "\\\\");
 }
 
-let mainWindow
-const winURL = process.env.NODE_ENV === 'development'
-  ? `http://localhost:9080`
-  : `file://${__dirname}/index.html`
+let mainWindow;
+let instructionsWindow;
+let urlInstrucciones
+const winURL = process.env.NODE_ENV === "development" ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
-function createWindow () {
+function createWindow() {
   /**
    * Initial window options
    */
   mainWindow = new BrowserWindow({
     show: false,
-    useContentSize: true,    
-    frame: false, 
+    useContentSize: true,
+    frame: false,
     backgroundColor: "#f1efeb"
-  })
+  });
 
-  mainWindow.maximize()
-  mainWindow.show()
-  mainWindow.loadURL(winURL)
+  mainWindow.maximize();
+  mainWindow.show();
+  mainWindow.loadURL(winURL);
 
- /* let view = new BrowserView()
-  mainWindow.setBrowserView(view)
+  //Listener del evento close de la ventana principal
+  mainWindow.on("closed", event => {
+    console.log("Cerrado");
+    instructionsWindow.hide();
+  });
 
-  view.setBounds({ x: 0, y: 25, width: 500, height: 500 })
-  view.webContents.loadURL('https://electronjs.org')
-  view.webContents.on("did-finish-load",()=>{
-    console.log("Ya se cargo la página")
-    view.setAutoResize({
-      horizontal: true,
-      vertical: true,
-      width: true,
-      height: true,
+  //.........................segunda ventana instrucciones..............
+
+  instructionsWindow = new BrowserWindow({
+    show: false,
+    useContentSize: true,
+    frame: true,
+    backgroundColor: "#f1efeb"
+  });
+  //Quita el menu
+  instructionsWindow.setMenu(null);
+  //Cambia el título
+  instructionsWindow.setTitle("Instrucciones del trabajo");
+
+  //Muestra la ventana de instrucciones
+  ipcMain.on("show-instrucciones", (event, url) => {
+    urlInstrucciones = url
+    instructionsWindow.webContents.loadURL(urlInstrucciones);
+    instructionsWindow.maximize();
+    instructionsWindow.show();
+  });
+
+  //Listener cuando da click al daskboard
+  ipcMain.on("click-dashboard", e => {
+    instructionsWindow.hide();
+  });
+
+  //Evita que se cierre la ventana
+  instructionsWindow.on(
+    "close",
+    (instructionsWindow.onbeforeunload = e => {
+      console.log("I do not want to be closed");
+
+      e.preventDefault();
+      //e.returnValue = false;
     })
-  })
- // mainWindow.loadURL(winURL)
-  //mainWindow.loadURL("https://www.google.com")
+  );
 
-  //El codigo de bajo inserta css en una URL experiementar luego
-  mainWindow.webContents.on('did-finish-load', function() {
-    mainWindow.webContents.insertCSS('html,body{ background-color: #FF0000 !important;}')
-
-    });*/
-
-  mainWindow.on('closed', () => {
-    mainWindow = null
+  //Si falla la carga
+  instructionsWindow.webContents.on("did-fail-load",(e)=>{
+    console.log("Falló en cargar,Reintentando")
+    instructionsWindow.webContents.loadURL(urlInstrucciones);
   })
 }
+app.on("ready", createWindow);
 
-app.on('ready', createWindow)
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-})
+});
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (mainWindow === null) {
-    createWindow()
+    createWindow();
   }
-})
+});
 
 /**
  * Auto Updater

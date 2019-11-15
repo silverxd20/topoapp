@@ -216,6 +216,8 @@ export default {
               } else if (jsonRespTarea.assignmentType == "course") {
                 //En caso de que salga un curso aqui no manejmos
                 console.log("Esto es un curso: " + jsonRespTarea.title);
+                this.jsonTarea.push(jsonRespTarea);
+                this.arraySessionParaTareasCards.push(arraySession[index]);
                 console.log("................................................");
               } else if (jsonRespTarea.assignmentType == "task_attempt") {
                 //Si el tipo de tarea es de Revisor, se enviará al data.

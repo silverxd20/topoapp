@@ -31,14 +31,14 @@ export default new Router({
       component: require('@/components/views/preguntasFrecuentes').default
     },
     {
-      path: '/test',
-      name: 'test',
-      component: require('@/components/test').default
-    },
-    {
       path: '/taskWait',
       name: 'taskWait',
       component: require('@/components/miniComponents/taskWait').default
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: require('@/components/test').default
     },
     {
       path: '*',

@@ -95,6 +95,7 @@
 <script>
 import barraSuperior from "./components/barraSuperior/barraSuperior";
 import { mapState, mapMutations } from "vuex";
+import {ipcRenderer} from 'electron';
 const electron = require("electron");
 const BrowserView = electron.remote.BrowserView;
 
@@ -146,6 +147,7 @@ export default {
       let view = new BrowserView.fromId(this.browserViewId);
       view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
       this.hideBackDash();
+      ipcRenderer.send("click-dashboard")
       this.muestraDrawer();
       this.btnDashboard();
     },

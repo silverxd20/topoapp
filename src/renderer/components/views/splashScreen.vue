@@ -57,7 +57,7 @@ export default {
       //LISTENER DE CAMBIO DE SESSION
       firebase.auth().onAuthStateChanged((user)=> {
         if (user) {
-          this.getUserAuthData(user)
+          console.log(this.getUserAuthData(user))
         //Si ya tiene la session abierta pasa al dashboard
           this.muestraDrawer()
           this.$router.push({ path: "Dashboard"})

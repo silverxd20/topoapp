@@ -60,31 +60,26 @@ export default new Vuex.Store({
   },
   
   actions: {
-   async getUserAuthData({commit}, payload){
+    getUserAuthData({commit}, payload){
       if (!firebase.apps.length) {
         // Initialize Firebase
         firebase.initializeApp(this.firebaseConfig);
       }
       this.db = firebase.firestore();
-
-      var docRef = await this.db.collection("usuarios").doc(payload.uid);
-      let resp = await docRef.get().then((doc)=> {
+      this.db.collection("usuarios").doc(payload.uid).get().then((doc)=> {
+     
       if (doc.exists) {
-
       commit("showUserAuthData",doc.data())
-      return 1
+      return doc.data().text
       } else {
       // doc.data() will be undefined in this case
       console.log('No hay documentos')
-      return 0
+      return Promise.reject("No such document");
       }
       }).catch(function(error) {
       console.log('Error getting document:', error);
       return 0
       });
-
-      console.log(resp)
-      
     }
   }
 
