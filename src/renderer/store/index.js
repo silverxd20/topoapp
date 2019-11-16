@@ -1,14 +1,14 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import { createPersistedState, createSharedMutations } from 'vuex-electron'
-import modules from './modules'
+import Vue from "vue";
+import Vuex from "vuex";
+import { createPersistedState, createSharedMutations } from "vuex-electron";
+import modules from "./modules";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
-    state: {
-    toggleBackToDashboard: "divBtnback d-inline",  
-    browserViewId:"0",
+  state: {
+    toggleBackToDashboard: "divBtnback d-inline",
+    browserViewId: "0",
     toggledrawer: false,
     userAuthData: {
       nombre: "...",
@@ -27,69 +27,66 @@ export default new Vuex.Store({
       measurementId: "G-2Q69C2TFFR"
     }
   },
-  
+
   mutations: {
-    showBackDash (state) {
+    showBackDash(state) {
       //Aplica otro nombre a la clase deje de ocultar y muestre el back to dashboard
-      state.toggleBackToDashboard = "divBtnbackON"
+      state.toggleBackToDashboard = "divBtnbackON";
     },
-    hideBackDash (state) {
+    hideBackDash(state) {
       //Aplica el nombre de la clase correcto para que oculte el back to dashboard
-      state.toggleBackToDashboard = "divBtnback d-inline"
+      state.toggleBackToDashboard = "divBtnback d-inline";
     },
-    browserId (state,payload) {
-      state.browserViewId = payload
+    browserId(state, payload) {
+      state.browserViewId = payload;
     },
-    ocultaDrawer (state) {
-      state.toggledrawer = false
+    ocultaDrawer(state) {
+      state.toggledrawer = false;
     },
-    muestraDrawer (state) {
-      state.toggledrawer = true
+    muestraDrawer(state) {
+      state.toggledrawer = true;
     },
-    showUserAuthData(state, payload){
-      state.userAuthData = payload
-      console.log("Datos de usuarios metidos al store")
-    }, 
-    clearUserData(state){
+    showUserAuthData(state, payload) {
+      state.userAuthData = payload;
+      console.log("Datos de usuarios metidos al store");
+    },
+    clearUserData(state) {
       state.userAuthData = {
         nombre: "...",
         apellido: "",
         email: "..."
-      }
-    },
+      };
+    }
   },
-  
+
   actions: {
-    getUserAuthData({commit}, payload){
+    getUserAuthData({ commit }, payload) {
+      let db;
       if (!firebase.apps.length) {
         // Initialize Firebase
         firebase.initializeApp(this.firebaseConfig);
       }
-      this.db = firebase.firestore();
-      this.db.collection("usuarios").doc(payload.uid).get().then((doc)=> {
-     
-      if (doc.exists) {
-      commit("showUserAuthData",doc.data())
-      return doc.data().text
-      } else {
-      // doc.data() will be undefined in this case
-      console.log('No hay documentos')
-      return Promise.reject("No such document");
-      }
-      }).catch(function(error) {
-      console.log('Error getting document:', error);
-      return 0
-      });
+      db = firebase.firestore();
+      return db.collection("usuarios")
+        .doc(payload.uid)
+        .get()
+        .then(function(doc) {
+          if (doc.exists) {
+            //Envia la funcion al mutation y luego la retorna
+           commit("showUserAuthData",doc.data())
+            return doc.data();
+          } else {
+            return Promise.reject("No hay usuario");
+          }
+        });
     }
   }
 
-
-
   //Probar luego con los modulos por defecto a ver si logro hacerlo funcionar.
- /* modules,
+  /* modules,
   plugins: [
     createPersistedState(),
     createSharedMutations()
   ],
   strict: process.env.NODE_ENV !== 'production'*/
-})
+});

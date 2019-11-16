@@ -52,13 +52,14 @@ export default {
      },
 
      //Listener que observa si tienes la session activa o no para redireccionar 
-   async MonitorDeSession() {
-        
-      //LISTENER DE CAMBIO DE SESSION
-      firebase.auth().onAuthStateChanged((user)=> {
-        if (user) {
-          console.log(this.getUserAuthData(user))
+    MonitorDeSession() {
+
+      firebase.auth().onAuthStateChanged(async user=> {
+      console.log(user)
+       if (user) {
         //Si ya tiene la session abierta pasa al dashboard
+       let userData = await this.getUserAuthData(user)
+          console.log(userData)
           this.muestraDrawer()
           this.$router.push({ path: "Dashboard"})
           console.log("Luego del push dashboard")
@@ -66,9 +67,9 @@ export default {
         //Si no tiene ninguna session lo enví al login    
          this.$router.push({ path: "Login"})
          this.ocultaDrawer()
-        }
-      });
-    }
+        }     
+      })           
+    },
   }
 };
 </script>

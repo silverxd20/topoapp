@@ -90,7 +90,7 @@ export default {
   },
   methods: {
       // muestra el panel lateral desde el store vuex
-      ...mapMutations(["muestraDrawer","showUserAuthData"]),
+      ...mapMutations(["muestraDrawer"]),
       //Traer las funciones de actions en el store
       ...mapActions(["getUserAuthData"]),
 
@@ -106,24 +106,19 @@ export default {
    async btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
 
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(this.valorEmail, this.valorPass)
-        .then(user => {
-          if (user) {
+     let fireResp = await firebase.auth().signInWithEmailAndPassword(this.valorEmail, this.valorPass)
+        try{
+          console.log(fireResp.user)
+          if (fireResp.user) {
             //Oculta el spinner
-            this.spinner = "";
+            let userData = await this.getUserAuthData(fireResp.user)
             this.muestraDrawer()
-            //console.log("antes de get auth")
-            //this.getUserAuthData(user)
-            console.log("Respuesta traida de get auth")
-            console.log(this.getUserAuthData(user))
             this.$router.push({ path: "Dashboard" });
-            console.log("Luego del push dashboard")
-            
+            this.spinner = "";
+            console.log("Luego del push dashboard")  
           }
-        })
-        .catch(error => {
+        }
+        catch(error) {
           // Handle Errors here.
           var errorCode = error.code;
           var errorMessage = error.message;
@@ -158,7 +153,7 @@ export default {
 
             this.spinner = "";
           }
-        });
+        };
     },
 
     btnCerrar() {

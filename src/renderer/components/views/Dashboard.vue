@@ -332,7 +332,9 @@ export default {
           this.saldoTotal =
             parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           if (index == resta) {
-           let SaldoConPorcentaje = this.saldoTotal * 100 / 100
+            //Coloca el porcentaje % del usuario
+            let valorPorcentaje = this.userAuthData.porcentaje
+            let SaldoConPorcentaje = this.saldoTotal * valorPorcentaje / 100
             //Muesta el saldo lo muestra en el sistema
             this.saldo = parseFloat(SaldoConPorcentaje).toFixed(2);
             console.log(this.saldoTotal);
