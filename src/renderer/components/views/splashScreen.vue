@@ -1,11 +1,11 @@
 <template>
   <div>
 
-<div class="divTotal mt-5 h-100">
-  <div class="d-flex justify-content-center">
+<div class="divTotal">
+  <div class="divElements">
     <h1>Iniciando Toposat vector...</h1>
   </div>
-  <div class=" d-flex justify-content-center">
+  <div class="divElements">
     <v-progress-circular
       :size="40"
       :width="7"
@@ -13,7 +13,7 @@
       indeterminate
     ></v-progress-circular>
   </div>
-  <div class="d-flex justify-content-center mt-5 h-100 d-inline-block">
+  <div class="divElements ">
     <img class="imgScreen" src="../../assets/toposatScreen.png">
   </div>
 </div>
@@ -54,7 +54,7 @@ export default {
      //Listener que observa si tienes la session activa o no para redireccionar 
     MonitorDeSession() {
 
-      firebase.auth().onAuthStateChanged(async user=> {
+     /* firebase.auth().onAuthStateChanged(async user=> {
       console.log(user)
        if (user) {
         //Si ya tiene la session abierta pasa al dashboard
@@ -68,7 +68,7 @@ export default {
          this.$router.push({ path: "Login"})
          this.ocultaDrawer()
         }     
-      })           
+      })  */         
     },
   }
 };
@@ -78,7 +78,15 @@ export default {
 
 .imgScreen{
   height: 410px;
-  width: 620px;
-  
+  width: 620px
 }
+.divElements{
+display: flex;
+justify-content: center;
+margin-top: 10px
+}
+.imgScreen{
+margin-top: 3pc;
+}
+
 </style>
