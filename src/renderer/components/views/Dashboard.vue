@@ -42,6 +42,20 @@
               <!--Tareas en revision-->
               <div class="divCardDatos bg-light pt-3">
                 <div>
+                  <div class="divRefresh d-flex justify-content-end">
+                    <v-progress-circular
+                      v-show="toggleSpinnerRefresh"
+                      :size="15"
+                      :width="2"
+                      color="gray"
+                      indeterminate
+                    ></v-progress-circular>
+                    <v-icon
+                      v-show="toggleRefresh"
+                      class="refresh"
+                      @click="getDatosCuentas(arraySession)"
+                    >mdi-refresh</v-icon>
+                  </div>
                   <img class="imagenlogo d-block mx-auto" src="../../assets/tareasRevision.png" alt />
                 </div>
                 <div>
@@ -98,6 +112,8 @@ export default {
   components: { barraSuperior, cardTasks },
   data() {
     return {
+      toggleRefresh: false,
+      toggleSpinnerRefresh: true,
       parteSinJWT: "",
       showLoadingTasks: true,
       indexRetry: "0",
@@ -122,8 +138,8 @@ export default {
   methods: {
     //......................EVENT LISTENERS.......................................
     async firebaseInit() {
-      console.log("User data")
-      console.log(this.userAuthData)
+      console.log("User data");
+      console.log(this.userAuthData);
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
       if (!firebase.apps.length) {
@@ -140,6 +156,11 @@ export default {
       firebase.auth().onAuthStateChanged(user => {
         if (user) {
           //Solicita datos de la coleccion usuarios
+          try{
+
+          }catch(error){
+
+          }
           this.db
             .collection("tokens")
             .get()
@@ -187,7 +208,7 @@ export default {
           //................................................................................
           //Envia la solicitud para obtener los datos con libreria request
           let resp = await request(urlPedirTarea, { method: "GET", headers });
-
+          console.log(resp);
           //Muestra por log el array obtenido de la solicitud
           console.log("Solicitud #: " + index);
           console.log(JSON.parse(resp.body)[0]);
@@ -333,11 +354,13 @@ export default {
             parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           if (index == resta) {
             //Coloca el porcentaje % del usuario
-            let valorPorcentaje = this.userAuthData.porcentaje
-            let SaldoConPorcentaje = this.saldoTotal * valorPorcentaje / 100
+            let valorPorcentaje = this.userAuthData.porcentaje;
+            let SaldoConPorcentaje = (this.saldoTotal * valorPorcentaje) / 100;
             //Muesta el saldo lo muestra en el sistema
             this.saldo = parseFloat(SaldoConPorcentaje).toFixed(2);
             console.log(this.saldoTotal);
+            this.toggleSpinnerRefresh = false;
+            this.toggleRefresh = true;
           }
 
           //Suma las tareas aprobadas
@@ -370,23 +393,25 @@ export default {
             "Error: " + error + " Status Code: " + response.statusCode
           );
         }
-
       } catch (error) {
         //Cae aqui cuando el array viene vacio o undefined
-        let respCuentaUsuario = await request("https://api-internal.scale.com/internal/logged_in_user", {
-          method: "GET",
-          headers: {
-            authorization: cookiesJWT,
-            Origin: "https://www.remotasks.com",
-            "user-agent":
-              "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+        let respCuentaUsuario = await request(
+          "https://api-internal.scale.com/internal/logged_in_user",
+          {
+            method: "GET",
+            headers: {
+              authorization: cookiesJWT,
+              Origin: "https://www.remotasks.com",
+              "user-agent":
+                "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+            }
           }
-        });
+        );
 
-        if(respCuentaUsuario.statusCode == "401"){
-          console.log("El usuario perdio el token de session")
-        }else if(respCuentaUsuario.statusCode == "200"){
-         console.log("No tiene tareas esta cuenta desde el catch") 
+        if (respCuentaUsuario.statusCode == "401") {
+          console.log("El usuario perdio el token de session");
+        } else if (respCuentaUsuario.statusCode == "200") {
+          console.log("No tiene tareas esta cuenta desde el catch");
         }
       }
     },
@@ -396,32 +421,49 @@ export default {
       this.saldoTotal = parseInt("0");
       this.aprobadasTotal = parseInt("0");
       this.pendientesTotal = parseInt("0");
+       this.toggleRefresh = false;
+      this.toggleSpinnerRefresh = true;
 
       for (let indice in await cookiejwtParametro) {
+        console.log(indice);
         //Convierte el JWT fdsb... entrante en jwt=fdsb...
         let cookiesJWT = cookiejwtParametro[indice];
         var part1 = cookiesJWT.split(" ");
         var part2 = part1[0].toString().toLowerCase();
         var authJWT = part2 + "=" + part1[1];
         let count = 0;
-        //Envia la solicitud para obtener los datos
-        let response = await request("https://www.remotasks.com/dashboard", {
-          method: "GET",
-          headers: {
-            Cookie: authJWT,
-            Origin: "https://www.remotasks.com",
-            "user-agent":
-              "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+        for (let index = 0; index < 1; index++) {
+          try {
+            //Envia la solicitud para obtener los datos
+            console.log("Antes de llamar Request")
+            let response = await request(
+              "https://www.remotasks.com/dashboard",
+              {
+                method: "GET",
+                headers: {
+                  Cookie: authJWT,
+                  Origin: "https://www.remotasks.com",
+                  "user-agent":
+                    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+                }
+              }
+            );
+
+            //LLama la funcion que calcula y procesa los datos
+            console.log("Antes de llamar a CalculaDatos")
+            this.CalculaDatos(
+              response,
+              response.body,
+              indice,
+              cookiejwtParametro.length,
+              cookiesJWT
+            );
+          } catch (error) {
+            console.log("Error en la obtención de datos");
+            index = -1;
+            console.log(error);
           }
-        });
-        //LLama la funcion que calcula y procesa los datos
-        this.CalculaDatos(
-          response,
-          response.body,
-          indice,
-          cookiejwtParametro.length,
-          cookiesJWT
-        );
+        }
       }
     }, // fin de la function get saldo cuentas
 
@@ -463,6 +505,10 @@ export default {
   width: 100%;
   background-color: #f1efeb;
 }
+.divRefresh {
+  padding-right: 25px;
+  padding-top: 10px;
+}
 
 .imgSignOut {
   height: 25px;
@@ -476,7 +522,9 @@ export default {
   width: 240px;
   position: absolute;
 }
-
+.refresh :hover {
+  cursor: pointer;
+}
 .divRowDatos {
   position: relative;
   z-index: 1;

@@ -82,11 +82,4 @@ export default new Vuex.Store({
     }
   }
 
-  //Probar luego con los modulos por defecto a ver si logro hacerlo funcionar.
-  /* modules,
-  plugins: [
-    createPersistedState(),
-    createSharedMutations()
-  ],
-  strict: process.env.NODE_ENV !== 'production'*/
 });

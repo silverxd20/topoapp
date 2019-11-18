@@ -14,7 +14,7 @@
           >
             <v-icon height="22">mdi-keyboard-backspace</v-icon>
           </v-btn>
-          <p class="d-inline" pt-3>Dashboard</p>
+          <p class="d-inline" pt-3>Volver</p>
         </div>
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
@@ -53,7 +53,7 @@
             <v-list-item-icon>
               <v-icon>mdi-monitor-dashboard</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Dashboard</v-list-item-title>
+            <v-list-item-title>Panel de Trabajo</v-list-item-title>
           </v-list-item>
 
           <!-- Link de Entrenamiento

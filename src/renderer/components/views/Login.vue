@@ -4,17 +4,10 @@
       <div class="row d-flex justify-content-center align-items-center">
         <!--Mensaje-->
         <div class="mr-5">
-          <h1 class="topo d-flex justify-content-center">
-          𝐓𝐨𝐩𝐨𝐬𝐚𝐭 𝐯𝐞𝐜𝐭𝐨𝐫
-          </h1>
-          <h4 class="text-light mr-5 d-flex justify-content-center">
-            Haz tareas, gana dinero!
-          </h4>
+          <h1 class="topo d-flex justify-content-center">𝐓𝐨𝐩𝐨𝐬𝐚𝐭 𝐯𝐞𝐜𝐭𝐨𝐫</h1>
+          <h4 class="text-light mr-5 d-flex justify-content-center">Haz tareas, gana dinero!</h4>
           <!--Imagen izquierda-->
-          <img
-            class="img2 d-flex justify-content-center"
-            src="../../assets/worker.png"
-          />
+          <img class="img2 d-flex justify-content-center" src="../../assets/worker.png" />
         </div>
 
         <div class="d-inline">
@@ -22,9 +15,7 @@
             <!--Logo-->
             <img src="../../assets/joblogo.png" class="rounded mx-auto d-block" />
             <div class="form-group">
-              <label class="text-light" for="exampleInputEmail1"
-                >Email address</label
-              >
+              <label class="text-light" for="exampleInputEmail1">Email address</label>
               <input
                 v-model="valorEmail"
                 type="email"
@@ -34,9 +25,7 @@
               />
             </div>
             <div class="form-group">
-              <label class="text-light" for="exampleInputPassword1"
-                >Password</label
-              >
+              <label class="text-light" for="exampleInputPassword1">Password</label>
               <input
                 v-model="valorPass"
                 @keyup.enter="btnLogin()"
@@ -47,20 +36,15 @@
             </div>
 
             <div class="d-flex justify-content-center">
-              <button
-                @click="btnLogin()"
-                id="loginBtn"
-                class="btn btn-success"
-                type="button"
-              >
+              <button @click="btnLogin()" id="loginBtn" class="btn btn-success" type="button">
                 <span :class="spinner" role="status" aria-hidden="true"></span>
                 Login
               </button>
             </div>
-            <div class="d-flex justify-content-center">
-              <label class="text-danger pt-2">{{ mensaje }}</label>
+            <div >
+              <label class="text-danger pt-2 d-flex justify-content-center">{{ mensaje }}</label>
             </div>
-          </form>        
+          </form>
         </div>
       </div>
     </div>
@@ -68,7 +52,7 @@
 </template>
 
 <script>
-import {mapState, mapMutations, mapActions} from 'vuex';
+import { mapState, mapMutations, mapActions } from "vuex";
 const { remote } = require("electron");
 
 export default {
@@ -82,17 +66,17 @@ export default {
       mensaje: "",
       valorEmail: "",
       valorPass: "",
-      winPrincial: remote.getCurrentWindow(),
+      winPrincial: remote.getCurrentWindow()
     };
   },
   computed: {
-    ...mapState(["firebaseConfig"]),
+    ...mapState(["firebaseConfig"])
   },
   methods: {
-      // muestra el panel lateral desde el store vuex
-      ...mapMutations(["muestraDrawer"]),
-      //Traer las funciones de actions en el store
-      ...mapActions(["getUserAuthData"]),
+    // muestra el panel lateral desde el store vuex
+    ...mapMutations(["muestraDrawer"]),
+    //Traer las funciones de actions en el store
+    ...mapActions(["getUserAuthData"]),
 
     //Inicia el app de firebase
     firebaseInit() {
@@ -103,57 +87,64 @@ export default {
     },
 
     // LOGIN
-   async btnLogin() {
+    async btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
 
-     let fireResp = await firebase.auth().signInWithEmailAndPassword(this.valorEmail, this.valorPass)
-        try{
-          console.log(fireResp.user)
-          if (fireResp.user) {
-            //Oculta el spinner
-            let userData = await this.getUserAuthData(fireResp.user)
-            this.muestraDrawer()
-            this.$router.push({ path: "Dashboard" });
-            this.spinner = "";
-            console.log("Luego del push dashboard")  
+      let fireResp = await firebase
+        .auth()
+        .signInWithEmailAndPassword(this.valorEmail, this.valorPass);
+      try {
+        for (let index = 0; index < 1; index++) {
+          console.log(fireResp.user);
+          try {
+            if (fireResp.user) {
+              //Oculta el spinner
+              console.log("dentro de try catch antes de getUserAuthData")
+              let userData = await this.getUserAuthData(fireResp.user);
+              console.log("Luego del getUserAuthData")
+              this.muestraDrawer();
+              this.$router.push({ path: "Dashboard" });
+              this.spinner = "";
+              console.log("Luego del push dashboard");
+            }
+          } catch (error) {            
+            index = -1
+            setTimeout(()=>{          
+              console.log("Error consultando pass y user en la BD")
+              this.mensaje = "Problemas de conexión, Reintentando...";
+            }, 1000);
           }
         }
-        catch(error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          console.log(errorCode + " - " + errorMessage);
-          if (errorCode == "auth/invalid-email") {
-            //Si el usuario es incorrecto
-            this.mensaje = "El Correo es inválido.";
-            this.spinner = "";
-          }
+      } catch (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log(errorCode + " - " + errorMessage);
+        if (errorCode == "auth/invalid-email") {
+          //Si el usuario es incorrecto
+          this.mensaje = "El Correo es inválido.";
+          this.spinner = "";
+        }
 
-          //LISTENER DE CAMBIO DE SESSION
-          firebase.auth().onAuthStateChanged(user => {
-            //Si es necesario agregar algo aqui
-          });
+        // Validaciones del form de login.................................
+        if (errorCode == "auth/network-request-failed") {
+          //Si no hay internet emite este mensaje
+          this.mensaje = "No tienes conexion a internet.";
+          this.spinner = "";
+        }
 
-          // Validaciones del form de login.................................
-          if (errorCode == "auth/network-request-failed") {
-            //Si no hay internet emite este mensaje
-            this.mensaje = "No tienes conexion a internet.";
-            this.spinner = "";
-          }
+        if (errorCode == "auth/user-not-found") {
+          //Si no hay internet emite este mensaje
+          this.mensaje = "El Usuario no está registrado.";
+          this.spinner = "";
+        }
 
-          if (errorCode == "auth/user-not-found") {
-            //Si no hay internet emite este mensaje
-            this.mensaje = "El Usuario no está registrado.";
-            this.spinner = "";
-          }
-
-          if (errorCode == "auth/wrong-password") {
-            //Si no hay internet emite este mensaje
-            this.mensaje = "La contraseña es incorrecta.";
-
-            this.spinner = "";
-          }
-        };
+        if (errorCode == "auth/wrong-password") {
+          //Si no hay internet emite este mensaje
+          this.mensaje = "La contraseña es incorrecta.";
+          this.spinner = "";
+        }
+      }
     },
 
     btnCerrar() {
@@ -208,9 +199,8 @@ export default {
   );
   height: 100%;
 }
-.topo{
+.topo {
   font-size: 60px;
-  color: rgb(66, 66, 66)
+  color: rgb(66, 66, 66);
 }
-
 </style>
