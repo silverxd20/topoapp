@@ -41,8 +41,12 @@
             <div class="col-sm-4 borde">
               <!--Tareas en revision-->
               <div class="divCardDatos bg-light pt-3">
-                <div>
-                  <div class="divRefresh d-flex justify-content-end">
+                <div class="d-flex justify-content-center ml-5">
+                  <div class="divImg">
+                  <img class="imagenlogo d-inline" src="../../assets/tareasRevision.png" alt />
+                  </div>
+                  <!-- refresh icon y spinner -->
+                  <div class="divRefresh d-inline">
                     <v-progress-circular
                       v-show="toggleSpinnerRefresh"
                       :size="15"
@@ -56,7 +60,6 @@
                       @click="getDatosCuentas(arraySession)"
                     >mdi-refresh</v-icon>
                   </div>
-                  <img class="imagenlogo d-block mx-auto" src="../../assets/tareasRevision.png" alt />
                 </div>
                 <div>
                   <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
@@ -500,14 +503,16 @@ export default {
   height: 50px;
   width: 50px;
 }
+.divImg{
+  padding-left: 55px;
+}
 .divCompleto {
   height: 100%;
   width: 100%;
   background-color: #f1efeb;
 }
-.divRefresh {
-  padding-right: 25px;
-  padding-top: 10px;
+.divRefresh{
+  padding-left: 55px
 }
 
 .imgSignOut {

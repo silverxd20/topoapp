@@ -48,7 +48,7 @@
           </div>
         </v-img>
 
-        <!-- si la imagen es de tarea normal -->
+        <!-- si la imagen es un curso -->
         <v-img
           pa-2
           v-if="propJsonTask.assignmentType == 'course'"
@@ -101,7 +101,8 @@ export default {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
     abreTarea() {
-      this.$router.push({ path: "browserTask" });
+
+      console.log(this.propJsonTask.assignmentType)
     },
 
     // 1) Funcion que abre la tarea disponible
