@@ -6,6 +6,8 @@
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
+    "buildWin": "electron-builder build --win --publish never", 
+    "deploy": "electron-builder build --win --publish always",
     "build": "node .electron-vue/build.js && electron-builder",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
@@ -18,7 +20,7 @@
   },
   "build": {
     "productName": "toposat-app",
-    "appId": "com.example.yourapp",
+    "appId": "com.example.toposat",
     "directories": {
       "output": "build"
     },
@@ -40,14 +42,8 @@
         }
       ]
     },
-    "mac": {
-      "icon": "build/icons/icon.icns"
-    },
     "win": {
       "icon": "build/icons/icon.ico"
-    },
-    "linux": {
-      "icon": "build/icons"
     }
   },
   "dependencies": {
@@ -101,5 +97,9 @@
     "webpack-dev-server": "^3.1.4",
     "webpack-hot-middleware": "^2.22.2",
     "webpack-merge": "^4.1.3"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/silverxd20/topoapp.git"
   }
 }
