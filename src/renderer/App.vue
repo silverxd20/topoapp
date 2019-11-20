@@ -18,41 +18,57 @@
       <!-- App-bar -->
       <v-app-bar clipped-left height="25" app dark>
         <div :class="toggleBackToDashboard">
-        <!-- Parte del volver al panel de trabajo -->
-        <v-btn
-          @click="btnBackToDashboard()"
-          elevation="0"
-          width="10"
-          height="22"
-          rounded
-          color="transparent"
-          class="btnback d-inline"
-        >
-          <v-icon height="22">mdi-keyboard-backspace</v-icon>
-        </v-btn>
-        <p class="d-inline pt-3">Volver</p>
-        <!-- Parte del Zoom -->
-        <p class="ml-3 pt-3 d-inline">|</p>
-        <v-btn
-          @click="btnZoomMenos()"
-          elevation="0"
-          width="5"
-          height="20"
-          class="bg-dark d-inline ml-3 mb-1 mt-1"
-        >-</v-btn>
-        <v-btn
-          @click="btnZoomMas()"
-          elevation="0"
-          width="5"
-          height="20"
-          class="bg-dark d-inline ml-2 mb-1 mt-1">+</v-btn>
-        <v-badge color="grey" overlap>
-          <template v-slot:badge>
-            <span v-if="zoomActual != 0">{{porcentajeZoom}}</span>
-          </template>
-          <p class="ml-5 pt-3 mr-2 d-inline">Zoom</p>
-        </v-badge>
+          <!-- Parte del volver al panel de trabajo -->
+          <v-btn
+            @click="btnBackToDashboard()"
+            elevation="0"
+            width="10"
+            height="22"
+            rounded
+            color="transparent"
+            class="btnback d-inline"
+          >
+            <v-icon height="22">mdi-keyboard-backspace</v-icon>
+          </v-btn>
+          <p class="d-inline pt-4">Volver</p>
+          <!-- Parte del Zoom -->
+          <p class="ml-3 pt-3 d-inline">|</p>
+          <v-btn
+            @click="btnZoomMenos()"
+            elevation="0"
+            width="5"
+            height="20"
+            class="bg-dark d-inline ml-3 mb-1 mt-1"
+          >-</v-btn>
+          <v-btn
+            @click="btnZoomMas()"
+            elevation="0"
+            width="5"
+            height="20"
+            class="bg-dark d-inline ml-2 mb-1 mt-1"
+          >+</v-btn>
+          <v-badge color="grey" overlap>
+            <template v-slot:badge>
+              <span v-if="zoomActual != 0">{{porcentajeZoom}}</span>
+            </template>
+            <p class="ml-5 pt-3 mr-2 d-inline">Zoom</p>
+          </v-badge>
+
+          <p class="mx-2 pt-3 d-inline">|</p>
+          <!--Boton Actualizar -->
+          <!-- refresh icon y spinner -->
+          <div class="divRefresh d-inline">
+            <v-progress-circular v-show="false" :size="15" :width="2" color="gray" indeterminate></v-progress-circular>
+
+            <!-- Boton actualizar -->
+            <v-btn elevation="0" width="10" height="22" rounded color="transparent">
+              <v-icon height="5px" class="refresh mb-2" @click="btnActualizarWeb()">mdi-refresh</v-icon>
+            </v-btn>
+          </div>
+          <!-- texto actualizar -->
+          <p class="pt-4 ml-2 d-inline">Actualizar</p>
         </div>
+        <!-- div que cierra si es visible o no los menus del app bar-->
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
       </v-app-bar>
@@ -149,7 +165,7 @@ export default {
       toggleNotificationUpdated: false,
       toggleBackDash: false,
       zoomActual: 0,
-      porcentajeZoom:"",
+      porcentajeZoom: ""
     };
   },
   computed: {
@@ -197,6 +213,11 @@ export default {
       this.muestraDrawer();
       this.btnDashboard();
     },
+    //Boton que actualiza la página
+    btnActualizarWeb() {
+      let view = new BrowserView.fromId(this.browserViewId);
+      view.webContents.reload();
+    },
     //Boton que envia hacia el dashboard
     btnDashboard() {
       this.$router.push({ path: "Dashboard" });
@@ -222,9 +243,9 @@ export default {
       console.log(this.zoomActual);
       let zoomSumado = this.zoomActual - 0.25;
       view.webContents.setZoomLevel(zoomSumado);
-      let llevarAporcentaje = zoomSumado *100
-      this.porcentajeZoom = llevarAporcentaje+ "%"
-      console.log("Zoom despues de sumar: "+ this.porcentajeZoom );
+      let llevarAporcentaje = zoomSumado * 100;
+      this.porcentajeZoom = llevarAporcentaje + "%";
+      console.log("Zoom despues de sumar: " + this.porcentajeZoom);
       console.log((this.zoomActual = zoomSumado));
     },
     //Boton de Zoom más
@@ -234,9 +255,9 @@ export default {
       console.log(this.zoomActual);
       let zoomSumado = this.zoomActual + 0.25;
       view.webContents.setZoomLevel(zoomSumado);
-      let llevarAporcentaje = zoomSumado *100
-      this.porcentajeZoom = llevarAporcentaje+ "%"
-      console.log("Zoom despues de sumar: "+ this.porcentajeZoom );
+      let llevarAporcentaje = zoomSumado * 100;
+      this.porcentajeZoom = llevarAporcentaje + "%";
+      console.log("Zoom despues de sumar: " + this.porcentajeZoom);
       console.log((this.zoomActual = zoomSumado));
     },
     //Boton que envia hacia los cursos

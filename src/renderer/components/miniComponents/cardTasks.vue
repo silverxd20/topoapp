@@ -57,12 +57,12 @@
           src="src\renderer\assets\curso.jpg"
         >
           <div class="divCategory">
-            <v-card-title v-if="propJsonTask.type == 'segmentannotation'">Segmentación de imagen</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'annotation'">Anotacion de cuadros 2D</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'categorization'">Categorización</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'videoboxannotation'">Anotacion de videobox 2D</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'polygonannotation'">Anotacion de poligones</v-card-title>
-            <v-card-title v-if="propJsonTask.type == 'cuboidannotation'">Anotación de Cubos 3D</v-card-title>
+            <v-card-title v-if="propJsonTask.taskType == 'segmentannotation'">Segmentación de imagen</v-card-title>
+            <v-card-title v-if="propJsonTask.taskType == 'annotation'">Anotacion de cuadros 2D</v-card-title>
+            <v-card-title v-if="propJsonTask.taskType == 'categorization'">Categorización</v-card-title>
+            <v-card-title v-if="propJsonTask.taskType == 'videoboxannotation'">Anotacion de videobox 2D</v-card-title>
+            <v-card-title v-if="propJsonTask.taskType == 'polygonannotation'">Anotacion de poligones</v-card-title>
+            <v-card-title v-if="propJsonTask.taskType == 'cuboidannotation'">Anotación de Cubos 3D</v-card-title>
           </div>
         </v-img>
       </div>

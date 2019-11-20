@@ -10,7 +10,7 @@
       <v-expansion-panel >
         <v-expansion-panel-header class="font-weight-bold">Que es Toposat vector?</v-expansion-panel-header>
         <v-expansion-panel-content class="px-3">
-            Somos un sistema digital en el cual se procesan imagenes para el entrenamiento de inteligencia artificial.
+            Somos un sistema digital en el cual se editan imagenes para el entrenamiento de inteligencia artificial.
         </v-expansion-panel-content>
         </v-expansion-panel>
 
