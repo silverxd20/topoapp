@@ -114,9 +114,14 @@ app.on("activate", () => {
 
 import { autoUpdater } from 'electron-updater'
 
+// Cuando se descarga una vuena version muestra la notificación de reiniciar el app
 autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
+  mainWindow.webContents.send('update_downloaded');
 })
+// Reinicia la aplicación e instala la actualización
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
+});
 
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()

@@ -5,7 +5,7 @@
         <!-- si la imagen es de tarea normal -->
         <v-img
           v-if="propJsonTask.assignmentType == 'subtask'"
-          class="white--text align-end"
+          class="divImgCard white--text align-end"
           height="200px"
           :src="propJsonTask.params.attachment"
         >
@@ -22,9 +22,9 @@
         <!-- si la imagen es de revisor -->
         <v-img
           v-if="propJsonTask.assignmentType == 'task_attempt'"
-          class="white--text align-end"
+          class="divImgCard white--text align-end"
           height="200px"
-          :src="propJsonTask.subtask.params.attachment"
+          :src="propJsonTask.subtask.attachmentS3Downloads[0].s3URL"
         >
           <div class="divCategory">
             <v-card-title
@@ -52,7 +52,7 @@
         <v-img
           pa-2
           v-if="propJsonTask.assignmentType == 'course'"
-          class="white--text align-end"
+          class="divImgCard white--text align-end"
           height="200px"
           src="src\renderer\assets\curso.jpg"
         >
@@ -183,5 +183,8 @@ export default {
 <style scoped>
 .divCategory {
   background-image: linear-gradient(rgba(255, 0, 0, 0), rgb(23, 26, 26));
+}
+.divImgCard{
+  border-radius: 5px 5px 0px 0px;
 }
 </style>
