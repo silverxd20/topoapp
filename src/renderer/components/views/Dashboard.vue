@@ -82,11 +82,11 @@
       <!--Parte de las tareas-->
       <v-container class="cont-Tareas" grid-list-xs>
         <v-layout row wrap>
-          <v-flex xs6 v-for="(tasks, index) of jsonTarea" :key="index">
+          <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
             <!-- Tarjeta de las tareas -->
             <cardTasks
               :propJsonTask="tasks"
-              :propArraySession="arraySessionParaTareasCards"
+              :propArraySession="arraySession"
               :propIndex="index"
             ></cardTasks>
           </v-flex>
@@ -115,6 +115,7 @@ export default {
   components: { barraSuperior, cardTasks },
   data() {
     return {
+      sinTareas: "no",
       toggleRefresh: false,
       toggleSpinnerRefresh: true,
       parteSinJWT: "",
@@ -254,9 +255,14 @@ export default {
             } catch (error) {
               console.log("Error dentro de request: " + error);
               console.log("No hay tareas en una cuenta");
+
+              this.jsonTarea.push("s");
+              this.arraySessionParaTareasCards.push(arraySession[index]);
             }
           } else {
             console.log("No hay tareas en esta cuenta.");
+            this.jsonTarea.push("s");
+            this.arraySessionParaTareasCards.push(arraySession[index]);
           }
           //................................................................................
         } catch (error) {
@@ -410,8 +416,10 @@ export default {
 
         if (respCuentaUsuario.statusCode == "401") {
           console.log("El usuario perdio el token de session");
+          this.jsonTarea.push("s");
         } else if (respCuentaUsuario.statusCode == "200") {
           console.log("No tiene tareas esta cuenta desde el catch");
+          this.jsonTarea.push("s");
         }
       }
     },
@@ -436,7 +444,7 @@ export default {
           try {
             //Envia la solicitud para obtener los datos
             console.log("Antes de llamar Request");
-            request("https://www.remotasks.com/dashboard",
+           let response = await request("https://www.remotasks.com/dashboard",
               {
                 method: "GET",
                 headers: {
@@ -445,21 +453,18 @@ export default {
                   "user-agent":
                     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
                 }
-              }, async (error, response, body)=>{
- console.error('error:', error); // Print the error if one occurred
-  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  console.log('body:', body); // Print the HTML for the Google homepage.
-
-  //LLama la funcion que calcula y procesa los datos
+              })
+ 
+          //LLama la funcion que calcula y procesa los datos
             console.log("Antes de llamar a CalculaDatos");
             this.CalculaDatos(
               response,
-              body,
+              response.body,
               indice,
               cookiejwtParametro.length,
               cookiesJWT
             );
-              });
+             
             
           } catch (error) {
             console.log("Error en la obtención de datos");

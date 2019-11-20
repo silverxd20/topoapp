@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="mx-auto" max-width="300">
+    <v-card class="cardTasks mx-auto" max-width="300">
       <div>
         <!-- si la imagen es de tarea normal -->
         <v-img
@@ -67,15 +67,31 @@
         </v-img>
       </div>
 
+      <!-- si no hay tareas disponbles -->
+        <v-img
+         v-if="propJsonTask[0] == 's'"          
+          contain
+          class="divImgCard white--text align-end"
+          height="200px"
+          src="src/renderer/assets/noTasks.png">
+          <div class="divCategory">
+            <v-card-title>Sin tareas disponibles</v-card-title>
+          </div>
+        </v-img>
+
       <v-card-text class="text--primary">
+        <div v-if="propJsonTask[0] == 's'">Por ahora no hay trabajos en esta categoría, por favor revise luego.</div>
         <div v-if="propJsonTask.assignmentType == 'subtask'">Trabajo normal</div>
         <div v-if="propJsonTask.assignmentType == 'task_attempt'">Trabajo de Revisor</div>
         <div v-if="propJsonTask.assignmentType == 'course'">{{"Curso: "+propJsonTask.title}}</div>
+
       </v-card-text>
 
       <v-card-actions>
-        <v-btn elevation="1" @click="OpenTask()" color="blue darken-2" text>Iniciar</v-btn>
+        <v-btn v-if="propJsonTask[0] == 's'" :disabled="desabilitado" elevation="1" @click="OpenTask()" color="blue darken-2" text>Iniciar</v-btn>
+         <v-btn v-if="propJsonTask.assignmentType" elevation="1" @click="OpenTask()" color="blue darken-2" text>Iniciar</v-btn>     
       </v-card-actions>
+      
     </v-card>
   </div>
 </template>
@@ -93,8 +109,12 @@ export default {
 
   data() {
     return {
-      indexCard: this.propIndex
+      indexCard: this.propIndex,
+      desabilitado: true,
     };
+  },
+  mounted () {
+    this.initest();
   },
 
   methods: {
@@ -143,6 +163,10 @@ export default {
         }
       );
     },
+    initest(){
+      console.log("propJsonTask")
+      console.log(this.propJsonTask[0])
+    },
 
     openInstructions() {
       let win = new BrowserWindow({
@@ -175,5 +199,8 @@ export default {
 }
 .divImgCard{
   border-radius: 5px 5px 0px 0px;
+}
+.cardTasks{
+  border-radius: 12px
 }
 </style>

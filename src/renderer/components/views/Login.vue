@@ -109,6 +109,11 @@ export default {
             }
           } catch (error) {            
             index = -1
+            if (error.code == "auth/wrong-password") {
+          //Si no hay internet emite este mensaje
+          this.mensaje = "La contraseña es incorrecta.";
+          this.spinner = "";
+        }
             setTimeout(()=>{          
               console.log("Error consultando pass y user en la BD")
               this.mensaje = "Problemas de conexión, Reintentando...";
@@ -119,7 +124,7 @@ export default {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        console.log(errorCode + " - " + errorMessage);
+        //console.log(errorCode + " - " + errorMessage);
         if (errorCode == "auth/invalid-email") {
           //Si el usuario es incorrecto
           this.mensaje = "El Correo es inválido.";
