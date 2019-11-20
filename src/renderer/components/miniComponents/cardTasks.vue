@@ -83,8 +83,8 @@ To
 
 <script>
 import { mapMutations } from "vuex";
-const electron = require("electron");
 const { ipcRenderer } = require('electron')
+const electron = require("electron");
 const BrowserView = electron.remote.BrowserView;
 
 export default {
@@ -100,11 +100,7 @@ export default {
   methods: {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
-    abreTarea() {
-
-      console.log(this.propJsonTask.assignmentType)
-    },
-
+ 
     // 1) Funcion que abre la tarea disponible
     OpenTask() {
       let parteSinJWT = this.propArraySession[this.indexCard].split(" ");
@@ -144,13 +140,6 @@ export default {
 
           let urlInstrucciones = urlPart1[1]
           ipcRenderer.send("show-instrucciones", urlInstrucciones)
-
-          view.webContents.on("did-finish-load", () => {
-            console.log("Se inicio la carga del sitio");
-            view.webContents.insertCSS(
-              "html,body{ background-color: #FF0000 !important;}"
-            );
-          });
         }
       );
     },

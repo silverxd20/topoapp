@@ -18,18 +18,40 @@
       <!-- App-bar -->
       <v-app-bar clipped-left height="25" app dark>
         <div :class="toggleBackToDashboard">
-          <v-btn
-            @click="btnBackToDashboard()"
-            elevation="0"
-            width="10"
-            height="22"
-            rounded
-            color="transparent"
-            class="btnback d-inline"
-          >
-            <v-icon height="22">mdi-keyboard-backspace</v-icon>
-          </v-btn>
-          <p class="d-inline" pt-3>Volver</p>
+        <!-- Parte del volver al panel de trabajo -->
+        <v-btn
+          @click="btnBackToDashboard()"
+          elevation="0"
+          width="10"
+          height="22"
+          rounded
+          color="transparent"
+          class="btnback d-inline"
+        >
+          <v-icon height="22">mdi-keyboard-backspace</v-icon>
+        </v-btn>
+        <p class="d-inline pt-3">Volver</p>
+        <!-- Parte del Zoom -->
+        <p class="ml-3 pt-3 d-inline">|</p>
+        <v-btn
+          @click="btnZoomMenos()"
+          elevation="0"
+          width="5"
+          height="20"
+          class="bg-dark d-inline ml-3 mb-1 mt-1"
+        >-</v-btn>
+        <v-btn
+          @click="btnZoomMas()"
+          elevation="0"
+          width="5"
+          height="20"
+          class="bg-dark d-inline ml-2 mb-1 mt-1">+</v-btn>
+        <v-badge color="grey" overlap>
+          <template v-slot:badge>
+            <span v-if="zoomActual != 0">{{porcentajeZoom}}</span>
+          </template>
+          <p class="ml-5 pt-3 mr-2 d-inline">Zoom</p>
+        </v-badge>
         </div>
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
@@ -125,7 +147,9 @@ export default {
   data() {
     return {
       toggleNotificationUpdated: false,
-      toggleBackDash: false
+      toggleBackDash: false,
+      zoomActual: 0,
+      porcentajeZoom:"",
     };
   },
   computed: {
@@ -191,6 +215,30 @@ export default {
     btnReiniciarApp() {
       ipcRenderer.send("restart_app");
     },
+    //Boton de Zoom menos
+    btnZoomMenos() {
+      let view = new BrowserView.fromId(this.browserViewId);
+      //view.webContents.getZoomLevel((lvl)=>{this.zoomActual = lvl})
+      console.log(this.zoomActual);
+      let zoomSumado = this.zoomActual - 0.25;
+      view.webContents.setZoomLevel(zoomSumado);
+      let llevarAporcentaje = zoomSumado *100
+      this.porcentajeZoom = llevarAporcentaje+ "%"
+      console.log("Zoom despues de sumar: "+ this.porcentajeZoom );
+      console.log((this.zoomActual = zoomSumado));
+    },
+    //Boton de Zoom más
+    btnZoomMas() {
+      let view = new BrowserView.fromId(this.browserViewId);
+      //view.webContents.getZoomLevel((lvl)=>{this.zoomActual = lvl})
+      console.log(this.zoomActual);
+      let zoomSumado = this.zoomActual + 0.25;
+      view.webContents.setZoomLevel(zoomSumado);
+      let llevarAporcentaje = zoomSumado *100
+      this.porcentajeZoom = llevarAporcentaje+ "%"
+      console.log("Zoom despues de sumar: "+ this.porcentajeZoom );
+      console.log((this.zoomActual = zoomSumado));
+    },
     //Boton que envia hacia los cursos
     /*btnVideoCursos() {
       this.$router.push({ path: "videoCursos" });
@@ -235,7 +283,10 @@ export default {
 .divCardNotifInfo {
   padding: 20px;
 }
-.divBotonesNotif{
+.divBotonesNotif {
   right: 3px;
+}
+.btnMenosMas {
+  background-color: rgb(97, 97, 97) (65, 58, 58);
 }
 </style>
