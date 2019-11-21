@@ -89,11 +89,11 @@ export default {
     // LOGIN
     async btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
-
+      try {
       let fireResp = await firebase
         .auth()
         .signInWithEmailAndPassword(this.valorEmail, this.valorPass);
-      try {
+      
         for (let index = 0; index < 1; index++) {
           console.log(fireResp.user);
           try {

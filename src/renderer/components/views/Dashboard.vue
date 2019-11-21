@@ -82,7 +82,7 @@
       <!--Parte de las tareas-->
       <v-container class="cont-Tareas" grid-list-xs>
         <v-layout row wrap>
-          <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
+          <v-flex xs6 v-for="(tasks, index) of jsonTarea" :key="index">
             <!-- Tarjeta de las tareas -->
             <cardTasks
               :propJsonTask="tasks"
