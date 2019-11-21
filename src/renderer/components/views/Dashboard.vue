@@ -17,7 +17,7 @@
                   />
                 </div>
                 <div>
-                  <h1 id="approvedTasks" class="text-center">{{approvedTasks}}</h1>
+                  <h1 id="approvedTasks" class="text-center">{{aprobadas}}</h1>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Tareas aprobadas</p>
@@ -31,7 +31,7 @@
                   <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
                 </div>
                 <div>
-                  <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
+                  <h1 id="saldo" class="text-center">{{saldo}}</h1>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
@@ -62,7 +62,7 @@
                   </div>
                 </div>
                 <div>
-                  <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
+                  <h1 id="reviewTasks" class="text-center">{{pendientes}}</h1>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
@@ -122,14 +122,16 @@ export default {
       showLoadingTasks: true,
       indexRetry: "0",
       jsonTarea: [],
-      ReviewTasks: "-",
-      approvedTasks: "-",
+      ReviewTasks: "",
+      pendientes: "-",
+      approvedTasks: "",
+      aprobadas: "-",
       forLengthJWtCuentas: "0",
       db: "",
-      saldo: "",
+      saldo: "-",
       saldoTotal: "0",
-      aprobadasTotal: "",
-      pendientesTotal: "",
+      aprobadasTotal: "0",
+      pendientesTotal: "0",
       mainSeasson: "",
       arraySession: [],
       arraySessionParaTareasCards: [],
@@ -356,44 +358,29 @@ export default {
           let resta = cookiejwtParametro - 1;
 
           //Suma el saldo del dinero
-          this.saldoTotal =
-            parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
+          this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           if (index == resta) {
             //Coloca el porcentaje % del usuario
             let valorPorcentaje = this.userAuthData.porcentaje;
             let SaldoConPorcentaje = (this.saldoTotal * valorPorcentaje) / 100;
             //Muesta el saldo lo muestra en el sistema
-            this.saldo = parseFloat(SaldoConPorcentaje).toFixed(2);
+            this.saldo = "$"+parseFloat(SaldoConPorcentaje).toFixed(2);
             console.log(this.saldoTotal);
-            this.toggleSpinnerRefresh = false;
-            this.toggleRefresh = true;
           }
 
-          //Suma las tareas aprobadas
-          if (this.aprobadasTotal == "0") {
-            this.aprobadasTotal = parseInt(saldoAprobadas);
-            this.approvedTasks = this.aprobadasTotal;
-          } else {
-            this.aprobadasTotal =
-              this.aprobadasTotal + parseInt(saldoAprobadas);
-
+          //Suma las tareas aprobadas        
+            this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas);           
             if (index == resta) {
-              this.approvedTasks = this.aprobadasTotal;
+              this.aprobadas = this.aprobadasTotal;
             }
-          }
-
+          
           //Suma las tareas pendientes
-          if (this.pendientesTotal == "0") {
-            this.pendientesTotal = parseInt(saldoPendientes);
-            this.ReviewTasks = this.pendientesTotal;
-          } else {
-            this.pendientesTotal =
-              this.pendientesTotal + parseInt(saldoPendientes);
-
+            this.pendientesTotal = this.pendientesTotal + parseInt(saldoPendientes);
             if (index == resta) {
-              this.ReviewTasks = this.pendientesTotal;
+              this.pendientes = this.pendientesTotal;
+              this.toggleSpinnerRefresh = false;
+              this.toggleRefresh = true;
             }
-          }
         } else {
           console.log(
             "Error: " + error + " Status Code: " + response.statusCode
