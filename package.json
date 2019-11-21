@@ -1,8 +1,8 @@
 {
   "name": "toposat-app",
-  "version": "0.0.2",
-  "author": "",
-  "description": "An electron-vue project",
+  "version": "1.0.0",
+  "author": "Leonardo Galindo",
+  "description": "Toposat Vector",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -19,8 +19,8 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "toposat-app",
-    "appId": "com.example.toposat",
+    "productName": "Toposat vector",
+    "appId": "com.toposat.vector",
     "directories": {
       "output": "build"
     },
