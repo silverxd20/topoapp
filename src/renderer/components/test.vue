@@ -1,7 +1,22 @@
 <template>
   <div>
-    <p>Mensaje</p>
-    <button @click="testSincronia()">Probar</button>
+    <div class="divCard">
+      <div class="divImage">
+        <img class="imgFoto" src="" alt="">
+        <div class="divFondoDegradado">
+          <p>Poligon tarea</p>
+        </div>
+        <!-- parte de los datos -->
+        <div class="divDatos">
+          <p>Lucid dinamic object</p>
+        </div>
+        <div>
+          <button>
+            Iniciar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -19,33 +34,7 @@ export default {
     return {};
   },
   methods: {
-  async testSincronia() {
-      console.log("antes de ejecutar");
-     let resp = await this.getValues();
-      console.log("luego de resolver la solicitud");
-      console.log(resp)
-    },
-
-    getValues() {
-      let db
-         if (!firebase.apps.length) {
-        // Initialize Firebase
-        firebase.initializeApp(this.firebaseConfig);
-      }
-      db = firebase.firestore();
-      return db.collection("usuarios")
-        .doc("sbJnlIOehvg0yCnUyyBhzcUiSoI3")
-        .get()
-        .then(function(doc) {
-          if (doc.exists) {
-            console.log("Dato desde la funcion")
-            return doc.data();
-          }else{
-
-            return Promise.reject("No hay usuario");
-          }
-        });
-    }
+ 
   }
 };
 </script>
