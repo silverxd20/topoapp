@@ -20,7 +20,7 @@
                   <h1 id="approvedTasks" class="text-center">{{aprobadas}}</h1>
                 </div>
                 <div>
-                  <p class="text-center text-secondary font-weight-bold">Tareas aprobadas</p>
+                  <p class="text-center text-secondary font-weight-bold">Trabajos aprobados</p>
                 </div>
               </div>
             </div>
@@ -65,7 +65,7 @@
                   <h1 id="reviewTasks" class="text-center">{{pendientes}}</h1>
                 </div>
                 <div>
-                  <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
+                  <p class="text-center text-secondary font-weight-bold">Trabajos en revisión</p>
                 </div>
               </div>
             </div>

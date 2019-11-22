@@ -1,13 +1,13 @@
 {
   "name": "toposat-app",
-  "version": "1.0.0",
+  "version": "0.0.9",
   "author": "Leonardo Galindo",
   "description": "Toposat Vector",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
-    "buildWin": "electron-builder build --win --publish never", 
-    "deploy": "electron-builder build --win --publish always",
+    "buildWin": "node .electron-vue/build.js && electron-builder build --win --publish never", 
+    "deploy": "node .electron-vue/build.js && electron-builder build --win --publish always",
     "build": "node .electron-vue/build.js && electron-builder",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
@@ -21,6 +21,11 @@
   "build": {
     "productName": "Toposat vector",
     "appId": "com.toposat.vector",
+    "publish": [{
+      "provider": "github",
+      "owner": "silverxd20",
+      "repo": "topoapp"
+  }],
     "directories": {
       "output": "build"
     },
