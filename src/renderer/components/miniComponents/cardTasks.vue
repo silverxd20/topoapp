@@ -6,14 +6,14 @@
         <div
           v-if="propJsonTask.assignmentType == 'subtask'"
           class="divImage"
-          :style="{'background-image': 'url('+propJsonTask.params.attachment+')'}">
-
+          :style="{'background-image': 'url('+propJsonTask.params.attachment+')'}"
+        >
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
             <v-chip class="ma-2" color="primary" text-color="white">
-            Categoría
-            <v-icon right>mdi-tag</v-icon>
-          </v-chip>
+              Categoría
+              <v-icon right>mdi-tag</v-icon>
+            </v-chip>
           </div>
 
           <v-card-title class="divCategory">
@@ -48,14 +48,14 @@
         <div
           v-if="propJsonTask.assignmentType == 'task_attempt'"
           class="divImage"
-          :style="{'background-image': 'url('+UrlRevisorImage+')'}">
-
+          :style="{'background-image': 'url('+UrlRevisorImage+')'}"
+        >
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
             <v-chip class="ma-2" color="yellow" text-color="white">
-            Revisor
-            <v-icon right>mdi-star</v-icon>
-          </v-chip>
+              Revisor
+              <v-icon right>mdi-star</v-icon>
+            </v-chip>
           </div>
 
           <v-card-title class="divCategory">
@@ -90,14 +90,14 @@
         <div
           v-if="propJsonTask.assignmentType == 'course'"
           class="divImage"
-          :style="{'background-image': 'url(src/renderer/assets/curso.jpg)'}">
-
+          :style="{'background-image': 'url(src/renderer/assets/curso.jpg)'}"
+        >
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
             <v-chip class="ma-2" color="teal" text-color="white">
-            Curso
-            <v-icon right>mdi-book-open-page-variant</v-icon>
-          </v-chip>
+              Curso
+              <v-icon right>mdi-book-open-page-variant</v-icon>
+            </v-chip>
           </div>
 
           <!-- texto nombre de la categoría -->
@@ -174,6 +174,7 @@ To
 
 <script>
 import { mapMutations } from "vuex";
+const fs = require("fs");
 const { ipcRenderer } = require("electron");
 const electron = require("electron");
 const BrowserView = electron.remote.BrowserView;
@@ -197,15 +198,18 @@ export default {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
 
-     initest() {
-      try{
-      if (this.propJsonTask.assignmentType == 'task_attempt' && this.propJsonTask.subtask.params.attachment) {
-        this.UrlRevisorImage = this.propJsonTask.subtask.params.attachment
-      }else{
-        this.UrlRevisorImage = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL
-      }
-      }catch(error){
-       //Cae aqui cuando no es una tarea de revisor
+    initest() {
+      try {
+        if (
+          this.propJsonTask.assignmentType == "task_attempt" &&
+          this.propJsonTask.subtask.params.attachment
+        ) {
+          this.UrlRevisorImage = this.propJsonTask.subtask.params.attachment;
+        } else {
+          this.UrlRevisorImage = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
+        }
+      } catch (error) {
+        //Cae aqui cuando no es una tarea de revisor
       }
     },
 
@@ -238,15 +242,17 @@ export default {
           this.browserId(view.id);
           this.showBackDash();
 
-          view.webContents.on("dom-ready",() =>{
-            view.webContents.insertCSS(".jsx-2687182512{display: none; !important;}")
-            view.webContents.insertCSS(".title{background-color: blue; !important;}")
-            view.webContents.executeJavaScript("let text = document.getElementByClassName('jsx-2687182512')",false)
-            view.webContents.executeJavaScript(
-              "let texto = document.getElementsByClassName('jsx-2687182512')"+
-              "texto.innerHTML = 'Vuelve al panel para buscar trabajos disponibles'"
-              ,false)
-          })
+          view.webContents.on("dom-ready", function() {
+            fs.readFile(__dirname + "/test.css", "utf-8", function(
+              error,
+              data
+            ) {
+              if (!error) {
+                var formatedData = data.replace(/\s{2,10}/g, " ").trim();
+                view.webContents.insertCSS(formatedData);
+              }
+            });
+          });
 
           let urlPart1;
           //obtiene el url de ls instrucciones

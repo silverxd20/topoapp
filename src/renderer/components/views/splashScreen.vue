@@ -16,9 +16,14 @@
       <div class="divElements">
         <v-progress-circular :size="40" :width="5" color="dark" indeterminate></v-progress-circular>
       </div>
-      <div class="divElements">
-        <img class="imgScreen" src="../../assets/toposatScreen.png" />
-      </div>
+      <v-container fluid grid-list-xs>
+        <v-layout row wrap>
+          <v-flex xs12>
+            <img class="imgScreen" src="../../assets/splashEdited.png" />
+          </v-flex>
+        </v-layout>
+      </v-container>
+ 
     </div>
   </div>
 </template>
@@ -87,15 +92,17 @@ export default {
 
 <style scoped>
 .imgScreen {
-  height: 410px;
-  width: 620px;
+  width: 100%;
 }
 .divElements {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  padding-top: 15px;
 }
 .imgScreen {
   margin-top: 3pc;
+}
+.divTotal{
+  background-color: rgb(247, 247, 247)
 }
 </style>

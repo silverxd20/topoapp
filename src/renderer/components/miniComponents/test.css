@@ -1,0 +1,8 @@
+.fullscreen-card::after{
+content: "Vuelve al panel para buscar nuevos trabajos disponibles" !important;
+font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+font-size: x-large !important;
+}
+.jsx-2687182512{
+    display: none;
+}
