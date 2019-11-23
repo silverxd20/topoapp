@@ -48,7 +48,7 @@
         <div
           v-if="propJsonTask.assignmentType == 'task_attempt'"
           class="divImage"
-          :style="{'background-image': 'url('+propJsonTask.subtask.attachmentS3Downloads[0].s3URL+')'}">
+          :style="{'background-image': 'url('+UrlRevisorImage+')'}">
 
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
@@ -61,27 +61,27 @@
           <v-card-title class="divCategory">
             <v-card-title
               class="text-light"
-              v-if="propJsonTask.type == 'segmentannotation'"
+              v-if="propJsonTask.taskType == 'segmentannotation'"
             >Segmentación de imagen</v-card-title>
             <v-card-title
               class="text-light"
-              v-if="propJsonTask.type == 'annotation'"
+              v-if="propJsonTask.taskType == 'annotation'"
             >Anotación de cuadros 2D</v-card-title>
             <v-card-title
               class="text-light"
-              v-if="propJsonTask.type == 'categorization'"
+              v-if="propJsonTask.taskType == 'categorization'"
             >Categorización</v-card-title>
             <v-card-title
               class="text-light"
-              v-if="propJsonTask.type == 'videoboxannotation'"
+              v-if="propJsonTask.taskType == 'videoboxannotation'"
             >Anotación de videobox</v-card-title>
             <v-card-title
               class="text-light"
-              v-if="propJsonTask.type == 'polygonannotation'"
+              v-if="propJsonTask.taskType == 'polygonannotation'"
             >Anotación de poligones</v-card-title>
             <v-card-title
               class="text-light"
-              v-if="propJsonTask.type == 'cuboidannotation'"
+              v-if="propJsonTask.taskType == 'cuboidannotation'"
             >Anotación de Cubos 3D</v-card-title>
           </v-card-title>
         </div>
@@ -185,16 +185,29 @@ export default {
   data() {
     return {
       indexCard: this.propIndex,
-      desabilitado: true
+      desabilitado: false,
+      UrlRevisorImage: ""
     };
   },
-  mounted() {
+  created() {
     this.initest();
   },
 
   methods: {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
+
+     initest() {
+      try{
+      if (this.propJsonTask.assignmentType == 'task_attempt' && this.propJsonTask.subtask.params.attachment) {
+        this.UrlRevisorImage = this.propJsonTask.subtask.params.attachment
+      }else{
+        this.UrlRevisorImage = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL
+      }
+      }catch(error){
+       //Cae aqui cuando no es una tarea de revisor
+      }
+    },
 
     // 1) Funcion que abre la tarea disponible
     OpenTask() {
@@ -225,6 +238,16 @@ export default {
           this.browserId(view.id);
           this.showBackDash();
 
+          view.webContents.on("dom-ready",() =>{
+            view.webContents.insertCSS(".jsx-2687182512{display: none; !important;}")
+            view.webContents.insertCSS(".title{background-color: blue; !important;}")
+            view.webContents.executeJavaScript("let text = document.getElementByClassName('jsx-2687182512')",false)
+            view.webContents.executeJavaScript(
+              "let texto = document.getElementsByClassName('jsx-2687182512')"+
+              "texto.innerHTML = 'Vuelve al panel para buscar trabajos disponibles'"
+              ,false)
+          })
+
           let urlPart1;
           //obtiene el url de ls instrucciones
           if (this.propJsonTask.subtask) {
@@ -237,10 +260,6 @@ export default {
           ipcRenderer.send("show-instrucciones", urlInstrucciones);
         }
       );
-    },
-    initest() {
-      console.log("propJsonTask");
-      console.log(this.propJsonTask[0]);
     },
 
     openInstructions() {

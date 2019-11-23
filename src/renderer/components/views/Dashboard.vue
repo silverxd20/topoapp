@@ -148,13 +148,10 @@ export default {
       console.log(this.userAuthData);
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
+      try {
       if (!firebase.apps.length) {
         // Initialize Firebase
-        try {
-          firebase.initializeApp(this.firebaseConfig);
-        } catch (error) {
-          console.log("Error iniciando Firebase: " + error);
-        }
+          firebase.initializeApp(this.firebaseConfig);  
       }
       this.db = firebase.firestore();
 
@@ -184,6 +181,9 @@ export default {
             });
         }
       });
+      }catch(error){
+        console.log("Error en firebase init")
+      }
     },
 
     //..........................FUNCIONES...........................................
@@ -211,7 +211,6 @@ export default {
           //................................................................................
           //Envia la solicitud para obtener los datos con libreria request
           let resp = await request(urlPedirTarea, { method: "GET", headers });
-          console.log(resp);
           //Muestra por log el array obtenido de la solicitud
           console.log("Solicitud #: " + index);
           console.log(JSON.parse(resp.body)[0]);
