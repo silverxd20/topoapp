@@ -6,7 +6,7 @@
         <div
           v-if="propJsonTask.assignmentType == 'subtask'"
           class="divImage"
-          :style="{'background-image': 'url('+propJsonTask.params.attachment+')'}"
+          :style="{'background-image': 'url('+UrlImageTask+')'}"
         >
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
@@ -48,7 +48,7 @@
         <div
           v-if="propJsonTask.assignmentType == 'task_attempt'"
           class="divImage"
-          :style="{'background-image': 'url('+UrlRevisorImage+')'}"
+          :style="{'background-image': 'url('+UrlImageTask+')'}"
         >
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
@@ -90,7 +90,7 @@
         <div
           v-if="propJsonTask.assignmentType == 'course'"
           class="divImage"
-          :style="{'background-image': 'url(src/renderer/assets/curso.jpg)'}"
+          style="background-image: url('https://firebasestorage.googleapis.com/v0/b/remodesktop-9b704.appspot.com/o/curso.jpg?alt=media&token=46194c0c-6d76-4b1f-a1bd-ee90926ca8e6');"
         >
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
@@ -133,7 +133,7 @@
         <div
           v-if="propJsonTask[0] == 's'"
           class="divImageNoTask"
-          :style="{'background-image': 'url(src/renderer/assets/noTasks.png)'}"
+          style="background-image: url('https://firebasestorage.googleapis.com/v0/b/remodesktop-9b704.appspot.com/o/noTasks.png?alt=media&token=7f41d0b3-934f-42ed-9711-33106b15dd31')"
         >
           <v-card-title class="divCategory">
             <v-card-title class="text-light">Sin tareas disponibles</v-card-title>
@@ -186,29 +186,38 @@ export default {
   data() {
     return {
       indexCard: this.propIndex,
-      desabilitado: false,
-      UrlRevisorImage: ""
+      desabilitado: true,
+      UrlImageTask: ""
     };
   },
-  created() {
-    this.initest();
+  mounted() {
+    this.initComprobarDndVieneLaImg();
   },
 
   methods: {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
 
-    initest() {
+    initComprobarDndVieneLaImg() {
       try {
-        if (
-          this.propJsonTask.assignmentType == "task_attempt" &&
-          this.propJsonTask.subtask.params.attachment
-        ) {
-          this.UrlRevisorImage = this.propJsonTask.subtask.params.attachment;
-        } else {
-          this.UrlRevisorImage = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
+        //Si el trabajo es de revisor
+        if (this.propJsonTask.assignmentType == "task_attempt") {
+
+          this.UrlImageTask = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
+        } 
+
+        //Si el trabajo es normal
+         if (this.propJsonTask.assignmentType == "subtask") {     
+
+          this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
+        }
+        // es un curso no hagas nada
+        if (this.propJsonTask.assignmentType == "course") {
+          console.log("Fué un curso")
         }
       } catch (error) {
+        console.log("Error trayendo imagen")
+        console.log(error)
         //Cae aqui cuando no es una tarea de revisor
       }
     },
@@ -242,17 +251,12 @@ export default {
           this.browserId(view.id);
           this.showBackDash();
 
-          view.webContents.on("dom-ready", function() {
-            fs.readFile(__dirname + "/test.css", "utf-8", function(
-              error,
-              data
-            ) {
-              if (!error) {
-                var formatedData = data.replace(/\s{2,10}/g, " ").trim();
-                view.webContents.insertCSS(formatedData);
-              }
-            });
-          });
+          view.webContents.on("dom-ready", (e)=>{
+          view.webContents.insertCSS(".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}");
+          view.webContents.insertCSS(".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;");
+          view.webContents.insertCSS(".fullscreen-card::after{font-size: x-large !important;}");
+          view.webContents.insertCSS(".jsx-2687182512{display: none !important;}"); 
+  })
 
           let urlPart1;
           //obtiene el url de ls instrucciones
