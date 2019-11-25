@@ -48,7 +48,7 @@
       ]
     },
     "win": {
-      "icon": "build/icons/icon.ico",
+      "icon": "build/icons/topoicono.png",
       "target": [
         {
           "target": "nsis",

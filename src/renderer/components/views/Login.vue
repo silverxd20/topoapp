@@ -109,15 +109,10 @@ export default {
             }
           } catch (error) {            
             index = -1
-            if (error.code == "auth/wrong-password") {
-          //Si no hay internet emite este mensaje
-          this.mensaje = "La contraseña es incorrecta.";
-          this.spinner = "";
-        }
             setTimeout(()=>{          
-              console.log("Error consultando pass y user en la BD")
-              this.mensaje = "Problemas de conexión, Reintentando...";
-            }, 1000);
+              console.log("Conexión de internet lenta, Reintentando...")
+              this.mensaje = "Conexión de internet lenta, Reconectando...";
+            }, 3000);
           }
         }
       } catch (error) {

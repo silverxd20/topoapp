@@ -1,0 +1,38 @@
+.full-screen-instructions{
+    display: flex !important;
+    justify-content: center !important;
+}
+.instructions__wrapper {
+flex-grow: 0 !important;
+}
+.instructions__body{
+    display: none !important;
+}
+.instructions__title {
+    text-indent: -9999px !important;
+    line-height: 0 !important;
+  }
+.instructions__title::after{
+    content: "Por favor lea y consulte las instrucciones siempre que hallan dudas, tendrá mayor precision y logrará mejor un desempeño en el trabajo. " !important;
+    font-size: large;
+    color: rgb(19, 19, 19);
+    text-indent: 0;
+  display: block;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+  line-height: initial;
+}
+.instructions__title.jsx-400793135{
+    background-color: rgb(255, 255, 255) !important;
+}
+.default.jsx-1809695030{
+    text-indent: -9999px !important;
+ 
+}
+.default.jsx-1809695030::before{
+content: "Comenzar";
+padding-left: 35px;
+font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;
+text-indent: 0px;
+}
+
+

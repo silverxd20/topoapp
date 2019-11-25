@@ -17,10 +17,10 @@
                   />
                 </div>
                 <div>
-                  <h1 id="approvedTasks" class="text-center">{{approvedTasks}}</h1>
+                  <h1 id="approvedTasks" class="text-center">{{aprobadas}}</h1>
                 </div>
                 <div>
-                  <p class="text-center text-secondary font-weight-bold">Tareas aprobadas</p>
+                  <p class="text-center text-secondary font-weight-bold">Trabajos aprobados</p>
                 </div>
               </div>
             </div>
@@ -31,7 +31,7 @@
                   <img class="imagenlogo d-block mx-auto" src="../../assets/cashLogo.png" alt />
                 </div>
                 <div>
-                  <h1 id="saldo" class="text-center">{{"$"+saldo}}</h1>
+                  <h1 id="saldo" class="text-center">{{saldo}}</h1>
                 </div>
                 <div>
                   <p class="text-center text-secondary font-weight-bold">Saldo disponible</p>
@@ -62,10 +62,10 @@
                   </div>
                 </div>
                 <div>
-                  <h1 id="reviewTasks" class="text-center">{{ReviewTasks}}</h1>
+                  <h1 id="reviewTasks" class="text-center">{{pendientes}}</h1>
                 </div>
                 <div>
-                  <p class="text-center text-secondary font-weight-bold">Tareas en revision</p>
+                  <p class="text-center text-secondary font-weight-bold">Trabajos en revisión</p>
                 </div>
               </div>
             </div>
@@ -82,7 +82,7 @@
       <!--Parte de las tareas-->
       <v-container class="cont-Tareas" grid-list-xs>
         <v-layout row wrap>
-          <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
+          <v-flex xs6 v-for="(tasks, index) of jsonTarea" :key="index">
             <!-- Tarjeta de las tareas -->
             <cardTasks
               :propJsonTask="tasks"
@@ -122,14 +122,16 @@ export default {
       showLoadingTasks: true,
       indexRetry: "0",
       jsonTarea: [],
-      ReviewTasks: "-",
-      approvedTasks: "-",
+      ReviewTasks: "",
+      pendientes: "-",
+      approvedTasks: "",
+      aprobadas: "-",
       forLengthJWtCuentas: "0",
       db: "",
-      saldo: "",
+      saldo: "-",
       saldoTotal: "0",
-      aprobadasTotal: "",
-      pendientesTotal: "",
+      aprobadasTotal: "0",
+      pendientesTotal: "0",
       mainSeasson: "",
       arraySession: [],
       arraySessionParaTareasCards: [],
@@ -146,13 +148,10 @@ export default {
       console.log(this.userAuthData);
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
+      try {
       if (!firebase.apps.length) {
         // Initialize Firebase
-        try {
-          firebase.initializeApp(this.firebaseConfig);
-        } catch (error) {
-          console.log("Error iniciando Firebase: " + error);
-        }
+          firebase.initializeApp(this.firebaseConfig);  
       }
       this.db = firebase.firestore();
 
@@ -182,6 +181,9 @@ export default {
             });
         }
       });
+      }catch(error){
+        console.log("Error en firebase init")
+      }
     },
 
     //..........................FUNCIONES...........................................
@@ -209,7 +211,6 @@ export default {
           //................................................................................
           //Envia la solicitud para obtener los datos con libreria request
           let resp = await request(urlPedirTarea, { method: "GET", headers });
-          console.log(resp);
           //Muestra por log el array obtenido de la solicitud
           console.log("Solicitud #: " + index);
           console.log(JSON.parse(resp.body)[0]);
@@ -356,44 +357,29 @@ export default {
           let resta = cookiejwtParametro - 1;
 
           //Suma el saldo del dinero
-          this.saldoTotal =
-            parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
+          this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
           if (index == resta) {
             //Coloca el porcentaje % del usuario
             let valorPorcentaje = this.userAuthData.porcentaje;
             let SaldoConPorcentaje = (this.saldoTotal * valorPorcentaje) / 100;
             //Muesta el saldo lo muestra en el sistema
-            this.saldo = parseFloat(SaldoConPorcentaje).toFixed(2);
+            this.saldo = "$"+parseFloat(SaldoConPorcentaje).toFixed(2);
             console.log(this.saldoTotal);
-            this.toggleSpinnerRefresh = false;
-            this.toggleRefresh = true;
           }
 
-          //Suma las tareas aprobadas
-          if (this.aprobadasTotal == "0") {
-            this.aprobadasTotal = parseInt(saldoAprobadas);
-            this.approvedTasks = this.aprobadasTotal;
-          } else {
-            this.aprobadasTotal =
-              this.aprobadasTotal + parseInt(saldoAprobadas);
-
+          //Suma las tareas aprobadas        
+            this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas);           
             if (index == resta) {
-              this.approvedTasks = this.aprobadasTotal;
+              this.aprobadas = this.aprobadasTotal;
             }
-          }
-
+          
           //Suma las tareas pendientes
-          if (this.pendientesTotal == "0") {
-            this.pendientesTotal = parseInt(saldoPendientes);
-            this.ReviewTasks = this.pendientesTotal;
-          } else {
-            this.pendientesTotal =
-              this.pendientesTotal + parseInt(saldoPendientes);
-
+            this.pendientesTotal = this.pendientesTotal + parseInt(saldoPendientes);
             if (index == resta) {
-              this.ReviewTasks = this.pendientesTotal;
+              this.pendientes = this.pendientesTotal;
+              this.toggleSpinnerRefresh = false;
+              this.toggleRefresh = true;
             }
-          }
         } else {
           console.log(
             "Error: " + error + " Status Code: " + response.statusCode

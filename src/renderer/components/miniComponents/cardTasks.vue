@@ -202,22 +202,20 @@ export default {
       try {
         //Si el trabajo es de revisor
         if (this.propJsonTask.assignmentType == "task_attempt") {
-
           this.UrlImageTask = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
-        } 
+        }
 
         //Si el trabajo es normal
-         if (this.propJsonTask.assignmentType == "subtask") {     
-
+        if (this.propJsonTask.assignmentType == "subtask") {
           this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
         }
         // es un curso no hagas nada
         if (this.propJsonTask.assignmentType == "course") {
-          console.log("Fué un curso")
+          console.log("Fué un curso");
         }
       } catch (error) {
-        console.log("Error trayendo imagen")
-        console.log(error)
+        console.log("Error trayendo imagen");
+        console.log(error);
         //Cae aqui cuando no es una tarea de revisor
       }
     },
@@ -251,12 +249,42 @@ export default {
           this.browserId(view.id);
           this.showBackDash();
 
-          view.webContents.on("dom-ready", (e)=>{
-          view.webContents.insertCSS(".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}");
-          view.webContents.insertCSS(".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;");
-          view.webContents.insertCSS(".fullscreen-card::after{font-size: x-large !important;}");
-          view.webContents.insertCSS(".jsx-2687182512{display: none !important;}"); 
-  })
+          view.webContents.on("dom-ready", e => {
+
+             /* fs.readFile(__dirname + "/test.css", "utf-8", function(
+                error,
+                data
+              ) {
+                if (!error) {
+                  var formatedData = data.replace(/\s{2,10}/g, " ").trim();
+                  view.webContents.insertCSS(formatedData);
+                }
+              });*/
+
+            //Estilo de la parte cuando SI tiene tareas
+            view.webContents.insertCSS(".full-screen-instructions{display: flex !important; justify-content: center !important;}")
+            view.webContents.insertCSS(".instructions__wrapper{flex-grow: 0 !important;}")
+            view.webContents.insertCSS(".instructions__body{display: none !important;}")
+            //view.webContents.insertCSS(".default.jsx-1809695030{text-indent: -9999px !important;}")
+            //view.webContents.insertCSS(".default.jsx-1809695030::before{content: 'Comenzar'; padding-left: 35px; text-indent: 0px; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;}")
+            view.webContents.insertCSS(".instructions__title{text-indent: -9999px !important; line-height: 0 !important;}")
+            view.webContents.insertCSS(".instructions__title.jsx-400793135{background-color: rgb(255, 255, 255) !important;}")
+            view.webContents.insertCSS(".instructions__title::after{content: 'Por favor lea y consulte las instrucciones siempre que hallan dudas, tendrá mayor precision y logrará un mejor desempeño en el trabajo.' !important; font-size: large;  color: rgb(19, 19, 19); text-indent: 0; display: block; line-height: initial; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;}")
+            
+            //Estilo de la parte cuando NO tiene tareas
+            view.webContents.insertCSS(
+              ".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}"
+            );
+            view.webContents.insertCSS(
+              ".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;"
+            );
+            view.webContents.insertCSS(
+              ".fullscreen-card::after{font-size: x-large !important;}"
+            );
+            view.webContents.insertCSS(
+              ".jsx-2687182512{display: none !important;}"
+            );
+          });
 
           let urlPart1;
           //obtiene el url de ls instrucciones

@@ -148,19 +148,25 @@ export default {
       console.log(this.userAuthData);
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
+
+      for (let index = 0; index < 1; index++) {
+
       try {
       if (!firebase.apps.length) {
         // Initialize Firebase
+        console.log("Iniciando firebase")
           firebase.initializeApp(this.firebaseConfig);  
       }
+      console.log("antes de firestore")
       this.db = firebase.firestore();
 
       //Listener que se ejecuta cuando el usuario esta iniciado y obtiene las tareas y saldo.
+      console.log("antes de onAuthStateChanged")
       firebase.auth().onAuthStateChanged(user => {
+        try {
         if (user) {
           //Solicita datos de la coleccion usuarios
-          try {
-          } catch (error) {}
+            console.log("antes de pedir tokens")
           this.db
             .collection("tokens")
             .get()
@@ -178,12 +184,24 @@ export default {
                   this.getAvailableTasks(this.arraySession);
                 }
               });
+            }).catch(error =>{
+              console.log("Error obteniendo tokens catch promise")
+            console.log(error)  
             });
+          }
+        } catch (error) {
+            console.log("Error obteniendo tokens")
+            console.log(error)         
         }
       });
       }catch(error){
-        console.log("Error en firebase init")
+        index = -1
+            setTimeout(()=>{          
+              console.log("Error en firebase init")
+            }, 3000);
       }
+    }
+
     },
 
     //..........................FUNCIONES...........................................
