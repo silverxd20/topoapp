@@ -89,9 +89,9 @@
             >Anotación de Cubos 3D</v-card-title>
           </v-card-title>
           <v-card-title
-              class="textoCategory"
-              v-if="propJsonTask.taskType == 'lidarsegmentation'"
-            >Segmentación Lidar</v-card-title>
+            class="textoCategory"
+            v-if="propJsonTask.taskType == 'lidarsegmentation'"
+          >Segmentación Lidar</v-card-title>
         </div>
 
         <!-- si la imagen es un curso -->
@@ -139,7 +139,6 @@
               v-if="propJsonTask.taskType == 'lidarsegmentation'"
             >Segmentación Lidar</v-card-title>
           </v-card-title>
-          
         </div>
 
         <!-- si no hay tareas disponibles -->
@@ -187,7 +186,7 @@ To
 
 <script>
 import { mapMutations } from "vuex";
-const https = require('https');
+const https = require("https");
 const fs = require("fs");
 const { ipcRenderer } = require("electron");
 const electron = require("electron");
@@ -204,11 +203,11 @@ export default {
       indexCard: this.propIndex,
       desabilitado: true,
       UrlImageTask: "",
-      nombreTarea: "-",
+      nombreTarea: "-"
     };
   },
   mounted() {
-    this.initTraeNombreDeLTareaDeIntrucciones()
+    this.initTraeNombreDeLTareaDeIntrucciones();
     this.initComprobarDndVieneLaImg();
   },
 
@@ -216,42 +215,31 @@ export default {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
 
- async initTraeNombreDeLTareaDeIntrucciones(){
+    async initTraeNombreDeLTareaDeIntrucciones() {
       //Hace un split para obtener el url de la instrucciones
-      let urlArrayParte1
-        if (this.propJsonTask.assignmentType == 'task_attempt') {
-            urlArrayParte1 = this.propJsonTask.subtask.instruction.split('"');
-          } else if(this.propJsonTask.assignmentType == 'subtask') {
-            urlArrayParte1 = this.propJsonTask.instruction.split('"');
-          }else if(this.propJsonTask.assignmentType == 'course') {
-            //No hagas nada si es un curso
-          }
+      let urlArrayParte1;
+      if (this.propJsonTask.assignmentType == "task_attempt") {
+        urlArrayParte1 = this.propJsonTask.subtask.instruction.split('"');
+      } else if (this.propJsonTask.assignmentType == "subtask") {
+        urlArrayParte1 = this.propJsonTask.instruction.split('"');
+      } else if (this.propJsonTask.assignmentType == "course") {
+        //No hagas nada si es un curso
+      }
 
-    if (urlArrayParte1) {
-      let linkInstrucciones = urlArrayParte1[1];
-          if (linkInstrucciones == "height:800px; width:100%") {
-            linkInstrucciones = urlArrayParte1[3];
-          }
-          console.log(linkInstrucciones)
-    let respuesta1 = await fetch(linkInstrucciones);
-    let textResp = await respuesta1.text()
-    const $ = cheerio.load(textResp);
-      let tareaName = $("span").text().split("INSTRUCTION")
-      this.nombreTarea = tareaName[0]  
-      console.log(this.nombreTarea)
-        /* request({
-    method: 'GET',
-    url: linkInstrucciones
-}, function (error, response, html) {
-  if (!error && response.statusCode == 200) {
-      const $ = cheerio.load(html);
-      let tareaName = $("span").text().split("INSTRUCTION")
-      this.nombreTarea = tareaName[0]  
-      console.log(this.nombreTarea)
-  }
-  console.log(response.statusCode)
-}); */
-       }
+      if (urlArrayParte1) {
+        let linkInstrucciones = urlArrayParte1[1];
+        if (linkInstrucciones == "height:800px; width:100%") {
+          linkInstrucciones = urlArrayParte1[3];
+        }
+        let respuesta1 = await fetch(linkInstrucciones);
+        let textResp = await respuesta1.text();
+        const $ = cheerio.load(textResp);
+        let tareaName = $("span")
+          .text()
+          .split("INSTRUCTION");
+        this.nombreTarea = tareaName[0];
+        console.log(this.nombreTarea);
+      }
     },
 
     initComprobarDndVieneLaImg() {
@@ -259,21 +247,24 @@ export default {
         //Si el trabajo es de revisor
         if (this.propJsonTask.assignmentType == "task_attempt") {
           if (this.propJsonTask.subtask.attachmentS3Downloads) {
-              this.UrlImageTask = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
-          }else{
-            console.log("No hay propJsonTask.attachmentS3Downloads en tarea de revisor")
-            this.UrlImageTask = this.propJsonTask.subtask.params.attachment
+            this.UrlImageTask = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
+          } else {
+            console.log(
+              "No hay propJsonTask.attachmentS3Downloads en tarea de revisor"
+            );
+            this.UrlImageTask = this.propJsonTask.subtask.params.attachment;
           }
         }
 
         //Si el trabajo es normal
         if (this.propJsonTask.assignmentType == "subtask") {
           if (this.propJsonTask.attachmentS3Downloads) {
-            
             this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
-          }else{
-            console.log("No hay propJsonTask.attachmentS3Downloads en tarea normal")
-            this.UrlImageTask = this.propJsonTask.params.attachment
+          } else {
+            console.log(
+              "No hay propJsonTask.attachmentS3Downloads en tarea normal"
+            );
+            this.UrlImageTask = this.propJsonTask.params.attachment;
           }
         }
         // es un curso no hagas nada
@@ -318,8 +309,7 @@ export default {
           this.showBackDash();
 
           view.webContents.on("dom-ready", e => {
-
-             /* fs.readFile(__dirname + "/test.css", "utf-8", function(
+            /* fs.readFile(__dirname + "/test.css", "utf-8", function(
                 error,
                 data
               ) {
@@ -330,19 +320,41 @@ export default {
               });*/
 
             //Estilo de la parte cuando SI tiene tareas
-            view.webContents.insertCSS(".full-screen-instructions{display: flex !important; justify-content: center !important;}")
-            view.webContents.insertCSS(".instructions__wrapper{flex-grow: 0 !important;}")
-            view.webContents.insertCSS(".instructions__body{display: none !important;}")
-            view.webContents.insertCSS(".instructions__title{text-indent: -9999px !important; line-height: 0 !important;}")
-            view.webContents.insertCSS(".instructions__title.jsx-400793135{background-color: rgb(255, 255, 255) !important;}")
-            view.webContents.insertCSS(".instructions__title::after{content: 'Por favor lea y consulte las instrucciones siempre que hallan dudas, tendrá mayor precision y logrará un mejor desempeño en el trabajo.' !important; font-size: large;  color: rgb(19, 19, 19); text-indent: 0; display: block; line-height: initial; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;}")
-            view.webContents.insertCSS(".wootric-question{display: none !important;}")
-            
+            view.webContents.insertCSS(
+              ".full-screen-instructions{display: flex !important; justify-content: center !important;}"
+            );
+            view.webContents.insertCSS(
+              ".instructions__wrapper{flex-grow: 0 !important;}"
+            );
+            view.webContents.insertCSS(
+              ".instructions__body{display: none !important;}"
+            );
+            view.webContents.insertCSS(
+              ".instructions__title{text-indent: -9999px !important; line-height: 0 !important;}"
+            );
+            view.webContents.insertCSS(
+              ".instructions__title.jsx-400793135{background-color: rgb(255, 255, 255) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".instructions__title::after{content: 'Por favor lea y consulte las instrucciones siempre que hallan dudas, tendrá mayor precision y logrará un mejor desempeño en el trabajo.' !important; font-size: large;  color: rgb(19, 19, 19); text-indent: 0; display: block; line-height: initial; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;}"
+            );
+            view.webContents.insertCSS(
+              ".wootric-question{display: none !important;}"
+            );
+
             //Estilo de la parte cuando NO tiene tareas
-            view.webContents.insertCSS(".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}");
-            view.webContents.insertCSS(".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;");
-            view.webContents.insertCSS(".fullscreen-card::after{font-size: x-large !important;}");
-            view.webContents.insertCSS(".jsx-2687182512{display: none !important;}");
+            view.webContents.insertCSS(
+              ".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}"
+            );
+            view.webContents.insertCSS(
+              ".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;"
+            );
+            view.webContents.insertCSS(
+              ".fullscreen-card::after{font-size: x-large !important;}"
+            );
+            view.webContents.insertCSS(
+              ".jsx-2687182512{display: none !important;}"
+            );
           });
 
           let urlPart1;
@@ -357,12 +369,12 @@ export default {
           if (urlInstrucciones == "height:800px; width:100%") {
             urlInstrucciones = urlPart1[3];
           }
-          console.log("Instrucciones")
-          console.log(urlInstrucciones)
+          console.log("Instrucciones");
+          console.log(urlInstrucciones);
           ipcRenderer.send("show-instrucciones", urlInstrucciones);
         }
       );
-    },
+    }
   }
 };
 </script>
@@ -375,7 +387,7 @@ export default {
   height: 40px;
   background-image: linear-gradient(rgba(255, 0, 0, 0), rgb(23, 26, 26));
 }
-.textoCategory{
+.textoCategory {
   position: absolute;
   color: white;
 }

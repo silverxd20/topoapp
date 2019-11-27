@@ -142,7 +142,7 @@ ipcMain.on('restart_app', () => {
 
 app.on('ready', () => {
   createWindow()
-  autoUpdater.checkForUpdates()
-  //if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+  //autoUpdater.checkForUpdates()
+  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
  

@@ -7,13 +7,13 @@
           <h1 class="topo d-flex justify-content-center">𝐓𝐨𝐩𝐨𝐬𝐚𝐭 𝐯𝐞𝐜𝐭𝐨𝐫</h1>
           <h4 class="text-light mr-5 d-flex justify-content-center">Haz tareas, gana dinero!</h4>
           <!--Imagen izquierda-->
-          <img class="img2 d-flex justify-content-center" src="../../assets/worker.png" />
+          <img class="img2 d-flex justify-content-center fluid" src="../../assets/worker.png" />
         </div>
 
         <div class="d-inline">
           <form class="form pt-3 pl-5 pr-5 mt-3 mb-3 bg-dark">
             <!--Logo-->
-            <img src="../../assets/joblogo.png" class="rounded mx-auto d-block" />
+            <img src="../../assets/joblogo.png" class="rounded mx-auto d-block fluid" />
             <div class="form-group">
               <label class="text-light" for="exampleInputEmail1">Email address</label>
               <input
