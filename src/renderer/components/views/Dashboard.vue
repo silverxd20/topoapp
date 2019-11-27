@@ -437,7 +437,6 @@ export default {
       this.toggleSpinnerRefresh = true;
 
       for (let indice in await cookiejwtParametro) {
-        console.log(indice);
         //Convierte el JWT fdsb... entrante en jwt=fdsb...
         let cookiesJWT = cookiejwtParametro[indice];
         var part1 = cookiesJWT.split(" ");

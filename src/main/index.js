@@ -24,7 +24,10 @@ function createWindow() {
     show: false,
     useContentSize: true,
     frame: false,
-    backgroundColor: "#f1efeb"
+    backgroundColor: "#f1efeb",
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
 
   mainWindow.maximize();
@@ -95,12 +98,16 @@ function createWindow() {
   );
 
   //Si falla la carga
-  instructionsWindow.webContents.on("did-fail-load",(e)=>{
-    console.log("Reintentando conexión con las instruccines")
-    instructionsWindow.webContents.loadURL(urlProxified);
+  instructionsWindow.webContents.on("did-fail-load",(event,errorCode,errorDescription, validatedURL )=>{
+    console.log("Reintentando conexión con las instrucciones")
+    if (errorCode == -3) {
+      console.log("Codigo de error: "+errorCode+" validatedURL: "+validatedURL )
+    }else{
+      instructionsWindow.webContents.loadURL(urlProxified);
+    }
   })
 }
-app.on("ready", createWindow);
+//app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -134,6 +141,8 @@ ipcMain.on('restart_app', () => {
 });
 
 app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
+  createWindow()
+  autoUpdater.checkForUpdates()
+  //if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
  

@@ -11,36 +11,40 @@
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
             <v-chip class="ma-2" color="primary" text-color="white">
-              Categoría
+              Trabajo Normal
               <v-icon right>mdi-tag</v-icon>
             </v-chip>
           </div>
 
           <v-card-title class="divCategory">
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.type == 'segmentannotation'"
             >Segmentación de imagen</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.type == 'annotation'"
             >Anotación de cuadros 2D</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.type == 'categorization'"
             >Categorización</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.type == 'videoboxannotation'"
             >Anotación de videobox</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.type == 'polygonannotation'"
             >Anotación de poligones</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.type == 'cuboidannotation'"
             >Anotación de Cubos 3D</v-card-title>
+            <v-card-title
+              class="textoCategory"
+              v-if="propJsonTask.Type == 'lidarsegmentation'"
+            >Segmentación Lidar</v-card-title>
           </v-card-title>
         </div>
 
@@ -53,37 +57,41 @@
           <!-- chips superior -->
           <div class="d-flex justify-content-end">
             <v-chip class="ma-2" color="yellow" text-color="white">
-              Revisor
+              Trabajo de Revisor
               <v-icon right>mdi-star</v-icon>
             </v-chip>
           </div>
 
           <v-card-title class="divCategory">
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'segmentannotation'"
             >Segmentación de imagen</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'annotation'"
             >Anotación de cuadros 2D</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'categorization'"
             >Categorización</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'videoboxannotation'"
             >Anotación de videobox</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'polygonannotation'"
             >Anotación de poligones</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'cuboidannotation'"
             >Anotación de Cubos 3D</v-card-title>
           </v-card-title>
+          <v-card-title
+              class="textoCategory"
+              v-if="propJsonTask.taskType == 'lidarsegmentation'"
+            >Segmentación Lidar</v-card-title>
         </div>
 
         <!-- si la imagen es un curso -->
@@ -103,30 +111,35 @@
           <!-- texto nombre de la categoría -->
           <v-card-title class="divCategory">
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'segmentannotation'"
             >Segmentación de imagen</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'annotation'"
             >Anotación de cuadros 2D</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'categorization'"
             >Categorización</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'videoboxannotation'"
             >Anotación de videobox</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'polygonannotation'"
             >Anotación de poligones</v-card-title>
             <v-card-title
-              class="text-light"
+              class="textoCategory"
               v-if="propJsonTask.taskType == 'cuboidannotation'"
             >Anotación de Cubos 3D</v-card-title>
+            <v-card-title
+              class="textoCategory"
+              v-if="propJsonTask.taskType == 'lidarsegmentation'"
+            >Segmentación Lidar</v-card-title>
           </v-card-title>
+          
         </div>
 
         <!-- si no hay tareas disponibles -->
@@ -136,7 +149,7 @@
           style="background-image: url('https://firebasestorage.googleapis.com/v0/b/remodesktop-9b704.appspot.com/o/noTasks.png?alt=media&token=7f41d0b3-934f-42ed-9711-33106b15dd31')"
         >
           <v-card-title class="divCategory">
-            <v-card-title class="text-light">Sin tareas disponibles</v-card-title>
+            <v-card-title class="text-light textoCategory">Sin tareas disponibles</v-card-title>
           </v-card-title>
         </div>
       </div>
@@ -202,12 +215,23 @@ export default {
       try {
         //Si el trabajo es de revisor
         if (this.propJsonTask.assignmentType == "task_attempt") {
-          this.UrlImageTask = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
+          if (this.propJsonTask.subtask.attachmentS3Downloads) {
+              this.UrlImageTask = this.propJsonTask.subtask.attachmentS3Downloads[0].s3URL;
+          }else{
+            console.log("No hay propJsonTask.attachmentS3Downloads en tarea de revisor")
+            this.UrlImageTask = this.propJsonTask.subtask.params.attachment
+          }
         }
 
         //Si el trabajo es normal
         if (this.propJsonTask.assignmentType == "subtask") {
-          this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
+          if (this.propJsonTask.attachmentS3Downloads) {
+            
+            this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
+          }else{
+            console.log("No hay propJsonTask.attachmentS3Downloads en tarea normal")
+            this.UrlImageTask = this.propJsonTask.params.attachment
+          }
         }
         // es un curso no hagas nada
         if (this.propJsonTask.assignmentType == "course") {
@@ -216,6 +240,7 @@ export default {
       } catch (error) {
         console.log("Error trayendo imagen");
         console.log(error);
+
         //Cae aqui cuando no es una tarea de revisor
       }
     },
@@ -265,25 +290,16 @@ export default {
             view.webContents.insertCSS(".full-screen-instructions{display: flex !important; justify-content: center !important;}")
             view.webContents.insertCSS(".instructions__wrapper{flex-grow: 0 !important;}")
             view.webContents.insertCSS(".instructions__body{display: none !important;}")
-            //view.webContents.insertCSS(".default.jsx-1809695030{text-indent: -9999px !important;}")
-            //view.webContents.insertCSS(".default.jsx-1809695030::before{content: 'Comenzar'; padding-left: 35px; text-indent: 0px; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;}")
             view.webContents.insertCSS(".instructions__title{text-indent: -9999px !important; line-height: 0 !important;}")
             view.webContents.insertCSS(".instructions__title.jsx-400793135{background-color: rgb(255, 255, 255) !important;}")
             view.webContents.insertCSS(".instructions__title::after{content: 'Por favor lea y consulte las instrucciones siempre que hallan dudas, tendrá mayor precision y logrará un mejor desempeño en el trabajo.' !important; font-size: large;  color: rgb(19, 19, 19); text-indent: 0; display: block; line-height: initial; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;}")
+            view.webContents.insertCSS(".wootric-question{display: none !important;}")
             
             //Estilo de la parte cuando NO tiene tareas
-            view.webContents.insertCSS(
-              ".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}"
-            );
-            view.webContents.insertCSS(
-              ".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;"
-            );
-            view.webContents.insertCSS(
-              ".fullscreen-card::after{font-size: x-large !important;}"
-            );
-            view.webContents.insertCSS(
-              ".jsx-2687182512{display: none !important;}"
-            );
+            view.webContents.insertCSS(".fullscreen-card::after{content: 'Vuelve al panel para buscar nuevos trabajos disponibles' !important;}");
+            view.webContents.insertCSS(".fullscreen-card::after{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif !important;");
+            view.webContents.insertCSS(".fullscreen-card::after{font-size: x-large !important;}");
+            view.webContents.insertCSS(".jsx-2687182512{display: none !important;}");
           });
 
           let urlPart1;
@@ -295,32 +311,15 @@ export default {
           }
 
           let urlInstrucciones = urlPart1[1];
+          if (urlInstrucciones == "height:800px; width:100%") {
+            urlInstrucciones = urlPart1[3];
+          }
+          console.log("Instrucciones")
+          console.log(urlInstrucciones)
           ipcRenderer.send("show-instrucciones", urlInstrucciones);
         }
       );
     },
-
-    openInstructions() {
-      let win = new BrowserWindow({
-        show: false,
-        frame: false,
-        useContentSize: true
-      });
-      win.maximize();
-      win.show();
-      win.webContents.loadURL("https://www.google.com/");
-
-      win.webContents.on("did-finish-load", () => {
-        console.log("Finalizó la carga del sitio");
-        view.webContents.insertCSS(
-          "html,body{ background-color: #FF0000 !important;}"
-        );
-      });
-
-      win.on("closed", () => {
-        win = null;
-      });
-    }
   }
 };
 </script>
@@ -328,10 +327,14 @@ export default {
 <style scoped>
 .divCategory {
   position: absolute;
-  bottom: 1px;
+  bottom: 0px;
   width: 100%;
   height: 40px;
   background-image: linear-gradient(rgba(255, 0, 0, 0), rgb(23, 26, 26));
+}
+.textoCategory{
+  position: absolute;
+  color: white;
 }
 .divImgCard {
   border-radius: 5px 5px 0px 0px;
