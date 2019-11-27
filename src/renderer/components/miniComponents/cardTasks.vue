@@ -158,8 +158,8 @@
         <div
           v-if="propJsonTask[0] == 's'"
         >Por ahora no hay trabajos en esta categoría, por favor revise luego.</div>
-        <div v-if="propJsonTask.assignmentType == 'subtask'">Trabajo normal</div>
-        <div v-if="propJsonTask.assignmentType == 'task_attempt'">Trabajo de Revisor</div>
+        <div v-if="propJsonTask.assignmentType == 'subtask'">{{nombreTarea}}</div>
+        <div v-if="propJsonTask.assignmentType == 'task_attempt'">{{nombreTarea}}</div>
         <div v-if="propJsonTask.assignmentType == 'course'">{{propJsonTask.title}}</div>
       </v-card-text>
 
@@ -187,9 +187,12 @@ To
 
 <script>
 import { mapMutations } from "vuex";
+const https = require('https');
 const fs = require("fs");
 const { ipcRenderer } = require("electron");
 const electron = require("electron");
+const cheerio = require("cheerio");
+let request = require("request");
 const BrowserView = electron.remote.BrowserView;
 
 export default {
@@ -200,16 +203,56 @@ export default {
     return {
       indexCard: this.propIndex,
       desabilitado: true,
-      UrlImageTask: ""
+      UrlImageTask: "",
+      nombreTarea: "-",
     };
   },
   mounted() {
+    this.initTraeNombreDeLTareaDeIntrucciones()
     this.initComprobarDndVieneLaImg();
   },
 
   methods: {
     ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
     //metodos aqui
+
+ async initTraeNombreDeLTareaDeIntrucciones(){
+      //Hace un split para obtener el url de la instrucciones
+      let urlArrayParte1
+        if (this.propJsonTask.assignmentType == 'task_attempt') {
+            urlArrayParte1 = this.propJsonTask.subtask.instruction.split('"');
+          } else if(this.propJsonTask.assignmentType == 'subtask') {
+            urlArrayParte1 = this.propJsonTask.instruction.split('"');
+          }else if(this.propJsonTask.assignmentType == 'course') {
+            //No hagas nada si es un curso
+          }
+
+    if (urlArrayParte1) {
+      let linkInstrucciones = urlArrayParte1[1];
+          if (linkInstrucciones == "height:800px; width:100%") {
+            linkInstrucciones = urlArrayParte1[3];
+          }
+          console.log(linkInstrucciones)
+    let respuesta1 = await fetch(linkInstrucciones);
+    let textResp = await respuesta1.text()
+    const $ = cheerio.load(textResp);
+      let tareaName = $("span").text().split("INSTRUCTION")
+      this.nombreTarea = tareaName[0]  
+      console.log(this.nombreTarea)
+        /* request({
+    method: 'GET',
+    url: linkInstrucciones
+}, function (error, response, html) {
+  if (!error && response.statusCode == 200) {
+      const $ = cheerio.load(html);
+      let tareaName = $("span").text().split("INSTRUCTION")
+      this.nombreTarea = tareaName[0]  
+      console.log(this.nombreTarea)
+  }
+  console.log(response.statusCode)
+}); */
+       }
+    },
 
     initComprobarDndVieneLaImg() {
       try {
