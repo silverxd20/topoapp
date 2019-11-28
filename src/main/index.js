@@ -115,6 +115,10 @@ app.on("window-all-closed", () => {
   }
 });
 
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() });
+});
+
 app.on("activate", () => {
   if (mainWindow === null) {
     createWindow();

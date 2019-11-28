@@ -6,7 +6,7 @@
         <div class="mr-5">
           <h1 class="topo d-flex justify-content-center">𝐓𝐨𝐩𝐨𝐬𝐚𝐭 𝐯𝐞𝐜𝐭𝐨𝐫</h1>
           <h4 class="text-light mr-5 d-flex justify-content-center">Gana dinero procesando imágenes.</h4>
-          <p class="pt-2 d-flex justify-content-center">Version 1.0.2</p>
+          <p class="pt-2 d-flex justify-content-center">{{versionApp}}</p>
           <!--Imagen izquierda-->
           <img class="img2 d-flex justify-content-center fluid" src="../../assets/worker.png" />
         </div>
@@ -54,15 +54,17 @@
 
 <script>
 import { mapState, mapMutations, mapActions } from "vuex";
-const { remote } = require("electron");
+const { remote, ipcRenderer } = require("electron");
 
 export default {
   name: "Login",
   created() {
+    this.getCurrentVersionApp()
     this.firebaseInit();
   },
   data() {
     return {
+      versionApp: "",
       spinner: "",
       mensaje: "",
       valorEmail: "",
@@ -87,6 +89,13 @@ export default {
       }
     },
 
+getCurrentVersionApp(){
+  ipcRenderer.send('app_version');
+    ipcRenderer.on('app_version', (event, arg) => {
+      ipcRenderer.removeAllListeners('app_version');
+      this.versionApp = 'Version ' + arg.version;
+    });
+},
     // LOGIN
     async btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
