@@ -11,7 +11,9 @@
     Problemas con el internet, recuperando la conexión...
     </v-alert>
       <div class="divElements">
-        <h1>Iniciando Toposat vector...</h1>
+        <h1 class="d-inline">Iniciando Toposat vector...</h1>
+        <div class="d-inline version">
+        </div>
       </div>
       <div class="divElements">
         <v-progress-circular :size="40" :width="5" color="dark" indeterminate></v-progress-circular>
@@ -105,4 +107,5 @@ export default {
 .divTotal{
   background-color: rgb(247, 247, 247)
 }
+
 </style>

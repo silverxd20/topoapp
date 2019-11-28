@@ -1,11 +1,13 @@
 <template>
   <div class="divtodo">
-    <div class="container contenedor align-items-center" id="contenedor">
-      <div class="row d-flex justify-content-center align-items-center">
+    <div class="container contenedor 
+    {tgg{t{gtf{gft{gff{gtgt">
+      <div class="fila row d-flex justify-content-center align-items-center">
         <!--Mensaje-->
         <div class="mr-5">
           <h1 class="topo d-flex justify-content-center">𝐓𝐨𝐩𝐨𝐬𝐚𝐭 𝐯𝐞𝐜𝐭𝐨𝐫</h1>
-          <h4 class="text-light mr-5 d-flex justify-content-center">Haz tareas, gana dinero!</h4>
+          <h4 class="text-light mr-5 d-flex justify-content-center">Gana dinero procesando imágenes.</h4>
+          <p class="pt-2 d-flex justify-content-center">Version 1.0.2</p>
           <!--Imagen izquierda-->
           <img class="img2 d-flex justify-content-center fluid" src="../../assets/worker.png" />
         </div>
@@ -164,7 +166,16 @@ export default {
   box-shadow: 3px 6px 10px 3px;
   width: 400px;
 }
-
+.contenedor{
+  height: 100%;
+  width:100%;
+  box-sizing: border-box;
+}
+.fila{
+  height: 100%;
+  width:100%;
+  box-sizing: border-box;
+}
 .img2 {
   width: 350px;
   height: 350px;
