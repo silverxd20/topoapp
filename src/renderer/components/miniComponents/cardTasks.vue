@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-card class="cardTasks mx-auto" max-width="300">
+    <v-card class="cardTasks mx-auto mt-3" max-width="300">
       <div>
         <!-- si la imagen es de tarea normal -->
         <div
-          v-if="propJsonTask.assignmentType == 'subtask'"
+          v-if="propJsonTask.assignmentType == 'subtask' && propJsonTask.type != 'lidarsegmentation'"
           class="divImage"
           :style="{'background-image': 'url('+UrlImageTask+')'}"
         >
@@ -44,6 +44,28 @@
             <v-card-title
               class="textoCategory"
               v-if="propJsonTask.Type == 'lidarsegmentation'"
+            >Segmentación Lidar</v-card-title>
+          </v-card-title>
+        </div>
+
+        <!-- si la Tarea es de una lidar atravesada en clasic -->
+        <div
+          v-if="propJsonTask.type == 'lidarsegmentation'"
+          class="divImage"
+          :style="{'background-image': 'url('+UrlImageTask+')'}"
+        >
+          <!-- chips superior -->
+          <div class="d-flex justify-content-end">
+            <v-chip class="ma-2" color="primary" text-color="white">
+              Lidar atravesado en classic
+              <v-icon right>mdi-tag</v-icon>
+            </v-chip>
+          </div>
+
+          <v-card-title class="divCategory">
+            <v-card-title
+              class="textoCategory"
+              v-if="propJsonTask.type == 'lidarsegmentation'"
             >Segmentación Lidar</v-card-title>
           </v-card-title>
         </div>
@@ -160,6 +182,7 @@
         <div v-if="propJsonTask.assignmentType == 'subtask'">{{nombreTarea}}</div>
         <div v-if="propJsonTask.assignmentType == 'task_attempt'">{{nombreTarea}}</div>
         <div v-if="propJsonTask.assignmentType == 'course'">{{propJsonTask.title}}</div>
+        <div v-if="propJsonTask.type == 'lidarsegmentation'">{{propJsonTask.project.name}}</div>
       </v-card-text>
 
       <v-card-actions class="d-flex justify-content-center">
@@ -257,7 +280,7 @@ export default {
         }
 
         //Si el trabajo es normal
-        if (this.propJsonTask.assignmentType == "subtask") {
+        if (this.propJsonTask.assignmentType == "subtask" && this.propJsonTask.type != "lidarsegmentation") {
           if (this.propJsonTask.attachmentS3Downloads) {
             this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
           } else {
@@ -270,6 +293,12 @@ export default {
         // es un curso no hagas nada
         if (this.propJsonTask.assignmentType == "course") {
           console.log("Fué un curso");
+        }
+
+        //Si el trabajo es Lidar atravesado en clasic
+        if (this.propJsonTask.assignmentType == "subtask" && this.propJsonTask.type == "lidarsegmentation") {
+          
+            this.UrlImageTask = this.propJsonTask.params.lidar_metadata[0].images[0].imageUrl;
         }
       } catch (error) {
         console.log("Error trayendo imagen");
@@ -371,7 +400,10 @@ export default {
           }
           console.log("Instrucciones");
           console.log(urlInstrucciones);
-          ipcRenderer.send("show-instrucciones", urlInstrucciones);
+          if (urlInstrucciones != null) {
+            //Si hay instrucciones entonces las abre
+            ipcRenderer.send("show-instrucciones", urlInstrucciones);
+          }
         }
       );
     }

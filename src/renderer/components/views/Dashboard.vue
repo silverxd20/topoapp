@@ -180,7 +180,7 @@ export default {
                   console.log(this.arraySession);
 
                   // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
-                  this.getDatosCuentas(this.arraySession);
+                  //this.getDatosCuentas(this.arraySession);
                   this.getAvailableTasks(this.arraySession);
                 }
               });
@@ -239,18 +239,20 @@ export default {
             try {
               //Comprueba si la tarea es normal o de tipo revisor
               if (jsonRespTarea.assignmentType == "subtask") {
-                //Es una tarea normal, se enviará al data.
-                console.log("Es una tarea clasica");
-                console.log("................................................");
-                this.jsonTarea.push(jsonRespTarea);
-                this.arraySessionParaTareasCards.push(arraySession[index]);
 
-                //IF interno que comprueba si hay una lidar en el panel de tasks clasicas
-                if (jsonRespTarea.type == "lidarsegmentation") {
+                if (jsonRespTarea.type != "lidarsegmentation") {              
+                  //Es una tarea normal, se enviará al data.
+                  console.log("Es una tarea clasica");
+                  console.log("................................................");
+                  this.jsonTarea.push(jsonRespTarea);
+                  this.arraySessionParaTareasCards.push(arraySession[index]);           
+
+                //ELSE IF interno que comprueba si hay una lidar en el panel de tasks clasicas
+               } else if (jsonRespTarea.type == "lidarsegmentation") {
                   //Si alguna cuenta tiene lidar y se atraviesa en clasic, manejarlo aqui
-                  console.log(
-                    "Hay una lidar segmentacion atravesada en clasic"
-                  );
+                  console.log("Hay una lidar segmentacion atravesada en clasic");
+                  this.jsonTarea.push(jsonRespTarea);
+                  this.arraySessionParaTareasCards.push(arraySession[index]);
                 } else {
                   //No hay lidar atravesada
                 }
