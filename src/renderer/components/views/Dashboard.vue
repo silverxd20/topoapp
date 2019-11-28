@@ -76,14 +76,25 @@
       <!-- Oculta o muestra el mensaje y loader de las tareas -->
       <div v-show="showLoadingTasks" class="text-center divBuscandoTasks">
         <v-progress-circular color="dark" indeterminate size="40"></v-progress-circular>
-        <h4>Buscando trabajos disponibles</h4>
+        <h4>Buscando trabajos disponibles...</h4>
       </div>
 
       <!--Parte de las tareas-->
       <v-container class="cont-Tareas" grid-list-xs>
-        <v-layout row wrap>
+        <v-layout row wrap v-if="vflexSize == '2'">  
           <v-flex xs6 v-for="(tasks, index) of jsonTarea" :key="index">
-            <!-- Tarjeta de las tareas -->
+            <!-- Tarjeta de las tareas de 2 celdas-->
+            <cardTasks
+              :propJsonTask="tasks"
+              :propArraySession="arraySession"
+              :propIndex="index"
+            ></cardTasks>
+          </v-flex>
+        </v-layout>
+
+        <v-layout row wrap v-if="vflexSize >= '3'">  
+          <v-flex xs4 v-for="(tasks, index) of jsonTarea" :key="index">
+            <!-- Tarjeta de las tareas de 3 celdas-->
             <cardTasks
               :propJsonTask="tasks"
               :propArraySession="arraySession"
@@ -111,10 +122,13 @@ export default {
   name: "dashboard",
   created() {
     this.firebaseInit();
+    console.log("Data de usuarios")
+    console.log(this.userAuthData)
   },
   components: { barraSuperior, cardTasks },
   data() {
     return {
+      vflexSize: "",
       sinTareas: "no",
       toggleRefresh: false,
       toggleSpinnerRefresh: true,
@@ -175,6 +189,8 @@ export default {
                 //busca el ID del usuario para traer sus JWT
                 if (doc.id == user.uid) {
                   this.arraySession = Object.values(doc.data());
+                 console.log(this.arraySession.length)
+                 this.vflexSize = this.arraySession.length
                   //Transforma el json a Array de las cuentas JWT.
                   console.log("valor de arraySession");
                   console.log(this.arraySession);
@@ -284,6 +300,10 @@ export default {
             console.log("No hay tareas en esta cuenta.");
             this.jsonTarea.push("s");
             this.arraySessionParaTareasCards.push(arraySession[index]);
+            //Cuando termine el bucle quita el loader y el mensaje
+              if (index == this.forLengthJWtCuentas) {
+                this.showLoadingTasks = false;
+              }
           }
           //................................................................................
         } catch (error) {
