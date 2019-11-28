@@ -1,7 +1,6 @@
 <template>
   <div class="divtodo">
-    <div class="container contenedor 
-    {tgg{t{gtf{gft{gff{gtgt">
+    <div class="container contenedor d-flex align-items-center">
       <div class="fila row d-flex justify-content-center align-items-center">
         <!--Mensaje-->
         <div class="mr-5">
