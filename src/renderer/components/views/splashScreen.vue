@@ -64,7 +64,6 @@ export default {
       firebase.auth().onAuthStateChanged(async user => {
         for (let index = 0; index < 1; index++) {
           try {
-            console.log(user);
             let userData;
             if (user) {
               //Si ya tiene la session abierta pasa al dashboard

@@ -292,7 +292,7 @@ export default {
         }
         // es un curso no hagas nada
         if (this.propJsonTask.assignmentType == "course") {
-          console.log("Fué un curso");
+          //Cae aqui cuando es un curso pero no hagas nada!
         }
 
         //Si el trabajo es Lidar atravesado en clasic

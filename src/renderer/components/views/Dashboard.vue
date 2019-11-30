@@ -122,8 +122,6 @@ export default {
   name: "dashboard",
   created() {
     this.firebaseInit();
-    console.log("Data de usuarios")
-    console.log(this.userAuthData)
   },
   components: { barraSuperior, cardTasks },
   data() {
@@ -158,29 +156,23 @@ export default {
   methods: {
     //......................EVENT LISTENERS.......................................
     async firebaseInit() {
-      console.log("User data");
-      console.log(this.userAuthData);
+
       this.mainSeasson = remote.getCurrentWindow();
       this.sesion = this.mainSeasson.webContents.session;
 
       for (let index = 0; index < 1; index++) {
-
       try {
       if (!firebase.apps.length) {
         // Initialize Firebase
-        console.log("Iniciando firebase")
           firebase.initializeApp(this.firebaseConfig);  
       }
-      console.log("antes de firestore")
       this.db = firebase.firestore();
 
       //Listener que se ejecuta cuando el usuario esta iniciado y obtiene las tareas y saldo.
-      console.log("antes de onAuthStateChanged")
       firebase.auth().onAuthStateChanged(user => {
         try {
         if (user) {
           //Solicita datos de la coleccion usuarios
-            console.log("antes de pedir tokens")
           this.db
             .collection("tokens")
             .get()
@@ -189,7 +181,6 @@ export default {
                 //busca el ID del usuario para traer sus JWT
                 if (doc.id == user.uid) {
                   this.arraySession = Object.values(doc.data());
-                 console.log(this.arraySession.length)
                  this.vflexSize = this.arraySession.length
                   //Transforma el json a Array de las cuentas JWT.
                   console.log("valor de arraySession");
@@ -217,8 +208,7 @@ export default {
             }, 3000);
       }
     }
-
-    },
+  },
 
     //..........................FUNCIONES...........................................
 
@@ -259,7 +249,6 @@ export default {
                 if (jsonRespTarea.type != "lidarsegmentation") {              
                   //Es una tarea normal, se enviará al data.
                   console.log("Es una tarea clasica");
-                  console.log("................................................");
                   this.jsonTarea.push(jsonRespTarea);
                   this.arraySessionParaTareasCards.push(arraySession[index]);           
 
@@ -277,11 +266,9 @@ export default {
                 console.log("Esto es un curso: " + jsonRespTarea.title);
                 this.jsonTarea.push(jsonRespTarea);
                 this.arraySessionParaTareasCards.push(arraySession[index]);
-                console.log("................................................");
               } else if (jsonRespTarea.assignmentType == "task_attempt") {
                 //Si el tipo de tarea es de Revisor, se enviará al data.
-                console.log("Tarea de tipo revisor: " + jsonRespTarea);
-                console.log("................................................");
+                console.log("Tarea de tipo revisor");
                 this.jsonTarea.push(jsonRespTarea);
                 this.arraySessionParaTareasCards.push(arraySession[index]);
               }
@@ -327,9 +314,8 @@ export default {
       try {
         if (response.statusCode == 200) {
           const $ = await cheerio.load(body);
-          var part1 = $(".jsx-2539128144")
-            .text()
-            .split(" ");
+          var part1 = $(".jsx-2539128144").text().split(" ");
+          var part2review = $(".item__content").text()
           let nameCuenta = part1[2].split("!");
           console.log("Nombre de la cuenta: " + nameCuenta[0]);
 
@@ -355,40 +341,79 @@ export default {
 
           if (part1[15] == "every") {
             //Si se mueve en el array obtiene igual las tareas aprobadas y pendientes.
+
+            //Obtiene valor de tareas Normales
             var part2 = part1[18].split("T");
             var part3 = part2[0].split("s");
             var part4 = part3[1].split("+");
 
+            //Obtiene valor de tareas de revisor
+            var parte2 = part1[19].split("T");
+            var parte3 = parte2[0].split("s");
+            var parte4 = parte3[1].split("+");
+
+            //Pone el valor de las tareas en 0
             var saldoPendientes = parseInt(0);
             var saldoAprobadas = parseInt(0);
-            if (part4.length == 1) {
-              console.log("Tareas pendientes: " + saldoPendientes);
-              console.log("Tareas Aprobadas: " + saldoAprobadas);
-              console.log("................................................");
-            } else if (part4.length == 2) {
+            var saldoPendientesRevisor = parseInt(0);
+            var saldoAprobadasRevisor = parseInt(0);
+
+              //Normal
+              if (part4.length == 2) {
               var saldoPendientes = part4[1];
               var saldoAprobadas = part4[0];
+              console.log(saldoPendientesRevisor)
               console.log("Tareas pendientes: " + saldoPendientes);
               console.log("Tareas Aprobadas: " + saldoAprobadas);
               console.log("................................................");
             }
+
+             //Revisor
+            if (parte4.length == 2) {
+              var saldoPendientesRevisor = parte4[1];
+              var saldoAprobadasRevisor = parte4[0];
+              console.log(saldoPendientesRevisor)
+              console.log("Tareas pendientes Revisor: " + saldoPendientesRevisor);
+              console.log("Tareas Aprobadas Revisor: " + saldoAprobadasRevisor);
+              console.log("................................................");
+            }
+
           } else {
             //Si no se mueve en el array obtiene las tareas aprobadas y pendientes.
+
+            //Obtiene valor de tareas Normales
             var part2 = part1[17].split("T");
             var part3 = part2[0].split("s");
             var part4 = part3[1].split("+");
 
-            if (part4.length == 1) {
+            //Obtiene valor de tareas de revisor
+            var parte2 = part1[18].split("T");
+            var parte3 = parte2[0].split("s");
+            var parte4 = parte3[1].split("+");
+
+              //Pone el valor de las tareas en 0
               var saldoPendientes = parseInt(0);
               var saldoAprobadas = parseInt(0);
+              var saldoPendientesRevisor = parseInt(0);
+              var saldoAprobadasRevisor = parseInt(0);
+
+              //Normal
+               if (part4.length == 2) {
+              var saldoPendientes = part4[1];
+              var saldoAprobadas = part4[0];
+              console.log(saldoPendientesRevisor)
               console.log("Tareas pendientes: " + saldoPendientes);
               console.log("Tareas Aprobadas: " + saldoAprobadas);
               console.log("................................................");
-            } else if (part4.length == 2) {
-              var saldoPendientes = part4[1];
-              var saldoAprobadas = part4[0];
-              console.log("Tareas pendientes: " + saldoPendientes);
-              console.log("Tareas Aprobadas: " + saldoAprobadas);
+            }
+
+            //Revisor
+            if (parte4.length == 2) {
+              var saldoPendientesRevisor = parte4[1];
+              var saldoAprobadasRevisor = parte4[0];
+              console.log(saldoPendientesRevisor)
+              console.log("Tareas pendientes Revisor: " + saldoPendientesRevisor);
+              console.log("Tareas Aprobadas Revisor: " + saldoAprobadasRevisor);
               console.log("................................................");
             }
           }
@@ -408,22 +433,20 @@ export default {
           }
 
           //Suma las tareas aprobadas        
-            this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas);           
+            this.aprobadasTotal = this.aprobadasTotal + parseInt(saldoAprobadas) + parseInt(saldoAprobadasRevisor);           
             if (index == resta) {
               this.aprobadas = this.aprobadasTotal;
             }
           
           //Suma las tareas pendientes
-            this.pendientesTotal = this.pendientesTotal + parseInt(saldoPendientes);
+            this.pendientesTotal = this.pendientesTotal + parseInt(saldoPendientes) + parseInt(saldoPendientesRevisor);
             if (index == resta) {
               this.pendientes = this.pendientesTotal;
               this.toggleSpinnerRefresh = false;
               this.toggleRefresh = true;
             }
         } else {
-          console.log(
-            "Error: " + error + " Status Code: " + response.statusCode
-          );
+          console.log("Error: " + error + " Status Code: " + response.statusCode);
         }
       } catch (error) {
         //Cae aqui cuando el array viene vacio o undefined
@@ -442,10 +465,6 @@ export default {
 
         if (respCuentaUsuario.statusCode == "401") {
           console.log("El usuario perdio el token de session");
-          this.jsonTarea.push("s");
-        } else if (respCuentaUsuario.statusCode == "200") {
-          console.log("No tiene tareas esta cuenta desde el catch");
-          this.jsonTarea.push("s");
         }
       }
     },
@@ -468,8 +487,7 @@ export default {
         for (let index = 0; index < 1; index++) {
           try {
             //Envia la solicitud para obtener los datos
-            console.log("Antes de llamar Request");
-           let response = await request("https://www.remotasks.com/dashboard",
+           let respuesta = await request("https://www.remotasks.com/dashboard",
               {
                 method: "GET",
                 headers: {
@@ -479,12 +497,11 @@ export default {
                     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
                 }
               })
- 
+            
           //LLama la funcion que calcula y procesa los datos
-            console.log("Antes de llamar a CalculaDatos");
             this.CalculaDatos(
-              response,
-              response.body,
+              respuesta,
+              respuesta.body,
               indice,
               cookiejwtParametro.length,
               cookiesJWT
