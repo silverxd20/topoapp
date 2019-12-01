@@ -19,6 +19,7 @@
               <label class="text-light" for="exampleInputEmail1">Email address</label>
               <input
                 v-model="valorEmail"
+                @keyup.enter="btnLogin()"
                 type="email"
                 class="form-control"
                 aria-describedby="emailHelp"
