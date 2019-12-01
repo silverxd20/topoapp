@@ -117,6 +117,14 @@
             <v-list-item-title>Entrenamiento</v-list-item-title>
           </v-list-item>-->
 
+          <!--Link de Cuenta de usuario-->
+          <v-list-item @click="btnCuentaUser()" link>
+            <v-list-item-icon>
+              <v-icon>mdi-account-card-details-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Cuenta</v-list-item-title>
+          </v-list-item>
+
           <!-- Link de Preguntas frecuentes-->
           <v-list-item @click="btnPreguntasFrecuentes()" link>
             <v-list-item-icon>
@@ -267,6 +275,9 @@ export default {
     //Boton que envia hacia las preguntas frecuentes
     btnPreguntasFrecuentes() {
       this.$router.push({ path: "preguntasFrecuentes" });
+    },
+    btnCuentaUser(){
+      this.$router.push({ path: "cuentaUser" });
     },
     //..................listeners....................
 

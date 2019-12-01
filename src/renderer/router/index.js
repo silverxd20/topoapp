@@ -20,11 +20,11 @@ export default new Router({
       name: 'dashboard',
       component: require('@/components/views/Dashboard').default
     },
-    /*{
-      path: '/videoCursos',
-      name: 'videocursos',
-      component: require('@/components/views/videoCursos').default
-    },*/
+    {
+      path: '/cuentaUser',
+      name: 'cuentaUser',
+      component: require('@/components/views/cuentaUser').default
+    },
     {
       path: '/preguntasFrecuentes',
       name: 'preguntasfrecuentes',

@@ -1,7 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { createPersistedState, createSharedMutations } from "vuex-electron";
-import modules from "./modules";
 
 Vue.use(Vuex);
 
@@ -10,11 +8,7 @@ export default new Vuex.Store({
     toggleBackToDashboard: "divBtnback d-inline",
     browserViewId: "0",
     toggledrawer: false,
-    userAuthData: {
-      nombre: "...",
-      apellido: " ",
-      email: "..."
-    },
+    userAuthData: "",
     db: "",
     firebaseConfig: {
       apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
@@ -50,6 +44,9 @@ export default new Vuex.Store({
       state.userAuthData = payload;
       console.log("Datos de usuarios metidos al store");
     },
+    actualizaAuthData(state, payload){
+      state.userAuthData = payload
+    },
     clearUserData(state) {
       state.userAuthData = {
         nombre: "...",
@@ -74,6 +71,7 @@ export default new Vuex.Store({
           if (doc.exists) {
             //Envia la funcion al mutation y luego la retorna
            commit("showUserAuthData",doc.data())
+           commit("userAuth", payload)
             return doc.data();
           } else {
             return Promise.reject("No hay usuario");
