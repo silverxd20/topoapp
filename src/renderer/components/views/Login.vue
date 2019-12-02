@@ -19,6 +19,7 @@
               <label class="text-light" for="exampleInputEmail1">Email address</label>
               <input
                 v-model="valorEmail"
+                :disabled="toggleEmail"
                 @keyup.enter="btnLogin()"
                 type="email"
                 class="form-control"
@@ -28,8 +29,9 @@
             </div>
             <div class="form-group">
               <label class="text-light" for="exampleInputPassword1">Password</label>
-              <input
+              <input                
                 v-model="valorPass"
+                :disabled="togglePassword"
                 @keyup.enter="btnLogin()"
                 type="password"
                 class="form-control"
@@ -65,6 +67,8 @@ export default {
   },
   data() {
     return {
+      toggleEmail: false,
+      togglePassword: false,
       versionApp: "",
       spinner: "",
       mensaje: "",
@@ -100,6 +104,8 @@ getCurrentVersionApp(){
     // LOGIN
     async btnLogin() {
       this.spinner = "spinner-border spinner-border-sm";
+      this.toggleEmail = true
+      this.togglePassword = true
       try {
       let fireResp = await firebase
         .auth()
@@ -116,7 +122,8 @@ getCurrentVersionApp(){
               this.muestraDrawer();
               this.$router.push({ path: "Dashboard" });
               this.spinner = "";
-              console.log("Luego del push dashboard");
+              this.toggleEmail = false
+              this.togglePassword = false
             }
           } catch (error) {            
             index = -1
@@ -130,6 +137,8 @@ getCurrentVersionApp(){
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
+        this.toggleEmail = false
+        this.togglePassword = false
         //console.log(errorCode + " - " + errorMessage);
         if (errorCode == "auth/invalid-email") {
           //Si el usuario es incorrecto
