@@ -27,12 +27,24 @@ function createWindow() {
     backgroundColor: "#f1efeb",
     webPreferences: {
       nodeIntegration: true,
+      //devTools: false,
     },
   });
 
+  mainWindow.setMenu(null);
   mainWindow.maximize();
   mainWindow.show();
   mainWindow.webContents.loadURL(winURL);
+
+  //Cambia el título
+  mainWindow.setTitle("Toposat vector");
+
+  mainWindow.on("page-title-updated", (event, title)=>{
+    event.preventDefault()
+  })
+  mainWindow.webContents.on("page-title-updated", (event, title)=>{
+    event.preventDefault()
+  })
 
    // Open dev tools initially when in development mode
   if (process.env.NODE_ENV === "development") {
@@ -55,14 +67,20 @@ function createWindow() {
   instructionsWindow = new BrowserWindow({
     show: false,
     useContentSize: true,
-    frame: true,
     backgroundColor: "#f1efeb",
-    javascript: true
+    javascript: true,
+    webPreferences: {
+      devTools: false,
+    },
   });
   //Quita el menu
   instructionsWindow.setMenu(null);
   //Cambia el título
   instructionsWindow.setTitle("Instrucciones del trabajo");
+
+  instructionsWindow.on("page-title-updated", (event, title)=>{
+    event.preventDefault()
+  })
 
   //Muestra la ventana de instrucciones
   ipcMain.on("show-instrucciones", (event, url) => {
@@ -107,7 +125,6 @@ function createWindow() {
     }
   })
 }
-//app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

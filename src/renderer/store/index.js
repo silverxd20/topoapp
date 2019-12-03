@@ -71,7 +71,6 @@ export default new Vuex.Store({
           if (doc.exists) {
             //Envia la funcion al mutation y luego la retorna
            commit("showUserAuthData",doc.data())
-           commit("userAuth", payload)
             return doc.data();
           } else {
             return Promise.reject("No hay usuario");
