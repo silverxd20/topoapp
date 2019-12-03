@@ -3,7 +3,7 @@
     <v-container fluid>
       <!-- TARJETA DE LOS DATOS DEL USUARIO -->
       <v-card class="mt-3 mx-5">
-        <img class="d-block mx-auto mb-4" src="/src/renderer/assets/cuenta.png" alt />
+        <img class="d-block mx-auto mb-4" src="../../assets/cuenta.png" alt />
         <p
           class="d-flex justify-content-center texto"
         >Puede cambiar su contraseña o correo de cobro paypal</p>
