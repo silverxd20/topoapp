@@ -64,6 +64,8 @@
       <!-- TARJETA DE LOS TOKENS -->
 
       <v-card v-if="userAuthData.premium == true" class="cardTokens mt-3 mx-5">
+
+        <!-- Titulo de la tarjeta -->
         <div class="tituloTokenCard d-flex justify-content-end">
           <h5 class="titulo text-center d-inline">Cuentas de Usuario</h5>
           <v-chip class="ma-2 d-inline" color="yellow" text-color="white">
@@ -71,36 +73,38 @@
             <v-icon right>mdi-star</v-icon>
           </v-chip>
         </div>
+
+        <!-- Spinner de carga inicial -->
         <div class="d-flex justify-content-center pt-3 pb-4">
           <v-progress-circular v-show="showSpinner" color="dark" indeterminate size="30"></v-progress-circular>
         </div>
         <div class="mx-5" v-for="(tokenValor, index) in tokenlist" :key="index.id">
           <div class="d-flex justify-content-end pr-1">
             <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <img
-              v-on="on"
-              class="botonListToken"
-              @click="verToken(tokenlist[index].token)"
-              src="../../assets/ver-cuenta.png"
-              />
-          </template>
-           <span>Muestra nombre y correo de esta cuenta</span>
-           </v-tooltip>
-            
+              <template v-slot:activator="{ on }">
+                <img
+                  v-on="on"
+                  class="botonListToken"
+                  @click="verToken(tokenlist[index].token)"
+                  src="../../assets/ver-cuenta.png"
+                />
+              </template>
+              <span>Muestra nombre y correo de esta cuenta</span>
+            </v-tooltip>
+
             <v-tooltip top>
-           <template v-slot:activator="{ on }">
-           <img
-              v-on="on"
-              v-show="showQuitarBtn"
-              class="botonListToken"
-              dialog = true
-              @click="ShowConfirmarDeleteToken(index)"
-              src="../../assets/close-circle.png"
-            />
-      </template>
-      <span>Elimina este token</span>
-    </v-tooltip>
+              <template v-slot:activator="{ on }">
+                <img
+                  v-on="on"
+                  v-show="showQuitarBtn"
+                  class="botonListToken"
+                  dialog="true"
+                  @click="ShowConfirmarDeleteToken(index)"
+                  src="../../assets/close-circle.png"
+                />
+              </template>
+              <span>Elimina este token</span>
+            </v-tooltip>
           </div>
           <v-text-field
             :disabled="toggleInputToken"
@@ -153,19 +157,41 @@
         </div>
 
         <!-- Dialog que muestra el nombre de la cuenta -->
-        <v-dialog v-if="CondicionDialog == 'datosCuenta'" v-model="dialog" max-width="350" persistent>
+        <v-dialog
+          v-if="CondicionDialog == 'datosCuenta'"
+          v-model="dialog"
+          max-width="350"
+          persistent
+        >
           <v-card>
             <v-card-title class="headline">Datos de esta cuenta</v-card-title>
-            <v-card-text>Nombre: <span :class="spinnerStatusDialog" role aria-hidden="true"></span>{{nombreCuentaToken}}</v-card-text>
-            <v-card-text>Correo: <span :class="spinnerStatusDialog" role aria-hidden="true"></span>{{correoCuentaToken}}</v-card-text>
+            <v-card-text>
+              Nombre:
+              <span :class="spinnerStatusDialog" role aria-hidden="true"></span>
+              {{nombreCuentaToken}}
+            </v-card-text>
+            <v-card-text>
+              Correo:
+              <span :class="spinnerStatusDialog" role aria-hidden="true"></span>
+              {{correoCuentaToken}}
+            </v-card-text>
             <v-text-field
-            class="mx-3"
-            @change="activaGuardarPaypal()"
-            v-model="emailUserPaypal"
-            label="Correo PayPal de esta cuenta"
-            outlined
-          ></v-text-field>
-          <p v-show="showMensajeAddPaypal" class="text-danger text-center px-2">Agrega un correo paypal para cobrar en esta cuenta</p>
+              class="mx-3"
+              @change="activaGuardarPaypal()"
+              v-model="emailUserPaypal"
+              label="Correo PayPal de esta cuenta"
+              outlined
+            ></v-text-field>
+            <!-- MENSAJE de agregar un correo paypal -->
+            <p
+              v-show="showMensajeAddPaypal"
+              class="text-danger text-center px-2"
+            >Agrega un correo paypal para cobrar en esta cuenta</p>
+
+            <!-- MENSAJE de agregar un correo paypal -->
+            <p d-block v-show="showPaypalActualizado" class="text-success text-center">
+            <v-icon class="pr-1">mdi-check</v-icon>El correo paypal se ha actualizado.
+          </p>
             <v-card-actions>
               <v-spacer></v-spacer>
 
@@ -180,26 +206,28 @@
                 class="bg-primary text-light"
                 :disabled="toggleGuardarPaypal"
                 text
-                @click.stop="dialog = false"
-                @click="cambiarPaypalDialog()"
-              >Guardar</v-btn>
+                @click="GuardarPaypalDialog()"
+              >
+              <span :class="spinnerStatusPaypalDialog" role aria-hidden="true"></span>
+              Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
 
         <!-- Dialog confirmacion para eliminar token -->
-        <v-dialog v-if="CondicionDialog == 'confirmacion'" v-model="dialog" max-width="290" persistent>
+        <v-dialog
+          v-if="CondicionDialog == 'confirmacion'"
+          v-model="dialog"
+          max-width="290"
+          persistent
+        >
           <v-card>
             <v-card-title class="headline">Confirmación!</v-card-title>
-            <v-card-text>Desea eliminar esta cuenta?</v-card-text>       
+            <v-card-text>Desea eliminar esta cuenta?</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
               <!-- Boton NO -->
-              <v-btn
-                color="green darken-1"
-                text
-                @click.stop="dialog = false"
-              >No</v-btn>
+              <v-btn color="green darken-1" text @click.stop="dialog = false">No</v-btn>
               <!-- Boton SI -->
               <v-btn
                 color="green darken-1"
@@ -218,6 +246,7 @@
 <script>
 import { mapState, mapMutations } from "vuex";
 let request = require("async-request");
+var request2 = require('request');
 
 export default {
   mounted() {
@@ -234,6 +263,7 @@ export default {
       showFallidoToken: false,
       showBotones: false,
       showQuitarBtn: false,
+      showPaypalActualizado: false,
       showMensajeAddPaypal: false,
       toggleGuardarPaypal: true,
       toggleContraseña: true,
@@ -243,14 +273,17 @@ export default {
       toggleBtnEditar: false,
       toggleBtnEditarToken: false,
       toggleInputToken: true,
+      jwtClickeadoActual: "",
       nombreCuentaToken: "",
       correoCuentaToken: "",
       spinnerStatus: "",
+      spinnerStatusPaypalDialog: "",
       emailUserPaypal: "",
       spinnerStatusToken: "",
       CondicionDialog: "",
       spinnerStatusDialog: "spinner-border spinner-border-sm",
       indexDeleteToken: "",
+      fingerPrint: "",
       dialog: false,
       show2: false,
       show3: false,
@@ -508,6 +541,7 @@ export default {
     },
     //9)Ver datos del token seleccionado
     async verToken(tokenJTW) {
+      this.jwtClickeadoActual = tokenJTW
       this.CondicionDialog = "datosCuenta"
       this.dialog = true
       this.spinnerStatusDialog = "spinner-border spinner-border-sm"
@@ -541,6 +575,7 @@ export default {
       this.showMensajeAddPaypal = false
       this.emailUserPaypal = ""
       this.toggleGuardarPaypal = true
+      this.showPaypalActualizado = false
     },
     //11) abre dialog que confirma antes de eliminar
     ShowConfirmarDeleteToken(index){
@@ -553,13 +588,49 @@ export default {
       this.toggleGuardarPaypal = false
     },
     //13) cambia o agrega en remotasks el correo de paypal de esa cuenta
-    cambiarPaypalDialog(){
+    async GuardarPaypalDialog(){
+      this.crearFingerPrint(31);
+      this.spinnerStatusPaypalDialog = "spinner-border spinner-border-sm"
 
+      //Url de la solicitud http
+        console.log(this.jwtClickeadoActual)
+        request2.post({
+        headers: {
+        authorization: this.jwtClickeadoActual,
+        Origin: "https://www.remotasks.com",
+        "finger-print": "0" + this.fingerPrint,
+        "content-type": "application/json",
+        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"},
+        url: 'https://api-internal.scale.com/internal/worker/update',
+        body: JSON.stringify({"paypalEmail":this.emailUserPaypal,"countryCode":"VE","password":""})
+        },(error, response, body)=>{
+          this.spinnerStatusPaypalDialog = ""
+          this.toggleGuardarPaypal = true
+          this.showPaypalActualizado = true 
+        }).catch(error =>{
+              console.log("Salio mala la guardada de paypal")
+              console.log(error)
+              this.spinnerStatusPaypalDialog = ""
+              this.toggleGuardarPaypal = false
+        });
     },
     //14) si cambia el valor de los inputs de tokens se activa el boton guardar
     ActivaGuardarTokensOnChange(){
       this.toggleBtnGuardarToken = false;
     },
+    //15) Crea el Finger Print y lo almacena en el data.
+    crearFingerPrint(length) {
+      var result = "";
+      var characters =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+        this.fingerPrint = result;
+      }
+    }
   }
 };
 </script>
