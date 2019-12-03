@@ -104,6 +104,7 @@
           </div>
           <v-text-field
             :disabled="toggleInputToken"
+            @change="ActivaGuardarTokensOnChange()"
             v-model="tokenValor.token"
             :label="'Token '+index"
             outlined
@@ -152,20 +153,36 @@
         </div>
 
         <!-- Dialog que muestra el nombre de la cuenta -->
-        <v-dialog v-if="CondicionDialog == 'datosCuenta'" v-model="dialog" max-width="290" persistent>
+        <v-dialog v-if="CondicionDialog == 'datosCuenta'" v-model="dialog" max-width="350" persistent>
           <v-card>
             <v-card-title class="headline">Datos de esta cuenta</v-card-title>
             <v-card-text>Nombre: <span :class="spinnerStatusDialog" role aria-hidden="true"></span>{{nombreCuentaToken}}</v-card-text>
             <v-card-text>Correo: <span :class="spinnerStatusDialog" role aria-hidden="true"></span>{{correoCuentaToken}}</v-card-text>
+            <v-text-field
+            class="mx-3"
+            @change="activaGuardarPaypal()"
+            v-model="emailUserPaypal"
+            label="Correo PayPal de esta cuenta"
+            outlined
+          ></v-text-field>
+          <p v-show="showMensajeAddPaypal" class="text-danger text-center px-2">Agrega un correo paypal para cobrar en esta cuenta</p>
             <v-card-actions>
               <v-spacer></v-spacer>
 
               <v-btn
-                color="green darken-1"
+                class="text-light bg-danger"
                 text
                 @click.stop="dialog = false"
                 @click="cerrarDialog()"
               >Cerrar</v-btn>
+
+              <v-btn
+                class="bg-primary text-light"
+                :disabled="toggleGuardarPaypal"
+                text
+                @click.stop="dialog = false"
+                @click="cambiarPaypalDialog()"
+              >Guardar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -174,8 +191,7 @@
         <v-dialog v-if="CondicionDialog == 'confirmacion'" v-model="dialog" max-width="290" persistent>
           <v-card>
             <v-card-title class="headline">Confirmación!</v-card-title>
-            <v-card-text>Desea eliminar esta cuenta?</v-card-text>
-           
+            <v-card-text>Desea eliminar esta cuenta?</v-card-text>       
             <v-card-actions>
               <v-spacer></v-spacer>
               <!-- Boton NO -->
@@ -218,6 +234,8 @@ export default {
       showFallidoToken: false,
       showBotones: false,
       showQuitarBtn: false,
+      showMensajeAddPaypal: false,
+      toggleGuardarPaypal: true,
       toggleContraseña: true,
       toggleCorreoPaypal: true,
       toggleBtnGuardar: true,
@@ -228,6 +246,7 @@ export default {
       nombreCuentaToken: "",
       correoCuentaToken: "",
       spinnerStatus: "",
+      emailUserPaypal: "",
       spinnerStatusToken: "",
       CondicionDialog: "",
       spinnerStatusDialog: "spinner-border spinner-border-sm",
@@ -505,21 +524,41 @@ export default {
         "https://api-internal.scale.com/internal/logged_in_user";
       //Envia la solicitud para obtener los datos con libreria request
       let resp = await request(urlPedirTarea, { method: "GET", headers });
-      let { firstName, lastName, email } = JSON.parse(resp.body);
+      let { firstName, lastName, email, paypalEmail } = JSON.parse(resp.body);
       this.spinnerStatusDialog = ""
       this.nombreCuentaToken = firstName + " " + lastName;
       this.correoCuentaToken = email;
+      this.emailUserPaypal = paypalEmail
+      if (this.emailUserPaypal == null) {
+        console.log("correo paypal null")
+        this.showMensajeAddPaypal = true
+      }
     },
     //10) Cierra el dialog
     cerrarDialog() {
       this.nombreCuentaToken = ""
       this.correoCuentaToken = ""
+      this.showMensajeAddPaypal = false
+      this.emailUserPaypal = ""
+      this.toggleGuardarPaypal = true
     },
     //11) abre dialog que confirma antes de eliminar
     ShowConfirmarDeleteToken(index){
       this.CondicionDialog = "confirmacion"
       this.dialog = true
       this.indexDeleteToken = index
+    },
+    //12) activa el boton guardar del input del dialog correo paypal
+    activaGuardarPaypal(){
+      this.toggleGuardarPaypal = false
+    },
+    //13) cambia o agrega en remotasks el correo de paypal de esa cuenta
+    cambiarPaypalDialog(){
+
+    },
+    //14) si cambia el valor de los inputs de tokens se activa el boton guardar
+    ActivaGuardarTokensOnChange(){
+      this.toggleBtnGuardarToken = false;
     },
   }
 };
