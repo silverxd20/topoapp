@@ -122,7 +122,7 @@
             <v-list-item-icon>
               <v-icon>mdi-account-card-details-outline</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Cuenta</v-list-item-title>
+            <v-list-item-title>Cuenta de usuario</v-list-item-title>
           </v-list-item>
 
           <!-- Link de Preguntas frecuentes-->

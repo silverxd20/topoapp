@@ -115,8 +115,7 @@ import { mapState } from "vuex";
 let { remote } = require("electron");
 const cheerio = require("cheerio");
 //const request = require("request");
-let request = require("async-request"),
-  response;
+let request = require("async-request")
 
 export default {
   name: "dashboard",

@@ -42,7 +42,7 @@
           >Editar</v-btn>
 
           <v-btn
-            @click="btnGuardar()"
+            @click="btnGuardarDatos()"
             class="ml-4 bg-primary"
             d-inline
             :disabled="toggleBtnGuardar"
@@ -56,28 +56,183 @@
             <v-icon class="pr-1">mdi-check</v-icon>Los datos han sido actualizados!
           </p>
           <p d-block v-show="showFallido" class="text-danger text-center">
-            <v-icon class="pr-1">mdi-alert-decagram</v-icon>No se pudieron actualizarlos datos, intente de nuevo.
+            <v-icon class="pr-1">mdi-alert-decagram</v-icon>No se pudieron actualizar los datos, intente de nuevo.
           </p>
         </div>
       </v-card>
 
       <!-- TARJETA DE LOS TOKENS -->
+
+      <v-card v-if="userAuthData.premium == true" class="cardTokens mt-3 mx-5">
+        <div class="tituloTokenCard d-flex justify-content-end">
+          <h5 class="titulo text-center d-inline">Cuentas de Usuario</h5>
+          <v-chip class="ma-2 d-inline" color="yellow" text-color="white">
+            Función Premium
+            <v-icon right>mdi-star</v-icon>
+          </v-chip>
+        </div>
+        <div class="d-flex justify-content-center pt-3 pb-4">
+          <v-progress-circular v-show="showSpinner" color="dark" indeterminate size="30"></v-progress-circular>
+        </div>
+        <div class="mx-5" v-for="(tokenValor, index) in tokenlist" :key="index.id">
+          <div class="d-flex justify-content-end pr-1">
+            <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <img
+              v-on="on"
+              class="botonListToken"
+              @click="verToken(tokenlist[index].token)"
+              src="../../assets/ver-cuenta.png"
+              />
+          </template>
+           <span>Muestra nombre y correo de esta cuenta</span>
+           </v-tooltip>
+            
+            <v-tooltip top>
+           <template v-slot:activator="{ on }">
+           <img
+              v-on="on"
+              v-show="showQuitarBtn"
+              class="botonListToken"
+              dialog = true
+              @click="ShowConfirmarDeleteToken(index)"
+              src="../../assets/close-circle.png"
+            />
+      </template>
+      <span>Elimina este token</span>
+    </v-tooltip>
+          </div>
+          <v-text-field
+            :disabled="toggleInputToken"
+            v-model="tokenValor.token"
+            :label="'Token '+index"
+            outlined
+          ></v-text-field>
+        </div>
+        <div v-show="showAgregarToken">
+          <p class="text-center">Agregar otra cuenta</p>
+          <div class="botonListToken pb-3 d-flex justify-content-center">
+            <img
+              v-show="showAgregarToken"
+              @click="agregarToken()"
+              src="../../assets/plus-circle.png"
+            />
+          </div>
+        </div>
+        <!-- botones para guardar o editar -->
+        <div class="d-flex justify-content-center pt-3">
+          <v-btn
+            v-show="showBotones"
+            :disabled="toggleBtnEditarToken"
+            @click="editarCampoTokens()"
+            class="mx-3 mb-4 bg-warning"
+            d-inline
+          >Editar</v-btn>
+
+          <v-btn
+            v-show="showBotones"
+            @click="btnGuardarTokens()"
+            class="ml-4 bg-primary"
+            d-inline
+            :disabled="toggleBtnGuardarToken"
+          >
+            <span :class="spinnerStatusToken" role aria-hidden="true"></span>
+            Guardar
+          </v-btn>
+        </div>
+
+        <!-- mensaje de confirmación o fállo -->
+        <div class="d-flex justify-content-center pt-1">
+          <p d-block v-show="showSatisfactorioToken" class="text-success text-center">
+            <v-icon class="pr-1">mdi-check</v-icon>La lista de cuentas se han actualizados!
+          </p>
+          <p d-block v-show="showFallidoToken" class="text-danger text-center">
+            <v-icon class>mdi-alert-decagram</v-icon>No se pudieron actualizar las cuentas, intente de nuevo.
+          </p>
+        </div>
+
+        <!-- Dialog que muestra el nombre de la cuenta -->
+        <v-dialog v-if="CondicionDialog == 'datosCuenta'" v-model="dialog" max-width="290" persistent>
+          <v-card>
+            <v-card-title class="headline">Datos de esta cuenta</v-card-title>
+            <v-card-text>Nombre: <span :class="spinnerStatusDialog" role aria-hidden="true"></span>{{nombreCuentaToken}}</v-card-text>
+            <v-card-text>Correo: <span :class="spinnerStatusDialog" role aria-hidden="true"></span>{{correoCuentaToken}}</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+
+              <v-btn
+                color="green darken-1"
+                text
+                @click.stop="dialog = false"
+                @click="cerrarDialog()"
+              >Cerrar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <!-- Dialog confirmacion para eliminar token -->
+        <v-dialog v-if="CondicionDialog == 'confirmacion'" v-model="dialog" max-width="290" persistent>
+          <v-card>
+            <v-card-title class="headline">Confirmación!</v-card-title>
+            <v-card-text>Desea eliminar esta cuenta?</v-card-text>
+           
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <!-- Boton NO -->
+              <v-btn
+                color="green darken-1"
+                text
+                @click.stop="dialog = false"
+              >No</v-btn>
+              <!-- Boton SI -->
+              <v-btn
+                color="green darken-1"
+                text
+                @click.stop="dialog = false"
+                @click="quitarToken()"
+              >Si</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-card>
     </v-container>
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from "vuex";
+let request = require("async-request");
 
 export default {
-  created() {
+  mounted() {
     this.initDatos();
   },
   data() {
     return {
+      tokenlist: [],
+      showAgregarToken: false,
+      showSpinner: true,
       showSatisfactorio: false,
+      showSatisfactorioToken: false,
       showFallido: false,
+      showFallidoToken: false,
+      showBotones: false,
+      showQuitarBtn: false,
+      toggleContraseña: true,
+      toggleCorreoPaypal: true,
+      toggleBtnGuardar: true,
+      toggleBtnGuardarToken: true,
+      toggleBtnEditar: false,
+      toggleBtnEditarToken: false,
+      toggleInputToken: true,
+      nombreCuentaToken: "",
+      correoCuentaToken: "",
       spinnerStatus: "",
+      spinnerStatusToken: "",
+      CondicionDialog: "",
+      spinnerStatusDialog: "spinner-border spinner-border-sm",
+      indexDeleteToken: "",
+      dialog: false,
       show2: false,
       show3: false,
       show4: false,
@@ -86,10 +241,6 @@ export default {
         required: value => !!value || "Obligatorio.",
         min: v => v.length >= 6 || "Minimo 6 caracteres"
       },
-      toggleContraseña: true,
-      toggleCorreoPaypal: true,
-      toggleBtnGuardar: true,
-      toggleBtnEditar: false,
       campoContraseña: "",
       campCorreoPaypal: "",
       contraseñaInicial: ""
@@ -100,12 +251,17 @@ export default {
   },
   methods: {
     ...mapMutations(["actualizaAuthData"]),
-
+    //1) Ejecuciones al inicio
     initDatos() {
       this.campoContraseña = this.userAuthData.password;
       this.campCorreoPaypal = this.userAuthData.correopaypal;
       this.contraseñaInicial = this.userAuthData.password;
+      console.log(this.userAuthData);
+      if (this.userAuthData.premium == true) {
+        this.getUserTokenList();
+      }
     },
+    //2) Permite que los inputs de los datos del usuario sean editables
     editarCampos() {
       this.toggleContraseña = false;
       this.toggleCorreoPaypal = false;
@@ -113,7 +269,55 @@ export default {
       this.showSatisfactorio = false;
       this.showFallido = false;
     },
-    btnGuardar() {
+    //3)Permite editar los campos de los tokens LISTO
+    editarCampoTokens() {
+      this.toggleInputTokens = false;
+      this.toggleInputToken = false;
+      this.showAgregarToken = true;
+      this.showQuitarBtn = true;
+      this.showSatisfactorioToken = false;
+      this.showFallidoToken = false;
+    },
+    //4) trae la lista de tokens y los pone en inputs LISTO
+    getUserTokenList() {
+      if (!firebase.apps.length) {
+        // Initialize Firebase
+        firebase.initializeApp(this.firebaseConfig);
+      }
+      let db;
+      db = firebase.firestore();
+      firebase.auth().onAuthStateChanged(user => {
+        db.collection("tokens")
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              //busca el ID del usuario para traer sus JWT
+              if (doc.id == user.uid) {
+                //Convierte el json que viene de la base de datos en array
+                let arraySession = Object.values(doc.data());
+                console.log(arraySession.length);
+                for (const index in arraySession) {
+                  //Envia el valor de la lista al data en json individual
+                  this.tokenlist.push({ token: arraySession[index] });
+                  //Cuando termine el bucle muestra y quita spiner y botones
+                  let lengthSession = arraySession.length - 1;
+                  if (index == lengthSession) {
+                    console.log("Finalizado");
+                    this.showSpinner = false;
+                    this.showBotones = true;
+                  }
+                }
+              }
+            });
+          })
+          .catch(error => {
+            console.log("Error obteniendo tokens catch promise");
+            console.log(error);
+          });
+      });
+    },
+    //5) Actualiza la contraseña y/o correo de paypal LISTO
+    btnGuardarDatos() {
       this.spinnerStatus = "spinner-border spinner-border-sm";
       this.toggleBtnGuardar = true;
       this.toggleBtnEditar = true;
@@ -229,7 +433,94 @@ export default {
           this.showFallido = true;
           this.toggleBtnGuardar = false;
         });
-    }
+    },
+    //6)Guarda los tokens en la base de datos
+    btnGuardarTokens() {
+      this.spinnerStatusToken = "spinner-border spinner-border-sm";
+      this.toggleInputToken = true;
+      this.showQuitarBtn = false;
+      this.showAgregarToken = false;
+      this.toggleBtnGuardarToken = true;
+      this.toggleBtnEditarToken = true;
+      this.showFallidoToken = false;
+
+      let tokenActualizadoList = [];
+      let db;
+      if (!firebase.apps.length) {
+        //Initialize Firebase
+        firebase.initializeApp(this.firebaseConfig);
+      }
+      //Cambia el formato del json al de la lista de la base de datos
+      let ListaTokensActualizada = {};
+      for (const index in this.tokenlist) {
+        console.log(this.tokenlist[index].token);
+        ListaTokensActualizada[index] = this.tokenlist[index].token;
+      }
+      //Envía a la base de datos la nueva lista de tokens
+      db = firebase.firestore();
+      db.collection("tokens")
+        .doc(this.userAuthData.userid)
+        .set(ListaTokensActualizada)
+        .then(e => {
+          console.log("Campos actualizados!");
+          this.showSatisfactorioToken = true;
+          this.toggleBtnEditarToken = false;
+          this.spinnerStatusToken = "";
+        })
+        .catch(error => {
+          console.error("Error actualizando campos: ", error);
+          this.showFallidoToken = true;
+          this.toggleInputToken = false;
+          this.showQuitarBtn = true;
+          this.showAgregarToken = true;
+          this.toggleBtnGuardarToken = false;
+          this.spinnerStatusToken = "";
+        });
+    },
+    //7) quita elemento de la lista
+    quitarToken() {
+      this.$delete(this.tokenlist, this.indexDeleteToken);
+      this.toggleBtnGuardarToken = false;
+    },
+    //8) agregar nuevo token LISTO
+    agregarToken() {
+      this.tokenlist.push({ token: "" });
+      this.toggleBtnGuardarToken = false;
+    },
+    //9)Ver datos del token seleccionado
+    async verToken(tokenJTW) {
+      this.CondicionDialog = "datosCuenta"
+      this.dialog = true
+      this.spinnerStatusDialog = "spinner-border spinner-border-sm"
+
+      let headers = {
+        authorization: tokenJTW,
+        Origin: "https://www.remotasks.com",
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+      };
+
+      //Url de la solicitud http
+      let urlPedirTarea =
+        "https://api-internal.scale.com/internal/logged_in_user";
+      //Envia la solicitud para obtener los datos con libreria request
+      let resp = await request(urlPedirTarea, { method: "GET", headers });
+      let { firstName, lastName, email } = JSON.parse(resp.body);
+      this.spinnerStatusDialog = ""
+      this.nombreCuentaToken = firstName + " " + lastName;
+      this.correoCuentaToken = email;
+    },
+    //10) Cierra el dialog
+    cerrarDialog() {
+      this.nombreCuentaToken = ""
+      this.correoCuentaToken = ""
+    },
+    //11) abre dialog que confirma antes de eliminar
+    ShowConfirmarDeleteToken(index){
+      this.CondicionDialog = "confirmacion"
+      this.dialog = true
+      this.indexDeleteToken = index
+    },
   }
 };
 </script>
@@ -238,5 +529,21 @@ export default {
 .texto {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   font-size: 17px;
+}
+.tituloTokenCard {
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  background-color: rgb(30, 136, 299);
+  padding: 10px;
+  color: white;
+}
+.botonListToken {
+  cursor: pointer;
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+.titulo {
+  margin-right: 170px;
+  padding-top: 15px;
 }
 </style>
