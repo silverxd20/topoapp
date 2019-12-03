@@ -515,27 +515,6 @@ export default {
         }
       }
     }, // fin de la function get saldo cuentas
-
-    // 3) Funcion que abre la tarea disponible
-    OpenTask() {
-      let parteSinJWT = this.arraySession[1].split(" "); // deja la cookie sin el jwt
-
-      this.sesion.cookies.set(
-        {
-          url: "https://www.remotasks.com/",
-          name: "jwt",
-          value: parteSinJWT[1]
-        },
-        error => {
-          this.mainSeasson.loadURL("https://www.remotasks.com/tasks");
-          this.mainSeasson.webContents.on("did-finish-load", function() {
-            this.mainSeasson.webContents.insertCSS(
-              "html,body{ background-color: #FF0000 !important;}"
-            );
-          });
-        }
-      );
-    }
   }
 };
 </script>
