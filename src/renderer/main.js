@@ -29,10 +29,14 @@ new Vue({
   template: '<App/>',
 }).$mount('#app')
 
-remote.globalShortcut.register('CommandOrControl+Shift+K', () => {
+//Habilita la devtool en productions
+
+/*remote.globalShortcut.register('CommandOrControl+Shift+K', () => {
   remote.BrowserWindow.getFocusedWindow().webContents.openDevTools()
 })
 
+//Habilita los shortcut en productions
+
 window.addEventListener('beforeunload', () => {
   remote.globalShortcut.unregisterAll()
-})
+})*/
