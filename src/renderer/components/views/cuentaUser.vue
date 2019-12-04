@@ -5,8 +5,13 @@
       <v-card class="mt-3 mx-5">
         <img class="d-block mx-auto mb-4" src="../../assets/cuenta.png" alt />
         <p
+          v-if="userAuthData.premium == false"
           class="d-flex justify-content-center texto"
         >Puede cambiar su contraseña o correo de cobro paypal</p>
+        <p
+          v-if="userAuthData.premium == true"
+          class="d-flex justify-content-center texto"
+        >Puede cambiar su contraseña toposat vector</p>
         <v-layout class="d-flex justify-content-center">
           <v-flex xs6>
             <v-text-field
@@ -22,9 +27,9 @@
               outlined
             ></v-text-field>
           </v-flex>
-          <v-flex xs6>
+          <v-flex xs6 v-if="userAuthData.premium == false">
             <v-text-field
-              :disabled="toggleCorreoPaypal"
+              :disabled="toggleCorreoPaypal"              
               class="mr-5 ml-2"
               label="Correo Paypal"
               v-model="campCorreoPaypal"
@@ -64,12 +69,11 @@
       <!-- TARJETA DE LOS TOKENS -->
 
       <v-card v-if="userAuthData.premium == true" class="cardTokens mt-3 mx-5">
-
         <!-- Titulo de la tarjeta -->
-        <div class="tituloTokenCard d-flex justify-content-end">
+        <div class="tituloTokenCard d-flex justify-content-center">
           <h5 class="titulo text-center d-inline">Cuentas de Usuario</h5>
-          <v-chip class="ma-2 d-inline" color="yellow" text-color="white">
-            Función Premium
+          <v-chip class="chipPremium ma-2 d-inline" color="yellow" text-color="white">
+            Premium
             <v-icon right>mdi-star</v-icon>
           </v-chip>
         </div>
@@ -80,6 +84,19 @@
         </div>
         <div class="mx-5" v-for="(tokenValor, index) in tokenlist" :key="index.id">
           <div class="d-flex justify-content-end pr-1">
+            <!-- Boton de abrir el university -->
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-on="on"
+                  class="botonListToken"
+                  @click="clickOpenUniversity(tokenlist[index].token)"
+                >mdi-dock-window</v-icon>
+              </template>
+              <span>Abre el university de esta cuenta</span>
+            </v-tooltip>
+
+            <!-- Boton de ver la cuenta del token -->
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <img
@@ -190,13 +207,13 @@
 
             <!-- MENSAJE de agregar un correo paypal -->
             <p d-block v-show="showPaypalActualizado" class="text-success text-center">
-            <v-icon class="pr-1">mdi-check</v-icon>El correo paypal se ha actualizado.
-          </p>
+              <v-icon class="pr-1">mdi-check</v-icon>El correo paypal se ha actualizado.
+            </p>
             <v-card-actions>
               <v-spacer></v-spacer>
 
               <v-btn
-                class="text-light bg-danger"
+                class="text-light bg-dark"
                 text
                 @click.stop="dialog = false"
                 @click="cerrarDialog()"
@@ -208,8 +225,9 @@
                 text
                 @click="GuardarPaypalDialog()"
               >
-              <span :class="spinnerStatusPaypalDialog" role aria-hidden="true"></span>
-              Guardar</v-btn>
+                <span :class="spinnerStatusPaypalDialog" role aria-hidden="true"></span>
+                Guardar
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -245,8 +263,10 @@
 
 <script>
 import { mapState, mapMutations } from "vuex";
+const electron = require("electron");
+import { remote, Menu } from "electron";
 let request = require("async-request");
-var request2 = require('request');
+var request2 = require("request");
 
 export default {
   mounted() {
@@ -541,10 +561,10 @@ export default {
     },
     //9)Ver datos del token seleccionado
     async verToken(tokenJTW) {
-      this.jwtClickeadoActual = tokenJTW
-      this.CondicionDialog = "datosCuenta"
-      this.dialog = true
-      this.spinnerStatusDialog = "spinner-border spinner-border-sm"
+      this.jwtClickeadoActual = tokenJTW;
+      this.CondicionDialog = "datosCuenta";
+      this.dialog = true;
+      this.spinnerStatusDialog = "spinner-border spinner-border-sm";
 
       let headers = {
         authorization: tokenJTW,
@@ -559,63 +579,74 @@ export default {
       //Envia la solicitud para obtener los datos con libreria request
       let resp = await request(urlPedirTarea, { method: "GET", headers });
       let { firstName, lastName, email, paypalEmail } = JSON.parse(resp.body);
-      this.spinnerStatusDialog = ""
+      this.spinnerStatusDialog = "";
       this.nombreCuentaToken = firstName + " " + lastName;
       this.correoCuentaToken = email;
-      this.emailUserPaypal = paypalEmail
+      this.emailUserPaypal = paypalEmail;
       if (this.emailUserPaypal == null) {
-        console.log("correo paypal null")
-        this.showMensajeAddPaypal = true
+        console.log("correo paypal null");
+        this.showMensajeAddPaypal = true;
       }
     },
     //10) Cierra el dialog
     cerrarDialog() {
-      this.nombreCuentaToken = ""
-      this.correoCuentaToken = ""
-      this.showMensajeAddPaypal = false
-      this.emailUserPaypal = ""
-      this.toggleGuardarPaypal = true
-      this.showPaypalActualizado = false
+      this.nombreCuentaToken = "";
+      this.correoCuentaToken = "";
+      this.showMensajeAddPaypal = false;
+      this.emailUserPaypal = "";
+      this.toggleGuardarPaypal = true;
+      this.showPaypalActualizado = false;
     },
     //11) abre dialog que confirma antes de eliminar
-    ShowConfirmarDeleteToken(index){
-      this.CondicionDialog = "confirmacion"
-      this.dialog = true
-      this.indexDeleteToken = index
+    ShowConfirmarDeleteToken(index) {
+      this.CondicionDialog = "confirmacion";
+      this.dialog = true;
+      this.indexDeleteToken = index;
     },
     //12) activa el boton guardar del input del dialog correo paypal
-    activaGuardarPaypal(){
-      this.toggleGuardarPaypal = false
+    activaGuardarPaypal() {
+      this.toggleGuardarPaypal = false;
     },
     //13) cambia o agrega en remotasks el correo de paypal de esa cuenta
-    async GuardarPaypalDialog(){
+    async GuardarPaypalDialog() {
       this.crearFingerPrint(31);
-      this.spinnerStatusPaypalDialog = "spinner-border spinner-border-sm"
+      this.spinnerStatusPaypalDialog = "spinner-border spinner-border-sm";
 
       //Url de la solicitud http
-        console.log(this.jwtClickeadoActual)
-        request2.post({
-        headers: {
-        authorization: this.jwtClickeadoActual,
-        Origin: "https://www.remotasks.com",
-        "finger-print": "0" + this.fingerPrint,
-        "content-type": "application/json",
-        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"},
-        url: 'https://api-internal.scale.com/internal/worker/update',
-        body: JSON.stringify({"paypalEmail":this.emailUserPaypal,"countryCode":"VE","password":""})
-        },(error, response, body)=>{
-          this.spinnerStatusPaypalDialog = ""
-          this.toggleGuardarPaypal = true
-          this.showPaypalActualizado = true 
-        }).catch(error =>{
-              console.log("Salio mala la guardada de paypal")
-              console.log(error)
-              this.spinnerStatusPaypalDialog = ""
-              this.toggleGuardarPaypal = false
+      console.log(this.jwtClickeadoActual);
+      request2
+        .post(
+          {
+            headers: {
+              authorization: this.jwtClickeadoActual,
+              Origin: "https://www.remotasks.com",
+              "finger-print": "0" + this.fingerPrint,
+              "content-type": "application/json",
+              "user-agent":
+                "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+            },
+            url: "https://api-internal.scale.com/internal/worker/update",
+            body: JSON.stringify({
+              paypalEmail: this.emailUserPaypal,
+              countryCode: "VE",
+              password: ""
+            })
+          },
+          (error, response, body) => {
+            this.spinnerStatusPaypalDialog = "";
+            this.toggleGuardarPaypal = true;
+            this.showPaypalActualizado = true;
+          }
+        )
+        .catch(error => {
+          console.log("Salio mala la guardada de paypal");
+          console.log(error);
+          this.spinnerStatusPaypalDialog = "";
+          this.toggleGuardarPaypal = false;
         });
     },
     //14) si cambia el valor de los inputs de tokens se activa el boton guardar
-    ActivaGuardarTokensOnChange(){
+    ActivaGuardarTokensOnChange() {
       this.toggleBtnGuardarToken = false;
     },
     //15) Crea el Finger Print y lo almacena en el data.
@@ -630,6 +661,35 @@ export default {
         );
         this.fingerPrint = result;
       }
+    },
+    //16) Abre university
+    clickOpenUniversity(tokenJWT) {
+      let parteSinJWT = tokenJWT.split(" ");
+      let mainSeasson = electron.remote.getCurrentWindow();
+      let sesion = mainSeasson.webContents.session;
+
+      sesion.cookies.set(
+        {
+          url: "https://www.remotasks.com/",
+          name: "jwt",
+          value: parteSinJWT[1]
+        },
+        error => {
+          const remote = require("electron").remote;
+          const BrowserWindow = remote.BrowserWindow;
+          const win = new BrowserWindow({
+            show: false
+          });
+          win.maximize();         
+          //Pone el titulo y no deja que se actualice
+          win.webContents.loadURL("https://www.remotasks.com/university");
+          win.setTitle("Toposat vector");
+          win.webContents.on("page-title-updated", (event, title) => {
+            event.preventDefault();
+            win.setTitle("Toposat vector");
+          });
+        }
+      );
     }
   }
 };
@@ -641,6 +701,8 @@ export default {
   font-size: 17px;
 }
 .tituloTokenCard {
+  position: relative;
+  height: 55px;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
     "Lucida Sans", Arial, sans-serif;
   background-color: rgb(30, 136, 299);
@@ -653,7 +715,14 @@ export default {
   margin-right: 5px;
 }
 .titulo {
+  position: absolute;
   margin-right: 170px;
-  padding-top: 15px;
+  padding-top: 7px;
+}
+.chipPremium{
+  position: absolute;
+  right: 5px;
+  top:3px;
+  margin-bottom: 5px;
 }
 </style>

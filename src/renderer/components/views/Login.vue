@@ -139,6 +139,7 @@ getCurrentVersionApp(){
         var errorMessage = error.message;
         this.toggleEmail = false
         this.togglePassword = false
+        this.spinner = ""
         //console.log(errorCode + " - " + errorMessage);
         if (errorCode == "auth/invalid-email") {
           //Si el usuario es incorrecto

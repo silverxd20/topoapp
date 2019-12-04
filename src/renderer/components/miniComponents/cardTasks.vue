@@ -280,7 +280,10 @@ export default {
         }
 
         //Si el trabajo es normal
-        if (this.propJsonTask.assignmentType == "subtask" && this.propJsonTask.type != "lidarsegmentation") {
+        if (
+          this.propJsonTask.assignmentType == "subtask" &&
+          this.propJsonTask.type != "lidarsegmentation"
+        ) {
           if (this.propJsonTask.attachmentS3Downloads) {
             this.UrlImageTask = this.propJsonTask.attachmentS3Downloads[0].s3URL;
           } else {
@@ -296,9 +299,11 @@ export default {
         }
 
         //Si el trabajo es Lidar atravesado en clasic
-        if (this.propJsonTask.assignmentType == "subtask" && this.propJsonTask.type == "lidarsegmentation") {
-          
-            this.UrlImageTask = this.propJsonTask.params.lidar_metadata[0].images[0].imageUrl;
+        if (
+          this.propJsonTask.assignmentType == "subtask" &&
+          this.propJsonTask.type == "lidarsegmentation"
+        ) {
+          this.UrlImageTask = this.propJsonTask.params.lidar_metadata[0].images[0].imageUrl;
         }
       } catch (error) {
         console.log("Error trayendo imagen");
@@ -337,6 +342,32 @@ export default {
           this.browserId(view.id);
           this.showBackDash();
 
+          //EVENTO que avisa cuando una nueva ventana es creada por link externo _blank
+          view.webContents.on("new-window",
+            (event, url, frameName, disposition, options) => {
+              event.preventDefault();
+              const win = new BrowserWindow({
+                webContents: options.webContents, // use existing webContents if provided
+                show: false
+              });
+              win.maximize();
+              win.setMenu(null);
+              win.once("ready-to-show", () => win.show());
+              if (!options.webContents) {
+                //win.loadURL(url); // existing webContents will be navigated automatically
+              }
+              win.webContents.loadURL(url);
+              event.newGuest = win;
+              //Pone el titulo y no deja que se actualice
+              win.setTitle("Toposat vector");
+              win.on("page-title-updated", (event, title) => {
+                event.preventDefault();
+                win.setTitle("Toposat vector");
+              });
+            }
+          );
+
+          //Evento que avisa cuando el dom esta listo
           view.webContents.on("dom-ready", e => {
             /* fs.readFile(__dirname + "/test.css", "utf-8", function(
                 error,
