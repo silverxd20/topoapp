@@ -526,7 +526,7 @@ export default {
       let ListaTokensActualizada = {};
       for (const index in this.tokenlist) {
         console.log(this.tokenlist[index].token);
-        ListaTokensActualizada[index] = this.tokenlist[index].token;
+        ListaTokensActualizada["_"+index] = this.tokenlist[index].token;
       }
       //Envía a la base de datos la nueva lista de tokens
       db = firebase.firestore();
