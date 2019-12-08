@@ -257,9 +257,7 @@ export default {
         let respuesta1 = await fetch(linkInstrucciones);
         let textResp = await respuesta1.text();
         const $ = cheerio.load(textResp);
-        let tareaName = $("span")
-          .text()
-          .split("INSTRUCTION");
+        let tareaName = $("span").text().split("I");
         this.nombreTarea = tareaName[0];
         console.log(this.nombreTarea);
       }
