@@ -312,11 +312,14 @@ export default {
     async CalculaDatos(response, body, index, cookiejwtParametro, cookiesJWT) {
       try {
         const $ = await cheerio.load(body);
-        var part1 = $(".jsx-2539128144")
-          .text()
-          .split(" ");
+        //obtiene el array de dnd vienen los datos de tareas normales y saldo
+        var part1 = $(".jsx-2539128144").text().split(" ");
+          //obtiene el array de dnd vienen los datos de tareas de revisor
         var part2review = $(".item__content").text();
 
+        /*Pregunta si part1 viene null pq cuando hay una tarea nueva
+        que no tiene ni 1 solo curso no se muestran los datos de tareas
+        ni saldo, cuando eso ocurre entonces se va al Else */
         if (part1[1] != null) {
           let nameCuenta = part1[2].split("!");
           console.log("Nombre de la cuenta: " + nameCuenta[0]);
@@ -457,9 +460,10 @@ export default {
             this.toggleSpinnerRefresh = false;
             this.toggleRefresh = true;
           }
+        
         } else {
-          console.log("fue else");
-
+          
+          //Entra aqui cuando hay una cuenta totalmente nueva
            let resta = cookiejwtParametro - 1;
           //Suma el saldo del dinero
           this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(0);
