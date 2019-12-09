@@ -67,8 +67,10 @@
           </div>
           <!-- texto actualizar -->
           <p class="pt-4 ml-2 d-inline">Actualizar</p>
+          <p class="mx-2 pt-3 d-inline">|</p>
         </div>
         <!-- div que cierra si es visible o no los menus del app bar-->
+         <!-- <div class="pt-4" id="google_translate_element"></div>-->
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
       </v-app-bar>
@@ -164,6 +166,9 @@ export default {
   mounted() {
     this.firebaseInit();
     this.PendienteDeActualizar();
+    /*this.$nextTick(() => {
+            this.googleTranslateInit();
+        });*/
   },
   components: {
     barraSuperior
@@ -247,19 +252,19 @@ export default {
     //Boton de Zoom menos
     btnZoomMenos() {
       let view = new BrowserView.fromId(this.browserViewId);
-      //view.webContents.getZoomLevel((lvl)=>{this.zoomActual = lvl})
+     this.zoomActual = view.webContents.getZoomLevel()
       console.log(this.zoomActual);
       let zoomSumado = this.zoomActual - 0.25;
       view.webContents.setZoomLevel(zoomSumado);
       let llevarAporcentaje = zoomSumado * 100;
       this.porcentajeZoom = llevarAporcentaje + "%";
-      console.log("Zoom despues de sumar: " + this.porcentajeZoom);
+      console.log("Zoom despues de restar: " + this.porcentajeZoom);
       console.log((this.zoomActual = zoomSumado));
     },
     //Boton de Zoom más
     btnZoomMas() {
       let view = new BrowserView.fromId(this.browserViewId);
-      //view.webContents.getZoomLevel((lvl)=>{this.zoomActual = lvl})
+      this.zoomActual = view.webContents.getZoomLevel()
       console.log(this.zoomActual);
       let zoomSumado = this.zoomActual + 0.25;
       view.webContents.setZoomLevel(zoomSumado);
@@ -278,6 +283,25 @@ export default {
     },
     btnCuentaUser(){
       this.$router.push({ path: "cuentaUser" });
+    },
+
+    googleTranslateInit() {
+
+            let checkIfGoogleLoaded = setInterval(() => {
+
+                if (google.translate.TranslateElement != null) {
+                    clearInterval(checkIfGoogleLoaded);
+
+                    this.googleTranslateElement('google_translate_element');
+                }
+
+            }, 100);
+
+        },
+       //Funcion javascripto del traductor de gogle
+      googleTranslateElement() {
+        //let view = new BrowserView.fromId(this.browserViewId);
+       new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,es'}, 'google_translate_element');
     },
     //..................listeners....................
 
@@ -321,4 +345,5 @@ export default {
 .btnMenosMas {
   background-color: rgb(97, 97, 97) (65, 58, 58);
 }
+
 </style>
