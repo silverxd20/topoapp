@@ -13,7 +13,7 @@
               :items-per-page="5"
               class="elevation-1"
               :no-data-text="tableText"
-              no-results-text="Todos tus pagos se verán reflejados aquí."
+              no-results-text="Todos tus pagos semanales se verán reflejados aquí."
             ></v-data-table>
             
           </v-card>
