@@ -32,12 +32,11 @@ export default {
       indexPagoPaypalData: "",
       tableText: "",
       titulos: [
-        { text: "Fecha", value: "fecha", sortable: true},
+        { text: "Fecha", value: "fecha"},
         { text: "Referencia Paypal", value: "transactionid" },
         { text: "Monto Pagado", value: "monto" }
       ],
       datosdepago: [],
-      IniciadoUnaVez: false
     };
   },
 
