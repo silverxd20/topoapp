@@ -21,6 +21,11 @@ export default new Router({
       component: require('@/components/views/Dashboard').default
     },
     {
+      path: '/Historial',
+      name: 'historial',
+      component: require('@/components/views/Historial').default
+    },
+    {
       path: '/cuentaUser',
       name: 'cuentaUser',
       component: require('@/components/views/cuentaUser').default

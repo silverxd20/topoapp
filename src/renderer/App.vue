@@ -111,13 +111,12 @@
             <v-list-item-title>Panel de Trabajo</v-list-item-title>
           </v-list-item>
 
-          <!-- Link de Entrenamiento
-          <v-list-item @click="btnVideoCursos()" link>
+          <v-list-item @click="btnHistorial()" link>
             <v-list-item-icon>
-              <v-icon>mdi-library-video</v-icon>
+              <v-icon>mdi-history</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Entrenamiento</v-list-item-title>
-          </v-list-item>-->
+            <v-list-item-title>Historial de Pagos</v-list-item-title>
+          </v-list-item>
 
           <!--Link de Cuenta de usuario-->
           <v-list-item @click="btnCuentaUser()" link>
@@ -274,9 +273,9 @@ export default {
       console.log((this.zoomActual = zoomSumado));
     },
     //Boton que envia hacia los cursos
-    /*btnVideoCursos() {
-      this.$router.push({ path: "videoCursos" });
-    },*/
+    btnHistorial() {
+      this.$router.push({ path: "Historial" });
+    },
     //Boton que envia hacia las preguntas frecuentes
     btnPreguntasFrecuentes() {
       this.$router.push({ path: "preguntasFrecuentes" });
