@@ -15,7 +15,6 @@
               :no-data-text="tableText"
               no-results-text="Todos tus pagos semanales se verán reflejados aquí."
             ></v-data-table>
-            
           </v-card>
         </v-flex>
       </v-layout>
@@ -32,20 +31,17 @@ export default {
       indexPagoPaypalData: "",
       tableText: "",
       titulos: [
-        { text: "Fecha", value: "fecha"},
+        { text: "Fecha (mes/dia/año)", value: "fecha" },
         { text: "Referencia Paypal", value: "transactionid" },
         { text: "Monto Pagado", value: "monto" }
       ],
-      datosdepago: [],
+      datosdepago: []
     };
   },
 
   mounted() {
     this.initFunction();
-    if (this.IniciadoUnaVez == false) {
-      this.getListHistorialPagoPaypal();
-      this.IniciadoUnaVez = true;
-    }
+    this.getListHistorialPagoPaypal();
   },
   computed: {
     ...mapState(["firebaseConfig", "userAuthData"])
@@ -62,26 +58,34 @@ export default {
     getListHistorialPagoPaypal() {
       let db;
       db = firebase.firestore();
-
-      //Solicita todos los documentos y su data interna
-      db.collection("historialpagos")
-        .get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            if (doc.id == this.userAuthData.userid) {
-              this.tableText = "Cargando lista..."
-              let listaPagos = Object.values(doc.data());
-              let listaInvertida = listaPagos.reverse();
-              for (const index in listaInvertida) {
-                console.log(listaPagos[index].confirm);
-                this.datosdepago.push(listaPagos[index].confirm);
+      for (let index = 0; index < 1; index++) {
+        try{
+        //Solicita todos los documentos y su data interna
+        db.collection("historialpagos")
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              if (doc.id == this.userAuthData.userid) {
+                this.tableText = "Cargando lista...";
+                let listaPagos = Object.values(doc.data());
+                let listaInvertida = listaPagos.reverse();
+                for (const index in listaInvertida) {
+                  console.log(listaPagos[index].confirm);
+                  this.datosdepago.push(listaPagos[index].confirm);
+                }
+              } else {
+                console.log("No existe este id");
+                this.tableText =
+                  "Todos tus pagos semanales se verán reflejados aquí.";
               }
-            } else {
-              console.log("No existe este id");
-              this.tableText = "Todos tus pagos semanales se verán reflejados aquí."
-            }
+            });
           });
-        });
+        }catch(error){
+          console.log("error trayendo lista de pagos, reintentando...")
+          index = -1
+        }
+
+      }
     }
   }
 };
