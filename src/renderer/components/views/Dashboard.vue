@@ -134,6 +134,7 @@ export default {
       jsonTarea: [],
       ReviewTasks: "",
       pendientes: "-",
+      indicefinish: 0,
       approvedTasks: "",
       aprobadas: "-",
       forLengthJWtCuentas: "0",
@@ -427,12 +428,13 @@ export default {
           }
 
           //..............Sumatoria del saldo de todas los datos.............
-          let resta = cookiejwtParametro - 1;
+          let resta = cookiejwtParametro;
+          this.indicefinish = this.indicefinish +1
 
           //Suma el saldo del dinero
           this.saldoTotal =
             parseFloat(this.saldoTotal) + parseFloat(SaldoCuenta[1]);
-          if (index == resta) {
+          if (this.indicefinish == resta) {
             //Coloca el porcentaje % del usuario
             let valorPorcentaje = this.userAuthData.porcentaje;
             let SaldoConPorcentaje = (this.saldoTotal * valorPorcentaje) / 100;
@@ -440,13 +442,12 @@ export default {
             this.saldo = "$" + parseFloat(SaldoConPorcentaje).toFixed(2);
             console.log(this.saldoTotal);
           }
-
           //Suma las tareas aprobadas
           this.aprobadasTotal =
             this.aprobadasTotal +
             parseInt(saldoAprobadas) +
             parseInt(saldoAprobadasRevisor);
-          if (index == resta) {
+          if (this.indicefinish == resta) {
             this.aprobadas = this.aprobadasTotal;
           }
 
@@ -455,7 +456,7 @@ export default {
             this.pendientesTotal +
             parseInt(saldoPendientes) +
             parseInt(saldoPendientesRevisor);
-          if (index == resta) {
+          if (this.indicefinish == resta) {
             this.pendientes = this.pendientesTotal;
             this.toggleSpinnerRefresh = false;
             this.toggleRefresh = true;
@@ -464,10 +465,12 @@ export default {
         } else {
           
           //Entra aqui cuando hay una cuenta totalmente nueva
-           let resta = cookiejwtParametro - 1;
+           let resta = cookiejwtParametro;
+           this.indicefinish = this.indicefinish +1
+
           //Suma el saldo del dinero
           this.saldoTotal = parseFloat(this.saldoTotal) + parseFloat(0);
-          if (index == resta) {
+          if (this.indicefinish == resta) {
             //Coloca el porcentaje % del usuario
             let valorPorcentaje = this.userAuthData.porcentaje;
             let SaldoConPorcentaje = (this.saldoTotal * valorPorcentaje) / 100;
@@ -478,13 +481,13 @@ export default {
 
           //Suma las tareas aprobadas
           this.aprobadasTotal = this.aprobadasTotal + parseInt(0)
-          if (index == resta) {
+          if (this.indicefinish == resta) {
             this.aprobadas = this.aprobadasTotal;
           }
 
           //Suma las tareas pendientes
           this.pendientesTotal = this.pendientesTotal + parseInt(0) 
-          if (index == resta) {
+          if (this.indicefinish == resta) {
             this.pendientes = this.pendientesTotal;
             this.toggleSpinnerRefresh = false;
             this.toggleRefresh = true;
@@ -527,9 +530,8 @@ export default {
         var authJWT = part2 + "=" + part1[1];
         let count = 0;
         for (let index = 0; index < 1; index++) {
-          try {
             //Envia la solicitud para obtener los datos
-            let respuesta = await request(
+            let respuesta = request(
               "https://www.remotasks.com/dashboard",
               {
                 method: "GET",
@@ -540,21 +542,21 @@ export default {
                     "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
                 }
               }
-            );
+            ).then(datos =>{
 
             //LLama la funcion que calcula y procesa los datos
             this.CalculaDatos(
-              respuesta,
-              respuesta.body,
+              datos,
+              datos.body,
               indice,
               cookiejwtParametro.length,
               cookiesJWT
             );
-          } catch (error) {
-            console.log("Error en la obtención de datos");
+            }).catch(error =>{
+              console.log("Error en la obtención de datos");
             index = -1;
             console.log(error);
-          }
+            })
         }
       }
     } // fin de la function get saldo cuentas
