@@ -1,7 +1,7 @@
 <template>
     <div>
         <historialPagoPaypal></historialPagoPaypal>
-        <historialTareas></historialTareas>
+        <!--<historialTareas></historialTareas>-->
     </div>
 </template>
 
