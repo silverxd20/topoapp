@@ -226,7 +226,8 @@ export default {
       indexCard: this.propIndex,
       desabilitado: true,
       UrlImageTask: "",
-      nombreTarea: "-"
+      nombreTarea: "-",
+      TaskIniciada: true,
     };
   },
   mounted() {
@@ -328,8 +329,27 @@ export default {
         error => {
           let boundsJson = mainSeasson.getContentBounds();
           let heightExacto = boundsJson.height - 25;
-          let view = new BrowserView();
-          mainSeasson.setBrowserView(view);
+          let view
+          
+          if (this.TaskIniciada == true) {
+            console.log("fue normal: "+ view)
+            view = new BrowserView();            
+            mainSeasson.setBrowserView(view);            
+            view.webContents.loadURL("https://www.remotasks.com/tasks");
+            
+            
+          view.webContents.openDevTools()
+          this.browserId(view.id);
+          this.showBackDash();
+          view.setBounds({
+            x: 0,
+            y: 25,
+            width: boundsJson.width,
+            height: heightExacto
+          });          
+          this.TaskIniciada = false
+          }else{
+            console.log("ya no es null entro en else")
           view.setBounds({
             x: 0,
             y: 25,
@@ -337,33 +357,11 @@ export default {
             height: heightExacto
           });
           view.webContents.loadURL("https://www.remotasks.com/tasks");
-          this.browserId(view.id);
+          //view.webContents.openDevTools()
+          //this.browserId(view.id);
           this.showBackDash();
-
-          //EVENTO que avisa cuando una nueva ventana es creada por link externo _blank
-          view.webContents.on("new-window",
-            (event, url, frameName, disposition, options) => {
-              event.preventDefault();
-              const win = new BrowserWindow({
-                webContents: options.webContents, // use existing webContents if provided
-                show: false
-              });
-              win.maximize();
-              win.setMenu(null);
-              win.once("ready-to-show", () => win.show());
-              if (!options.webContents) {
-                //win.loadURL(url); // existing webContents will be navigated automatically
-              }
-              win.webContents.loadURL(url);
-              event.newGuest = win;
-              //Pone el titulo y no deja que se actualice
-              win.setTitle("Toposat vector");
-              win.on("page-title-updated", (event, title) => {
-                event.preventDefault();
-                win.setTitle("Toposat vector");
-              });
-            }
-          );
+          }
+          
 
           //Evento que avisa cuando el dom esta listo
           view.webContents.on("dom-ready", e => {
@@ -412,6 +410,88 @@ export default {
             );
             view.webContents.insertCSS(
               ".jsx-2687182512{display: none !important;}"
+            );
+
+            //Estilos del curso atravesado en tasks
+            view.webContents.insertCSS(
+              ".queue-course-title{background-image: linear-gradient(94.21deg, rgb(0, 109, 199) -4.77%, rgb(0, 109, 199) -4.76%, rgb(0, 109, 199) 69.18%, rgb(0, 109, 199) 105.5%) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-header.jsx-431219561{background-image: linear-gradient(94.21deg, rgb(0, 109, 199) -4.77%, rgb(0, 109, 199) -4.76%, rgb(0, 109, 199) 69.18%, rgb(0, 109, 199) 105.5%) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-header.jsx-431219561{background-image: linear-gradient(94.21deg, rgb(0, 109, 199) -4.77%, rgb(0, 109, 199) -4.76%, rgb(0, 109, 199) 69.18%, rgb(0, 109, 199) 105.5%) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-page.jsx-3824627926{background-color: rgb(96, 96, 96) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".continue.jsx-2209961743{background-color: rgb(0, 109, 199) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".jsx-1709700039{background-color: ghostwhite !important;}"
+            );
+            view.webContents.insertCSS(
+              ".choice.jsx-927790731:hover{background-color: rgb(0, 109, 199) !important;}"
+            );
+            view.webContents.insertCSS(
+              ".choice.jsx-927790731:hover{color: white !important;}"
+            );
+            view.webContents.insertCSS(
+              ".segment.jsx-104292899.segment.halfFilled.jsx-104292899{border-radius: 15px !important;}"
+            );
+            view.webContents.insertCSS(
+              ".segment.filled.jsx-104292899{border-radius: 15px !important;}"
+            );
+            view.webContents.insertCSS(
+              ".remoBlue.jsx-1809695030{background-color: white !important;}"
+            );
+            view.webContents.insertCSS(
+              ".remoBlue.jsx-1809695030{color: black !important;}"
+            );
+            //Cambio de posicion del titulo curso
+            view.webContents.insertCSS(
+              ".course-header.jsx-431219561{display: block !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-header.jsx-431219561{text-align: center !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-title.jsx-431219561{margin-bottom: 10px !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-title.jsx-431219561{font-size: 23 !important;}"
+            );
+            //Cambio de posicion del progress bar curso
+            view.webContents.insertCSS(
+              ".course-progress.jsx-431219561{display: flex !important;}"
+            );
+            view.webContents.insertCSS(
+              ".course-progress.jsx-431219561{justify-content: center !important;}"
+            );
+            //Color del texto "Correct"
+            view.webContents.insertCSS(
+              ".jsx-3857101166{color: white !important;}"
+            );
+            //Cambio texto de mensaje en scenario
+            view.webContents.insertCSS(
+              ".message.jsx-433961312{color: white !important;}"
+            );
+            view.webContents.insertCSS(
+              ".btn-clear.jsx-437056394{display: none !important;}"
+            );
+            view.webContents.insertCSS(
+              ".queue-course-title.jsx-437056394{font-size: 20 !important;}"
+            );
+            view.webContents.insertCSS(
+              "svg.svg-inline--fa.fa-caret-left.fa-w-6.fa-null.fa-rotate-null.fa-pull-null{display: none !important;}"
+            );
+            view.webContents.insertCSS(
+              "svg.svg-inline--fa.fa-caret-right.fa-w-6.fa-null.fa-rotate-null.fa-pull-null{display: none !important;}"
+            );
+            //Quita el boton donde dice remotasks en skip
+            view.webContents.insertCSS(
+              ".jsx-2180323840.reason__category:nth-child(1){display: none !important;}"
             );
           });
 
