@@ -9,6 +9,7 @@ export default new Vuex.Store({
     browserViewId: "0",
     toggledrawer: false,
     userAuthData: "",
+    ListPagosPaypal: [],
     db: "",
     firebaseConfig: {
       apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
@@ -35,7 +36,9 @@ export default new Vuex.Store({
       state.browserViewId = payload;
     },
     ocultaDrawer(state) {
+      console.log("Antes: "+state.toggledrawer)
       state.toggledrawer = false;
+      console.log("Despues: "+state.toggledrawer)
     },
     muestraDrawer(state) {
       state.toggledrawer = true;
@@ -53,6 +56,14 @@ export default new Vuex.Store({
         apellido: "",
         email: "..."
       };
+    },
+    setListaPaypal(state,payload){
+      let listapago = Object.value(payload)
+      let listaInvertida = listapago.reverse();
+                
+                for (const index in listaInvertida) {
+                  state.ListPagosPaypal.push(payload[index].confirm);
+                }
     }
   },
 
@@ -76,6 +87,40 @@ export default new Vuex.Store({
             return Promise.reject("No hay usuario");
           }
         });
+    },
+
+    getListPagoPaypal({ commit },payload){
+      let db;
+      if (!firebase.apps.length) {
+        // Initialize Firebase
+        firebase.initializeApp(this.firebaseConfig);
+      }
+      db = firebase.firestore();
+      for (let index = 0; index < 1; index++) {
+        try{
+
+        //Solicita todos los documentos y su data interna
+        db.collection("historialpagos")
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.forEach(doc => {
+              console.log(payload.userid)
+              if (doc.id == payload.userid) {
+                this.tableText = "Cargando lista...";
+                commit("setListaPaypal", doc.data())
+              } else {
+                console.log("No existe este id");
+                this.tableText =
+                  "Todos tus pagos semanales se verán reflejados aquí.";
+              }
+            });
+          });
+        }catch(error){
+          console.log("error trayendo lista de pagos, reintentando...")
+          index = -1
+        }
+
+      }
     }
   }
 
