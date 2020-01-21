@@ -67,29 +67,35 @@
           </div>
           <!-- texto actualizar -->
           <p class="pt-4 ml-2 d-inline">Actualizar</p>
+
+          <div class="d-inline">
+          <div :class="showTraductor">
           <p class="mx-2 pt-3 d-inline">|</p>
-        
-        
-        <!-- Boton Traducir -->
-        <div class="d-inline">
-          <v-btn
-            elevation="0"
-            width="10"
-            height="22"
-            @click="btnAddTraductor()"
-            rounded
-            color="transparent"
-            class="d-inline"
-          >
-            <v-icon height="5px" class="refresh mb-2">mdi-google-translate</v-icon>
-          </v-btn>
+            <!-- Boton Traducir -->
+            <div class="d-inline">
+              <v-btn
+                elevation="0"
+                width="10"
+                height="22"
+                @click="btnAddTraductor()"
+                rounded
+                color="transparent"
+                class="d-inline"
+              >
+                <v-icon
+                  height="5px"
+                  class="refresh mb-2"
+                >mdi-google-translate</v-icon>
+              </v-btn>
+            </div>
+
+            <!-- Texto Traducir -->
+            <div class="d-inline">
+              <p class="pt-4 ml-2 d-inline">Traducir</p>
+            </div>
+          </div>
+          </div>
         </div>
-  
-        <!-- Texto Traducir -->
-        <div class="d-inline">
-          <p class="pt-4 ml-2 d-inline">Traducir</p>
-        </div>
-      </div>
         <!-- div que cierra si es visible o no los menus del app bar-->
         <!-- <div class="pt-4" id="google_translate_element"></div>-->
         <v-spacer></v-spacer>
@@ -179,7 +185,7 @@
 import barraSuperior from "./components/barraSuperior/barraSuperior";
 import { mapState, mapMutations } from "vuex";
 import { ipcRenderer } from "electron";
-import { setInterval } from 'timers';
+import { setInterval } from "timers";
 const fs = require("fs");
 const electron = require("electron");
 const BrowserView = electron.remote.BrowserView;
@@ -190,7 +196,7 @@ export default {
   mounted() {
     this.firebaseInit();
     this.PendienteDeActualizar();
-    this.poneOcultaDrawer = this.toggledrawer
+    this.poneOcultaDrawer = this.toggledrawer;
     /*this.$nextTick(() => {
             this.googleTranslateInit();
         });*/
@@ -208,8 +214,8 @@ export default {
     };
   },
 
-  updated () {
-    this.poneOcultaDrawer = this.toggledrawer
+  updated() {
+    this.poneOcultaDrawer = this.toggledrawer;
     console.log(this.poneOcultaDrawer);
   },
   computed: {
@@ -219,7 +225,8 @@ export default {
       "toggledrawer",
       "firebaseConfig",
       "userAuthData",
-      "browserViewId"
+      "browserViewId",
+      "showTraductor"
     ])
   },
   methods: {
@@ -228,14 +235,14 @@ export default {
       "ocultaDrawer",
       "muestraDrawer",
       "clearUserData",
-      "hideBackDash"
+      "hideBackDash",
+      "hideTranslate"
     ]),
 
     //..................Funciones....................
 
     //1) Boton que desconecta la session del usuario
     btnSignOut() {
-      
       firebase
         .auth()
         .signOut()
@@ -254,6 +261,7 @@ export default {
       let view = new BrowserView.fromId(this.browserViewId);
       view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
       this.hideBackDash();
+      this.hideTranslate();
       ipcRenderer.send("click-dashboard");
       this.muestraDrawer();
       this.btnDashboard();
@@ -317,17 +325,18 @@ export default {
       this.$router.push({ path: "cuentaUser" });
     },
 
-    btnAddTraductor() {     
+    btnAddTraductor() {
       let view = new BrowserView.fromId(this.browserViewId);
       request.get(
-          {            
-            url: "https://firebasestorage.googleapis.com/v0/b/adminstore-c7c8c.appspot.com/o/TraductorWeb.js?alt=media&token=45cd8aa4-0623-447b-bb75-f26daea6e069",           
-          },
-          (error, response, body) => {
-            console.log(body)
-            view.webContents.executeJavaScript(body);
-          }
-        )
+        {
+          url:
+            "https://firebasestorage.googleapis.com/v0/b/adminstore-c7c8c.appspot.com/o/TraductorWeb.js?alt=media&token=45cd8aa4-0623-447b-bb75-f26daea6e069"
+        },
+        (error, response, body) => {
+          console.log(body);
+          view.webContents.executeJavaScript(body);
+        }
+      );
     },
 
     //..................listeners....................

@@ -8,6 +8,7 @@ export default new Vuex.Store({
     toggleBackToDashboard: "divBtnback d-inline",
     browserViewId: "0",
     toggledrawer: false,
+    showTraductor: "divBtnback d-inline",
     userAuthData: "",
     ListPagosPaypal: [],
     db: "",
@@ -24,6 +25,12 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    showTranslate(state){
+      state.showTraductor = "divBtnbackON d-inline";
+    },
+    hideTranslate(state){
+      state.showTraductor = "divBtnback d-inline";
+    },
     showBackDash(state) {
       //Aplica otro nombre a la clase deje de ocultar y muestre el back to dashboard
       state.toggleBackToDashboard = "divBtnbackON";

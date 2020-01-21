@@ -236,7 +236,7 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["browserId", "showBackDash", "ocultaDrawer"]),
+    ...mapMutations(["browserId", "showBackDash", "ocultaDrawer","showTranslate"]),
     //metodos aqui
 
     async initTraeNombreDeLTareaDeIntrucciones() {
@@ -347,6 +347,10 @@ export default {
             height: heightExacto
           });          
           this.TaskIniciada = false
+          //Si es un curso muestra el boton de traducir
+          if (this.propJsonTask.assignmentType == "course") {
+            this.showTranslate()
+          }
           }else{
             console.log("ya no es null entro en else")
           view.setBounds({
@@ -358,6 +362,11 @@ export default {
           view.webContents.loadURL("https://www.remotasks.com/tasks");
           //view.webContents.openDevTools()
           //this.browserId(view.id);
+          console.log("tipo: "+this.propJsonTask.assignmentType)
+          //Si es un curso muestra el boton de traducir
+          if (this.propJsonTask.assignmentType == "course") {
+            this.showTranslate()
+          }
           this.showBackDash();
           }
           
@@ -493,7 +502,7 @@ export default {
               ".jsx-2180323840.reason__category:nth-child(1){display: none !important;}"
             );
           });
-
+          
           let urlPart1;
           //obtiene el url de ls instrucciones
           if (this.propJsonTask.subtask) {
