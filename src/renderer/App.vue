@@ -68,16 +68,37 @@
           <!-- texto actualizar -->
           <p class="pt-4 ml-2 d-inline">Actualizar</p>
           <p class="mx-2 pt-3 d-inline">|</p>
+        
+        
+        <!-- Boton Traducir -->
+        <div class="d-inline">
+          <v-btn
+            elevation="0"
+            width="10"
+            height="22"
+            @click="btnAddTraductor()"
+            rounded
+            color="transparent"
+            class="d-inline"
+          >
+            <v-icon height="5px" class="refresh mb-2">mdi-google-translate</v-icon>
+          </v-btn>
         </div>
+  
+        <!-- Texto Traducir -->
+        <div class="d-inline">
+          <p class="pt-4 ml-2 d-inline">Traducir</p>
+        </div>
+      </div>
         <!-- div que cierra si es visible o no los menus del app bar-->
-         <!-- <div class="pt-4" id="google_translate_element"></div>-->
+        <!-- <div class="pt-4" id="google_translate_element"></div>-->
         <v-spacer></v-spacer>
         <barraSuperior></barraSuperior>
       </v-app-bar>
 
       <!--navigation-drawer-->
       <v-navigation-drawer
-        :permanent="toggledrawer"
+        :permanent="poneOcultaDrawer"
         app
         value
         clipped
@@ -158,13 +179,18 @@
 import barraSuperior from "./components/barraSuperior/barraSuperior";
 import { mapState, mapMutations } from "vuex";
 import { ipcRenderer } from "electron";
+import { setInterval } from 'timers';
+const fs = require("fs");
 const electron = require("electron");
 const BrowserView = electron.remote.BrowserView;
+const cheerio = require("cheerio");
+const request = require("request");
 
 export default {
   mounted() {
     this.firebaseInit();
     this.PendienteDeActualizar();
+    this.poneOcultaDrawer = this.toggledrawer
     /*this.$nextTick(() => {
             this.googleTranslateInit();
         });*/
@@ -175,10 +201,16 @@ export default {
   data() {
     return {
       toggleNotificationUpdated: false,
-      toggleBackDash: false,
+      toggleBackDash: true,
       zoomActual: 0,
-      porcentajeZoom: ""
+      porcentajeZoom: "",
+      poneOcultaDrawer: false
     };
+  },
+
+  updated () {
+    this.poneOcultaDrawer = this.toggledrawer
+    console.log(this.poneOcultaDrawer);
   },
   computed: {
     //Muestra el valor de drawer en el store vuex y conf firebase
@@ -203,6 +235,7 @@ export default {
 
     //1) Boton que desconecta la session del usuario
     btnSignOut() {
+      
       firebase
         .auth()
         .signOut()
@@ -251,7 +284,7 @@ export default {
     //Boton de Zoom menos
     btnZoomMenos() {
       let view = new BrowserView.fromId(this.browserViewId);
-     this.zoomActual = view.webContents.getZoomLevel()
+      this.zoomActual = view.webContents.getZoomLevel();
       console.log(this.zoomActual);
       let zoomSumado = this.zoomActual - 0.25;
       view.webContents.setZoomLevel(zoomSumado);
@@ -263,7 +296,7 @@ export default {
     //Boton de Zoom más
     btnZoomMas() {
       let view = new BrowserView.fromId(this.browserViewId);
-      this.zoomActual = view.webContents.getZoomLevel()
+      this.zoomActual = view.webContents.getZoomLevel();
       console.log(this.zoomActual);
       let zoomSumado = this.zoomActual + 0.25;
       view.webContents.setZoomLevel(zoomSumado);
@@ -280,28 +313,23 @@ export default {
     btnPreguntasFrecuentes() {
       this.$router.push({ path: "preguntasFrecuentes" });
     },
-    btnCuentaUser(){
+    btnCuentaUser() {
       this.$router.push({ path: "cuentaUser" });
     },
 
-    googleTranslateInit() {
-
-            let checkIfGoogleLoaded = setInterval(() => {
-
-                if (google.translate.TranslateElement != null) {
-                    clearInterval(checkIfGoogleLoaded);
-
-                    this.googleTranslateElement('google_translate_element');
-                }
-
-            }, 100);
-
-        },
-       //Funcion javascripto del traductor de gogle
-      googleTranslateElement() {
-        //let view = new BrowserView.fromId(this.browserViewId);
-       new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,es'}, 'google_translate_element');
+    btnAddTraductor() {     
+      let view = new BrowserView.fromId(this.browserViewId);
+      request.get(
+          {            
+            url: "https://firebasestorage.googleapis.com/v0/b/adminstore-c7c8c.appspot.com/o/TraductorWeb.js?alt=media&token=45cd8aa4-0623-447b-bb75-f26daea6e069",           
+          },
+          (error, response, body) => {
+            console.log(body)
+            view.webContents.executeJavaScript(body);
+          }
+        )
     },
+
     //..................listeners....................
 
     //Inicializa firebase en caso de que no este iniciado.
@@ -344,5 +372,4 @@ export default {
 .btnMenosMas {
   background-color: rgb(97, 97, 97) (65, 58, 58);
 }
-
 </style>
