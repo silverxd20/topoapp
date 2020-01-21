@@ -336,9 +336,8 @@ export default {
             view = new BrowserView();            
             mainSeasson.setBrowserView(view);            
             view.webContents.loadURL("https://www.remotasks.com/tasks");
-            
-            
-          view.webContents.openDevTools()
+                  
+          //view.webContents.openDevTools()
           this.browserId(view.id);
           this.showBackDash();
           view.setBounds({
