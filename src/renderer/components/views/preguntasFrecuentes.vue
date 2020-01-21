@@ -24,13 +24,13 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
 
-      <!-- Pregunta 3 -->
+      <!-- Pregunta 3 
         <v-expansion-panel>
         <v-expansion-panel-header class="font-weight-bold">Que es la fecha de corte?</v-expansion-panel-header>
         <v-expansion-panel-content>
           
         </v-expansion-panel-content>
-      </v-expansion-panel>
+      </v-expansion-panel>-->
 
       <!-- Pregunta 4 -->
         <v-expansion-panel>
