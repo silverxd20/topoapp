@@ -5,7 +5,8 @@
           <img class=" mx-auto d-block imgPregunta" src="../../assets/preguntas.png" alt="">
           <h2 class="d-flex justify-content-center text-light">Preguntas frecuentes</h2>
       </div>
-    <v-expansion-panels popout>
+      <v-container>
+    <v-expansion-panels  popout>
         <!-- Pregunta 1 -->
       <v-expansion-panel >
         <v-expansion-panel-header class="font-weight-bold">Que es Toposat vector?</v-expansion-panel-header>
@@ -23,7 +24,7 @@
             ya pasado todo este proceso, se determinará el valor de la misma y se agregará a tu saldo disponible.
         </v-expansion-panel-content>
       </v-expansion-panel>
-
+    
       <!-- Pregunta 3 
         <v-expansion-panel>
         <v-expansion-panel-header class="font-weight-bold">Que es la fecha de corte?</v-expansion-panel-header>
@@ -39,9 +40,8 @@
            El método de pago es a travez de PayPal, se harán todos los sabados durante el transcurso de la mañana, se abonará el saldo que tenga disponible en su panel pricipal hasta la fecha de corte.
         </v-expansion-panel-content>
       </v-expansion-panel>
-
-
     </v-expansion-panels>
+</v-container>
   </v-row>
 </div>
 </template>
@@ -67,6 +67,6 @@
 }
 
 .divFondo{
-background-color: rgb(241, 239, 235)
+background-color: rgb(250, 250, 250)
 }
 </style>
