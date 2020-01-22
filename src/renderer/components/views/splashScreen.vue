@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     //Oculta y muestra el panel lateral desde el store vuex
-    ...mapMutations(["ocultaDrawer", "muestraDrawer"]),
+    ...mapMutations(["ocultaDrawer", "muestraDrawer","hidePayHistory","showlistDrawer"]),
     ...mapActions(["getUserAuthData"]),
 
     firebaseInit() {
@@ -69,6 +69,10 @@ export default {
               //Si ya tiene la session abierta pasa al dashboard
               userData = await this.getUserAuthData(user);
               console.log(userData);
+              if(userData.premium == true){
+                this.hidePayHistory()
+              }
+              this.showlistDrawer()
               this.muestraDrawer();
               this.$router.push({ path: "Dashboard"})
               console.log("Luego del push dashboard");

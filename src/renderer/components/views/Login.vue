@@ -82,7 +82,7 @@ export default {
   },
   methods: {
     // muestra el panel lateral desde el store vuex
-    ...mapMutations(["muestraDrawer","hidePayHistory"]),
+    ...mapMutations(["muestraDrawer","hidePayHistory","showlistDrawer"]),
     //Traer las funciones de actions en el store
     ...mapActions(["getUserAuthData"]),
 
@@ -120,9 +120,9 @@ getCurrentVersionApp(){
               let userData = await this.getUserAuthData(fireResp.user);
               console.log("Luego del getUserAuthData")
               if(userData.premium == true){
-              console.log("si fue true")
                 this.hidePayHistory()
               }
+              this.showlistDrawer()
               this.muestraDrawer();
               this.$router.push({ path: "Dashboard" });
               this.spinner = "";

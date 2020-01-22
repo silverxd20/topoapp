@@ -104,13 +104,14 @@
 
       <!--navigation-drawer-->
       <v-navigation-drawer
-        :permanent="poneOcultaDrawer"
+        :permanent="permanentDrawer"
+        :miniVariantWidth="toggledrawer"
+        :width="widthDrawer"
         app
         value
         clipped
         expand-on-hover
         dark
-        mini-variant-width="50px"
       >
         <template v-slot:prepend>
           <v-list>
@@ -129,7 +130,7 @@
 
         <v-divider></v-divider>
 
-        <v-list nav dense>
+        <v-list v-show="showListDrawer" nav dense>
           <!-- Link de Dashboard-->
           <v-list-item @click="btnDashboard()" link>
             <v-list-item-icon>
@@ -196,10 +197,7 @@ export default {
   mounted() {
     this.firebaseInit();
     this.PendienteDeActualizar();
-    this.poneOcultaDrawer = this.toggledrawer;
-    /*this.$nextTick(() => {
-            this.googleTranslateInit();
-        });*/
+    //this.poneOcultaDrawer = this.toggledrawer;
   },
   components: {
     barraSuperior
@@ -215,24 +213,28 @@ export default {
   },
 
   updated() {
-    this.poneOcultaDrawer = this.toggledrawer;
-    console.log(this.poneOcultaDrawer);
+
+    console.log("hubo cambios");
   },
   computed: {
     //Muestra el valor de drawer en el store vuex y conf firebase
     ...mapState([
       "toggleBackToDashboard",
       "toggledrawer",
+      "permanentDrawer",
       "firebaseConfig",
       "userAuthData",
       "browserViewId",
       "showTraductor",
-      "showHistorialPagos"
+      "showHistorialPagos",
+      "widthDrawer",
+      "showListDrawer"
     ])
   },
   methods: {
     //Oculta el drawer desde el el store
     ...mapMutations([
+      "hidelistDrawer",
       "ocultaDrawer",
       "muestraDrawer",
       "clearUserData",
@@ -250,6 +252,7 @@ export default {
         .signOut()
         .then(user => {
           console.log(user);
+          this.hidelistDrawer()
           //Pone en true el historial de pagos
           this.showPayHistory()
           //Oculta el drawer desde vuex

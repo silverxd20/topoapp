@@ -7,10 +7,13 @@ export default new Vuex.Store({
   state: {
     toggleBackToDashboard: "divBtnback d-inline",
     browserViewId: "0",
-    toggledrawer: false,
+    permanentDrawer: false,
+    toggledrawer: "0px",
+    widthDrawer: "256px",
     showTraductor: "divBtnback d-inline",
     showHistorialPagos: true,
     userAuthData: "",
+    showListDrawer: true,
     ListPagosPaypal: [],
     db: "",
     firebaseConfig: {
@@ -26,6 +29,12 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    showlistDrawer(state){
+      state.showListDrawer = true;
+    },
+    hidelistDrawer(state){
+      state.showListDrawer = false;
+    },
     showPayHistory(state){
       state.showHistorialPagos = true;
     },
@@ -50,12 +59,13 @@ export default new Vuex.Store({
       state.browserViewId = payload;
     },
     ocultaDrawer(state) {
-      console.log("Antes: "+state.toggledrawer)
-      state.toggledrawer = false;
-      console.log("Despues: "+state.toggledrawer)
+      //state.widthDrawer = "0px";
+      state.toggledrawer = "0px";
     },
     muestraDrawer(state) {
-      state.toggledrawer = true;
+      state.permanentDrawer = true;
+      state.toggledrawer = "50px";
+      state.widthDrawer = "256px";
     },
     showUserAuthData(state, payload) {
       state.userAuthData = payload;
