@@ -9,6 +9,7 @@ export default new Vuex.Store({
     browserViewId: "0",
     toggledrawer: false,
     showTraductor: "divBtnback d-inline",
+    showHistorialPagos: true,
     userAuthData: "",
     ListPagosPaypal: [],
     db: "",
@@ -25,6 +26,12 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    showPayHistory(state){
+      state.showHistorialPagos = true;
+    },
+    hidePayHistory(state){
+      state.showHistorialPagos = false;
+    },
     showTranslate(state){
       state.showTraductor = "divBtnbackON d-inline";
     },

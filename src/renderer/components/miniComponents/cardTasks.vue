@@ -501,6 +501,10 @@ export default {
             view.webContents.insertCSS(
               ".jsx-2180323840.reason__category:nth-child(1){display: none !important;}"
             );
+            //Quita los botones al final del curso de startTasks y reviewCourse
+            view.webContents.insertCSS(
+              ".course-summary__actions.jsx-3176796611{visivility: hidden !important;}"
+            );
           });
           
           let urlPart1;

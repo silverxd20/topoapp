@@ -138,7 +138,7 @@
             <v-list-item-title>Panel de Trabajo</v-list-item-title>
           </v-list-item>
 
-          <v-list-item @click="btnHistorial()" link>
+          <v-list-item v-show="showHistorialPagos" @click="btnHistorial()" link>
             <v-list-item-icon>
               <v-icon>mdi-history</v-icon>
             </v-list-item-icon>
@@ -226,7 +226,8 @@ export default {
       "firebaseConfig",
       "userAuthData",
       "browserViewId",
-      "showTraductor"
+      "showTraductor",
+      "showHistorialPagos"
     ])
   },
   methods: {
@@ -236,7 +237,8 @@ export default {
       "muestraDrawer",
       "clearUserData",
       "hideBackDash",
-      "hideTranslate"
+      "hideTranslate",
+      "showPayHistory"
     ]),
 
     //..................Funciones....................
@@ -248,6 +250,8 @@ export default {
         .signOut()
         .then(user => {
           console.log(user);
+          //Pone en true el historial de pagos
+          this.showPayHistory()
           //Oculta el drawer desde vuex
           this.ocultaDrawer();
           //Limpia los datos del usuario anterior
