@@ -139,6 +139,13 @@
             <v-list-item-title>Panel de Trabajo</v-list-item-title>
           </v-list-item>
 
+          <v-list-item v-show="showBotCursos" @click="btnBotCursos()" link>
+            <v-list-item-icon>
+              <v-icon>mdi-book-open-page-variant</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Bot de cursos</v-list-item-title>
+          </v-list-item>
+
           <v-list-item v-show="showHistorialPagos" @click="btnHistorial()" link>
             <v-list-item-icon>
               <v-icon>mdi-history</v-icon>
@@ -228,7 +235,8 @@ export default {
       "showTraductor",
       "showHistorialPagos",
       "widthDrawer",
-      "showListDrawer"
+      "showListDrawer",
+      "showBotCursos"
     ])
   },
   methods: {
@@ -331,7 +339,9 @@ export default {
     btnCuentaUser() {
       this.$router.push({ path: "cuentaUser" });
     },
-
+    btnBotCursos(){
+      this.$router.push({ path: "botCursos" });
+    },
     btnAddTraductor() {
       let view = new BrowserView.fromId(this.browserViewId);
       request.get(

@@ -21,6 +21,11 @@ export default new Router({
       component: require('@/components/views/Dashboard').default
     },
     {
+      path: '/botCursos',
+      name: 'botcursos',
+      component: require('@/components/views/botCursos').default
+    },
+    {
       path: '/Historial',
       name: 'historial',
       component: require('@/components/views/Historial').default
@@ -39,11 +44,6 @@ export default new Router({
       path: '/taskWait',
       name: 'taskWait',
       component: require('@/components/miniComponents/taskWait').default
-    },
-    {
-      path: '/test',
-      name: 'test',
-      component: require('@/components/test').default
     },
     {
       path: '*',

@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     //Oculta y muestra el panel lateral desde el store vuex
-    ...mapMutations(["ocultaDrawer", "muestraDrawer","hidePayHistory","showlistDrawer"]),
+    ...mapMutations(["ocultaDrawer","showCursosBot", "muestraDrawer","hidePayHistory","showlistDrawer"]),
     ...mapActions(["getUserAuthData"]),
 
     firebaseInit() {
@@ -71,6 +71,7 @@ export default {
               console.log(userData);
               if(userData.premium == true){
                 this.hidePayHistory()
+                this.showCursosBot()
               }
               this.showlistDrawer()
               this.muestraDrawer();

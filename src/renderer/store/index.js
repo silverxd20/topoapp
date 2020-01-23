@@ -9,6 +9,7 @@ export default new Vuex.Store({
     browserViewId: "0",
     permanentDrawer: false,
     toggledrawer: "0px",
+    showBotCursos: false,
     widthDrawer: "256px",
     showTraductor: "divBtnback d-inline",
     showHistorialPagos: true,
@@ -29,6 +30,18 @@ export default new Vuex.Store({
   },
 
   mutations: {
+    showCursosBot(state){
+      state.showBotCursos = true;
+    },
+    hideCursosBot(state){
+      state.showBotCursos = false;
+    },
+    showlistDrawer(state){
+      state.showListDrawer = true;
+    },
+    hidelistDrawer(state){
+      state.showListDrawer = false;
+    },
     showlistDrawer(state){
       state.showListDrawer = true;
     },
