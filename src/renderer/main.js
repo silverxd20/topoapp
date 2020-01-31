@@ -6,6 +6,9 @@ import store from './store'
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css'
 import '@mdi/font/css/materialdesignicons.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'jquery/dist/jquery.min.js'
+import 'bootstrap/dist/js/bootstrap.min.js'
 import { remote } from 'electron'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
