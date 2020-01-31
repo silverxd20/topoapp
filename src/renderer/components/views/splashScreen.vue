@@ -8,7 +8,7 @@
       type="error"
       icon="mdi-cloud-alert"
     >
-    Problemas con el internet, recuperando la conexión...
+    Hay problemas con el internet, se está recuperando la conexión por favor espere...
     </v-alert>
       <div class="divElements">
         <h1 class="d-inline">Iniciando Toposat vector...</h1>
