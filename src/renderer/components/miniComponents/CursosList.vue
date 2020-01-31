@@ -1,9 +1,11 @@
 <template>
   <div>
     <v-card height="400px">
-      <div class="pl-3 pt-1 pb-1 bg-success text-light">
+      <div class="divListCursoTop pl-3 pt-1 pb-1 text-light">
         <div class="divBarraTituloDropdown">
-          <h6 class="d-inline">Cursos de: {{nombreApellido.nombre +" "+nombreApellido.apellido}}</h6>
+          <h6 class="d-inline">Nombre de cuenta seleccionada: {{nameAccountSelected}}
+            <span :class="spinnerNameToken" role="" aria-hidden="true"></span>
+          </h6>
           <div class="divBtnlistCurso d-inline">
             <v-btn :disabled="toggleBtnGetCurso" @click="clickGetListCurso()" class="bg-transparent" elevation="0" rounded>
               <v-icon>mdi-send-circle</v-icon>
@@ -15,7 +17,7 @@
         <v-container fluid>
           <v-layout>
             <!-- Dropdown categoria-->
-            <v-flex md6>
+            <v-flex md3>
               <div class="dropdown">
                 <button
                   :disabled="toggleBtnGetCurso"
@@ -37,9 +39,9 @@
                 </div>
               </div>
             </v-flex>
-
+            
             <!-- Dropdown Token Cuentas-->
-            <v-flex md6>
+            <v-flex md9>
               <div class="dropdown">
                 <button
                   :disabled="toggleBtnGetCurso"
@@ -52,7 +54,7 @@
                 >{{selectViewCuentaName}}</button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
                   <button
-                    v-for="(item, index) in JwtFromListUserArray"
+                    v-for="(item, index) in jwtList"
                     :key="index"
                     class="dropdown-item"
                     type="button"
@@ -159,7 +161,10 @@ export default {
       selectViewCategoryName: "Categoría",
       selectViewCuentaName: "Cuenta Token",
       jsonContinueCatch: [],
+      spinnerNameToken: "-",
+      nameAccountSelected: "",
       cursoPasadoBackground: "",
+      jwtClickeadoActual: "",
       fingerPrint: "",
       currentSeccion: "0",
       escenario: "no",
@@ -185,9 +190,9 @@ export default {
   mounted () {
    
   },
-
+  props: ["jwtList"],
   computed: {
-    ...mapState(["toggleBtnGetCurso","showLoaderCurso","ListaDeCursos", "jwtList","JwtFromListUser","JwtFromListUserArray", "nombreApellido"])
+    ...mapState(["toggleBtnGetCurso","showLoaderCurso","ListaDeCursos", "nombreApellido"])
   },
   //LOS METODOS DEL COMPONENTE
   methods: {
@@ -220,6 +225,7 @@ export default {
       this.jwtSeleccionadoParaHeader = item
       let indice = index +1
       this.selectViewCuentaName = "Cuenta: #"+indice
+      this.getAccountName(item)
     },
     //3) Trae la lista del curso
     clickGetListCurso(){
@@ -550,6 +556,30 @@ export default {
         this.fingerPrint = result;
       }
     },
+    //9) Obtiene el nombre del token seleccionado
+   async getAccountName(tokenJTWSelected){
+        this.jwtClickeadoActual = tokenJTWSelected;
+      this.CondicionDialog = "datosCuenta";
+      this.dialog = true;
+      this.nameAccountSelected = "";
+      this.spinnerNameToken = "spinner-border spinner-border-sm";
+
+      let headers = {
+        authorization: tokenJTWSelected,
+        Origin: "https://www.remotasks.com",
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+      };
+
+      //Url de la solicitud http
+      let urlPedirTarea =
+        "https://api-internal.scale.com/internal/logged_in_user";
+      //Envia la solicitud para obtener los datos con libreria request
+      let resp = await request(urlPedirTarea, { method: "GET", headers });
+      let { firstName, lastName } = JSON.parse(resp.body);
+      this.spinnerNameToken = "";
+      this.nameAccountSelected = firstName + " " + lastName;
+    }
   }
 };
 </script>
@@ -564,5 +594,8 @@ export default {
 .divBtnlistCurso{
   position: absolute;
   right: 7px;
+}
+.divListCursoTop{
+  background: rgb(30,136,229)
 }
 </style>
