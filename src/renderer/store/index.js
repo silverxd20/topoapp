@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+let request = require("request");
 
 Vue.use(Vuex);
 
@@ -7,7 +8,7 @@ export default new Vuex.Store({
   state: {
     toggleBackToDashboard: "divBtnback d-inline",
     browserViewId: "0",
-    permanentDrawer: false,
+    permanentDrawer: true,
     toggledrawer: "0px",
     showBotCursos: false,
     widthDrawer: "256px",
@@ -16,6 +17,18 @@ export default new Vuex.Store({
     userAuthData: "",
     showListDrawer: true,
     ListPagosPaypal: [],
+    ListaDeCursos: [],
+    jwtList: [],
+    toggleBtnGetCurso: false,
+    showLoaderCurso: false,
+    JwtFromListUserJson: {},
+    JwtFromListUserArray: [],
+    nombreApellido: {
+      nombre: "-",
+      apellido: "",
+      categoria: "Categoría",
+      cuenta: "Cuenta"
+    },
     db: "",
     firebaseConfig: {
       apiKey: "AIzaSyBx9HYfNoMzkclTydv60oqKHywN4G7vNfo",
@@ -98,9 +111,46 @@ export default new Vuex.Store({
       let listapago = Object.value(payload)
       let listaInvertida = listapago.reverse();
                 
-                for (const index in listaInvertida) {
-                  state.ListPagosPaypal.push(payload[index].confirm);
-                }
+        for (const index in listaInvertida) {
+          state.ListPagosPaypal.push(payload[index].confirm);
+      }
+    },
+
+    //Parte del bot de cursos
+    llenarCursos(state, payload) {
+      state.ListaDeCursos = payload.Cursos;
+      state.jwtList = payload.Jwt;
+      state.showLoaderCurso = false;
+      state.toggleBtnGetCurso = false;
+      /*toastr.info("Lista completada.", "Mensaje", {
+        timeOut: 3000,
+        closeButton: true
+      });*/
+    },
+    disableBtnGetCursoTrue(state) {
+      state.toggleBtnGetCurso = true;
+    },
+    disableBtnGetCursoFalse(state) {
+      state.toggleBtnGetCurso = false;
+    },
+    habilitaLoaderCurso(state) {
+      state.showLoaderCurso = true;
+    },
+    deshabilitaLoaderCurso(state) {
+      state.showLoaderCurso = false;
+    },
+
+    LimpiarListaCursos(state) {
+      state.ListaDeCursos = [];
+    },
+
+    nombreApellidoUser(state, payload) {
+      state.nombreApellido = payload;
+    },
+
+    listaDeJwtFromListUser(state, payload) {
+      state.JwtFromListUserJson = payload;
+      state.JwtFromListUserArray = Object.values(payload);
     }
   },
 
@@ -157,6 +207,49 @@ export default new Vuex.Store({
           index = -1
         }
 
+      }
+    },
+
+    //Trae los cursos de la cuenta de los usuarios va en vuex
+    async traeCursos({ commit }, jwtSelected) {
+      let myHeaders = {
+        url: "https://api-internal.scale.com/internal/courses/available",
+        method: "GET", // or 'POST'
+        referrerPolicy: "no-referrer",
+        headers: {
+          accept: "*/*",
+          "accept-language": "es,es-ES;q=0.9,en;q=0.8",
+          "finger-print": "",
+          authorization: jwtSelected,
+          "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
+        }
+      };
+
+      try {
+        request(myHeaders, (error, response, body) => {
+          if (!error && response.statusCode == 200) {
+            var json = JSON.parse(body);
+            console.log(json);
+            console.log(response);
+            //Crea un payload con los parametros
+            let payload = { Jwt: jwtSelected, Cursos: json.courses };
+
+            //Hace commit a mutation enviando multiparametro en payload
+            commit("llenarCursos", payload);
+          } else if (response.statusCode == 403) {
+            console.log(response);
+            commit("deshabilitaLoaderCurso");
+            commit("disableBtnGetCursoFalse");
+            toastr.error("El usuario está Baneado.", "Mensaje", {
+              timeOut: 4000,
+              closeButton: true
+            });
+          }
+        });
+      } catch (error) {
+        commit("disableBtnGetCursoFalse");
+        commit("deshabilitaLoaderCurso");
+        console.log("Error trayendo cursos: " + error);
       }
     }
   }
