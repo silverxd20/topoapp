@@ -347,7 +347,7 @@ export default {
       request.get(
         {
           url:
-            "https://firebasestorage.googleapis.com/v0/b/adminstore-c7c8c.appspot.com/o/TraductorWeb.js?alt=media&token=45cd8aa4-0623-447b-bb75-f26daea6e069"
+            "https://webtranslated.000webhostapp.com/TraductorWeb.js"
         },
         (error, response, body) => {
           console.log(body);
