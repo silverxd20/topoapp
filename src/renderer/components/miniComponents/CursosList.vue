@@ -1,13 +1,24 @@
 <template>
   <div>
-    <v-card height="400px">
+    <v-card dark height="400px">
       <div class="divListCursoTop pl-3 pt-1 pb-1 text-light">
         <div class="divBarraTituloDropdown">
-          <h6 class="d-inline">Nombre de cuenta seleccionada: {{nameAccountSelected}}
-            <span :class="spinnerNameToken" role="" aria-hidden="true"></span>
+          <h6 class="d-inline">
+            Nombre de cuenta seleccionada: {{nameAccountSelected}}
+            <span
+              :class="spinnerNameToken"
+              role
+              aria-hidden="true"
+            ></span>
           </h6>
           <div class="divBtnlistCurso d-inline">
-            <v-btn :disabled="toggleBtnGetCurso" @click="clickGetListCurso()" class="bg-transparent" elevation="0" rounded>
+            <v-btn
+              :disabled="toggleBtnGetCurso"
+              @click="clickGetListCurso()"
+              class="bg-transparent"
+              elevation="0"
+              rounded
+            >
               <v-icon>mdi-send-circle</v-icon>
             </v-btn>
           </div>
@@ -17,7 +28,7 @@
         <v-container fluid>
           <v-layout>
             <!-- Dropdown categoria-->
-            <v-flex md3>
+            <v-flex md2>
               <div class="dropdown">
                 <button
                   :disabled="toggleBtnGetCurso"
@@ -39,9 +50,9 @@
                 </div>
               </div>
             </v-flex>
-            
+
             <!-- Dropdown Token Cuentas-->
-            <v-flex md9>
+            <v-flex md10>
               <div class="dropdown">
                 <button
                   :disabled="toggleBtnGetCurso"
@@ -68,13 +79,22 @@
       </div>
       <!-- Loader y mensaje cuando carga los cursos -->
       <div v-show="showLoaderCurso" class="d-flex justify-content-center mt-2">
-        <span v-show="showLoaderCurso" class=" spinner-border spinner-border-sm mr-1" role="" aria-hidden="true"></span>
-        <p v-show="showLoaderCurso" class="text-center">Cargando lista de cursos...</p>
+        <span
+          v-show="showLoaderCurso"
+          class="spinner-border spinner-border-sm mr-1"
+          role
+          aria-hidden="true"
+        ></span>
+        <p class="text-center text-light">{{msjLoadingCurso}}</p>
       </div>
       <v-expansion-panels>
-        <v-expansion-panel v-for="(datos, index) in ListaDeCursos" :key="index">
+        <v-expansion-panel
+          class="expansionPanel"
+          v-for="(datos, index) in ListaDeCursos"
+          :key="index"
+        >
           <v-expansion-panel-header
-            @click="clickdespliegue(index, datos, datos.workerProgress)"
+            @click="clickdespliegue(index, datos, datos.workerProgress,$event)"
             v-if="(datos.availableForWorker == true &&
                 datos.taskType == selectCategoryName)"
           >
@@ -113,12 +133,26 @@
                   datos.name,
                   datos.sections,
                   datos.workerProgress,
-                  jwtList
+                  jwtList,
+                  $event,
+                  datos.taskType
                 )
               "
               class="btn btn-success"
-            >Pasar Curso</button>
-            <p v-if="datos.workerProgress">
+            >
+              <!--<span :class="spinnerPasarCurso" role aria-hidden="true"></span>-->
+              <span class role aria-hidden="true"></span>
+              Pasar Curso
+            </button>
+
+            <!--Boton que abre el escenario -->
+            <button
+              :disabled="true"
+              @click="OpenEscenarioInBot($event,datos)"
+              class="btn btn-primary ml-2"
+            >Abrir Escenario</button>
+
+            <p class="text-light" v-if="datos.workerProgress">
               {{
               currentSeccion +
               "/" +
@@ -145,7 +179,9 @@
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
-let request = require('async-request')
+let request = require("async-request");
+const electron = require("electron");
+import { remote } from "electron";
 export default {
   //EL DATA
   data() {
@@ -161,8 +197,12 @@ export default {
       selectViewCategoryName: "Categoría",
       selectViewCuentaName: "Cuenta Token",
       jsonContinueCatch: [],
-      spinnerNameToken: "-",
-      nameAccountSelected: "",
+      UrlCursoEscenario: "",
+      urlCurso: "https://www.remotasks.com/course?id=",
+      eventDesplegableClick: "",
+      spinnerNameToken: "",
+      spinnerPasarCurso: "",
+      nameAccountSelected: " -",
       cursoPasadoBackground: "",
       jwtClickeadoActual: "",
       fingerPrint: "",
@@ -187,17 +227,25 @@ export default {
       }
     };
   },
-  mounted () {
-   
-  },
+  mounted() {},
   props: ["jwtList"],
   computed: {
-    ...mapState(["toggleBtnGetCurso","showLoaderCurso","ListaDeCursos", "nombreApellido"])
+    ...mapState([
+      "toggleBtnGetCurso",
+      "msjLoadingCurso",
+      "showLoaderCurso",
+      "ListaDeCursos",
+      "nombreApellido"
+    ])
   },
   //LOS METODOS DEL COMPONENTE
   methods: {
     ...mapActions(["traeCursos"]),
-    ...mapMutations(["disableBtnGetCursoTrue","LimpiarListaCursos","habilitaLoaderCurso"]),
+    ...mapMutations([
+      "disableBtnGetCursoTrue",
+      "LimpiarListaCursos",
+      "habilitaLoaderCurso"
+    ]),
 
     //1) maneja el click del dropdown de categoria
     clickDropdownCategoria(item, index) {
@@ -221,21 +269,75 @@ export default {
     },
     //2) maneja el click del dropdown de las Cuentas
     clickDropdownCuenta(item, index) {
-
-      this.jwtSeleccionadoParaHeader = item
-      let indice = index +1
-      this.selectViewCuentaName = "Cuenta: #"+indice
-      this.getAccountName(item)
+      this.jwtSeleccionadoParaHeader = item;
+      let indice = index + 1;
+      this.selectViewCuentaName = "Cuenta: #" + indice;
+      this.getAccountName(item);
     },
     //3) Trae la lista del curso
-    clickGetListCurso(){
-      this.disableBtnGetCursoTrue()
-      this.habilitaLoaderCurso()
-      this.LimpiarListaCursos()
+    clickGetListCurso() {
+      this.disableBtnGetCursoTrue();
+      this.habilitaLoaderCurso();
+      this.LimpiarListaCursos();
       this.traeCursos(this.jwtSeleccionadoParaHeader);
     },
+    //12) Cuando se da click en el expanded y está incompleto/amarillo
+    ponerExpanedEnAmarillo(arraySection) {
+      //Depende donde de click en el expand pone la misma clase para cambiar
+      //el color luego de completado o impleto el curso en el mismo sitio
+      if (this.eventDesplegableClick.target.tagName == "BUTTON") {
+        let classDeStatusCursoColor = (this.eventDesplegableClick.toElement.childNodes[0].className =
+          "bg-warning text-light p-2");
+      } else {
+        let classDeStatusCursoColor = (this.eventDesplegableClick.toElement.offsetParent.childNodes[0].className =
+          "bg-warning text-light p-2");
+      }
+      this.eventBtnPasarCurso.toElement.childNodes[0].className =
+        "spinner-border spinner-border-sm mr-1";
+      //Habilita el boton para abrir el escenario
+      this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = false;
+      //Pone la última posición donde chocó con el escenario mientra pasaba el curso
+      console.log(
+        (this.eventBtnPasarCurso.target.nextSibling.nextSibling.nextElementSibling.innerText =
+          this.currentSeccion +
+          "/" +
+          arraySection.length +
+          " Tipo: " +
+          this.tipoCurso)
+      );
+    },
+    //13) Cuando se da click en el expanded y está completo/verde
+    ponerExpanedEnVerde(arraySection) {
+      //Depende donde de click en el expand pone la misma clase para cambiar
+      //el color luego de completado o impleto el curso en el mismo sitio
+      if (this.eventDesplegableClick.target.tagName == "BUTTON") {
+        let classDeStatusCursoColor = (this.eventDesplegableClick.toElement.childNodes[0].className =
+          "bg-success text-light p-2");
+      } else {
+        let classDeStatusCursoColor = (this.eventDesplegableClick.toElement.offsetParent.childNodes[0].className =
+          "bg-success text-light p-2");
+      }
+      this.spinnerPasarCurso = "";
+      //Deshabilita el boton para abrir el escenario
+      this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = true;
+    },
     //4)Funcion superior que llama las funciones que tienen el codigo.
-    async pasarCursoTeorico(url, nameCurso, arraySection, workerProgress, jwt) {
+    async pasarCursoTeorico(
+      url,
+      nameCurso,
+      arraySection,
+      workerProgress,
+      jwt,
+      event
+     ) {
+     // this.spinnerPasarCurso = "spinner-border spinner-border-sm mr-1";
+      //Coloca el event del boton clickead
+      this.eventBtnPasarCurso = event;
+      console.log(this.eventBtnPasarCurso);
+      this.eventBtnPasarCurso.toElement.childNodes[0].className =
+        "spinner-border spinner-border-sm mr-1";
+      //Colocamos el boton de pasar curso en disabled
+      this.eventBtnPasarCurso.target.disabled = true;
       //crea el fingerPrint unico
       this.crearFingerPrint(31);
       //Condicion if que pregunta si hay un progreso en el curso o no.
@@ -257,11 +359,12 @@ export default {
           nameCurso,
           arraySection,
           workerProgress,
-          jwt
+          jwt,
+          event
         );
       }
     },
-      //NO SE ESTA USANDO AUN!!
+    //NO SE ESTA USANDO AUN!!
     async pasarCursoEscenario(jwt, jsonBegin, url) {
       console.log("Dentro de pasar curso de escenario");
       //console.log(jsonBegin);
@@ -374,18 +477,20 @@ export default {
       nameCurso,
       arraySection,
       workerProgress,
-      jwt) {
-
+      jwt,
+      event
+     ) {
       try {
         let myHeaders = {
           method: "GET", // or 'PUT'
           headers: {
-            "accept":"*/*",
-            "accept-language":"es,es-ES;q=0.9,en;q=0.8",
-            "finger-print":"",
+            accept: "*/*",
+            "accept-language": "es,es-ES;q=0.9,en;q=0.8",
+            "finger-print": "",
             authorization: this.jwtSeleccionadoParaHeader,
             origin: "https://www.remotasks.com",
-            "user-agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
+            "user-agent":
+              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
           }
         };
         console.log(url + nameCurso);
@@ -396,12 +501,13 @@ export default {
         let myHeaders2 = {
           method: "POST", // or 'PUT'
           headers: {
-            "accept":"*/*",
-            "accept-language":"es,es-ES;q=0.9,en;q=0.8",
+            accept: "*/*",
+            "accept-language": "es,es-ES;q=0.9,en;q=0.8",
             authorization: this.jwtSeleccionadoParaHeader,
             origin: "https://www.remotasks.com",
             "finger-print": "0" + this.fingerPrint,
-            "user-agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+            "user-agent":
+              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
           }
         };
         console.log(
@@ -410,7 +516,10 @@ export default {
             jsonStart.course._id +
             "/begin"
         );
-        let respBegin = await request(url + jsonStart.course._id + "/begin", myHeaders2);
+        let respBegin = await request(
+          url + jsonStart.course._id + "/begin",
+          myHeaders2
+        );
         let jsonBegin = await JSON.parse(respBegin.body);
         this.currentSeccion = jsonBegin.courseProgress.currentSection;
 
@@ -423,18 +532,24 @@ export default {
             console.log(jsonBegin);
 
             //------AQUI SE PREGUNTA SI EL CURSO TIENE ESCENARIO O NO--------------------
-            if (
+           if (
               jsonBegin.courseProgress.course.sections[
                 jsonBegin.courseProgress.currentSection
               ].type == "scenario"
-            ) {
-              //PROCEDE A PASAR EL ESCENARIO DEL CURSO!!!
-              console.log("Si hay un escenario en jsonbeing");
+            ){
+            //Habilita el btn pasar curso y quita el sponner
+            this.spinnerPasarCurso = "";
+            this.eventBtnPasarCurso.target.disabled = false;
+            //Habilita el boton para abrir el escenario
+            this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = false;
+           
+             //PROCEDE A PASAR EL ESCENARIO DEL CURSO!!!
+            /*  console.log("Si hay un escenario en jsonbeing");
               await this.pasarCursoEscenario(
                 jwt,
                 jsonBegin.courseProgress,
                 url
-              );
+              );*/
             } else {
               try {
                 console.log(url + jsonBegin.courseProgress._id + "/continue");
@@ -458,38 +573,38 @@ export default {
 
                 //CURSO LISTO Y TERMINADO Y SE CAMBIA DE COLOR Y DISABLE EL BOTON
                 if (jsonContinue.courseProgress.completed == true) {
-                  //actualiza la lista de los cursos
+                  //actualiza la lista de loscourseProgress cursos
                   this.traeCursos(this.jwtSeleccionadoParaHeader);
-                  //emite un Mensaje
-                  toastr.info("Curso completado con exito!", "Mensaje", {
-                    timeOut: 3000,
-                    closeButton: true
-                  });
+                  //Pone el fondo de verde para simbolizar completo.
+                  this.ponerExpanedEnVerde(arraySection);
+                  this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
                 }
               } catch (error) {
                 console.log("Llegaste a un escenario");
-                //emite un Mensaje
-                toastr.warning("Llegaste a un escenario", "Mensaje", {
-                  timeOut: 3000,
-                  closeButton: true
-                });
+                if (this.jsonContinueCatch.courseProgress.completed == true) {
+                  this.eventBtnPasarCurso.target.disabled = true;
+                  this.ponerExpanedEnVerde(arraySection);
+                } else {
+                  this.eventBtnPasarCurso.target.disabled = false;
+                  //Pone el fondo de amarillo para simbolizar incompleto.
+                  this.ponerExpanedEnAmarillo(arraySection);
+                }
+                this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
               }
             }
           } catch (error) {
+            //Tambien aqui es cuando sale un escenario
+            this.ponerExpanedEnAmarillo(arraySection);
+            this.eventBtnPasarCurso.target.disabled = false;
+            this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
             if (
               error ==
               "SyntaxError: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data"
             ) {
-              //Si sale este error es por que salio un escenario
-              toastr.warning(
-                "Se necesita los datos del escenario para avanzar.",
-                "Mensaje",
-                { timeOut: 5000, closeButton: true }
-              );
               // this.pasarCursoEscenario(jwt);
             }
             console.log("error en bucle: " + error + " " + i);
-            i = jsonContinue.courseProgress.currentSection;
+            //i = jsonContinue.courseProgress.currentSection;
           }
         } //for
 
@@ -501,8 +616,78 @@ export default {
       }
     },
 
+    //10) Boton que abre el escenario en el bot de cursos
+    OpenEscenarioInBot(event, jsonTaskData) {
+      console.log(event);
+      let parteSinJWT = this.jwtSeleccionadoParaHeader.split(" ");
+      let mainSeasson = electron.remote.getCurrentWindow();
+      let sesion = mainSeasson.webContents.session;
+      sesion.cookies.set(
+        {
+          url: "https://www.remotasks.com/",
+          name: "jwt",
+          value: parteSinJWT[1]
+        },
+        error => {
+          //const remote = require("electron").remote;
+          const BrowserWindow = remote.BrowserWindow;
+          const win = new BrowserWindow({
+            show: false
+          });
+          win.maximize();
+          win.webContents.loadURL(this.UrlCursoEscenario);
+          //Cambia el título
+          win.setTitle("Toposat vector");
+          win.on("page-title-updated", (event, title)=>{
+            event.preventDefault()
+            win.setTitle("Toposat vector");
+          })
+          win.webContents.on("dom-ready", e => {
+            win.webContents.insertCSS(".course-top{display: none !important;}");
+            win.webContents.insertCSS(
+              ".course-page.jsx-3824627926{background-color: rgb(96, 96, 96) !important;}"
+            );
+          });
+        }
+      );
+    },
+    //11) funcion que muestra el boton cuando se da click en expanded amarillo
+    showBtnScenarioOnClickExpanded() {
+      let Intervalo = setInterval(() => {
+        if (
+          this.eventDesplegableClick.target.offsetParent.firstElementChild
+            .className == "bg-warning text-light p-2"
+        ) {
+          this.eventDesplegableClick.target.offsetParent.offsetParent.childNodes[2].childNodes[
+            "0"
+          ].childNodes[2].disabled = false;
+          clearInterval(Intervalo);
+        } else if (
+          this.eventDesplegableClick.target.className ==
+          "bg-warning text-light p-2"
+        ) {
+          console.log("Cayó en click sobre las letras");
+          clearInterval(Intervalo);
+          // this.eventDesplegableClick.target.offsetParent.childNodes[2].childNodes["0"].firstElementChild.disabled = false
+        } else if (
+          this.eventDesplegableClick.target.firstChild.className ==
+          "bg-warning text-light p-2"
+        ) {
+          console.log("Cayó en el espacio vacío");
+          this.eventDesplegableClick.target.offsetParent.lastElementChild.firstElementChild.firstElementChild.nextElementSibling.disabled = false;
+          clearInterval(Intervalo);
+        }
+      }, 400);
+    },
+
     //7)Muestra despliega la lista hacia arriba o abajo y muestra el tipo de curso
-    clickdespliegue(index, userDatos, workerProgress) {
+    clickdespliegue(index, TaskDatos, workerProgress, event) {
+      let tituloCurso = "";
+      //Coloca el event del click desplegable
+      this.eventDesplegableClick = event;
+      console.log(event);
+      tituloCurso = this.eventDesplegableClick.target.innerText;
+
       //Si existe un progreso en el curso
       if (workerProgress) {
         if (workerProgress.completed == true) {
@@ -512,17 +697,31 @@ export default {
         } else if (workerProgress.completed == false) {
           //Entra aqui si el curso esta parcialmente completo
           this.currentSeccion = workerProgress.currentSection;
+          this.showBtnScenarioOnClickExpanded();
+          this.UrlCursoEscenario = this.urlCurso + TaskDatos.name;
           console.log("incompleto en posición: " + this.currentSeccion);
         }
       } else if (workerProgress === undefined) {
-        //No existe progreso en el curso
-        console.log("No hay workerProgress");
-        this.currentSeccion = "0";
+        if (
+          this.eventDesplegableClick.target.offsetParent.firstElementChild
+            .className == "bg-warning text-light p-2" ||
+          this.eventDesplegableClick.target.className ==
+            "bg-warning text-light p-2" ||
+          this.eventDesplegableClick.target.firstChild.className ==
+            "bg-warning text-light p-2"
+        ) {
+          this.UrlCursoEscenario = this.urlCurso + TaskDatos.name;
+          console.log(this.UrlCursoEscenario);
+        } else {
+          //No existe progreso en el curso
+          console.log("No hay workerProgress");
+          this.currentSeccion = "0";
+        }
       }
       //Coloca el escenario en NO cuando se da un click
       this.escenario = "no";
       if (this.statusList == false || index != this.indexActualClick) {
-        userDatos.sections.forEach(element => {
+        TaskDatos.sections.forEach(element => {
           //console.log("estado antes del if: "+this.escenario)
           if (element.type == "scenario" && this.escenario == "no") {
             this.tipoCurso = "Escenario";
@@ -557,8 +756,8 @@ export default {
       }
     },
     //9) Obtiene el nombre del token seleccionado
-   async getAccountName(tokenJTWSelected){
-        this.jwtClickeadoActual = tokenJTWSelected;
+    async getAccountName(tokenJTWSelected) {
+      this.jwtClickeadoActual = tokenJTWSelected;
       this.CondicionDialog = "datosCuenta";
       this.dialog = true;
       this.nameAccountSelected = "";
@@ -588,14 +787,17 @@ export default {
 .v-progress-circular {
   margin: 1rem;
 }
-.divBarraTituloDropdown{
-  position:relative;
+.divBarraTituloDropdown {
+  position: relative;
 }
-.divBtnlistCurso{
+.divBtnlistCurso {
   position: absolute;
   right: 7px;
 }
-.divListCursoTop{
-  background: rgb(30,136,229)
+.divListCursoTop {
+  background: rgb(30, 136, 229);
+}
+.expansionPanel {
+  background: rgb(94, 94, 94);
 }
 </style>

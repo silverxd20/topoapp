@@ -21,6 +21,7 @@ export default new Vuex.Store({
     jwtList: [],
     toggleBtnGetCurso: false,
     showLoaderCurso: false,
+    msjLoadingCurso: "Seleccione una categoría, la cuenta y presione el boton para iniciar.",
     JwtFromListUserJson: {},
     JwtFromListUserArray: [],
     nombreApellido: {
@@ -121,6 +122,7 @@ export default new Vuex.Store({
       state.ListaDeCursos = payload.Cursos;
       state.jwtList = payload.Jwt;
       state.showLoaderCurso = false;
+      state.msjLoadingCurso = "";
       state.toggleBtnGetCurso = false;
       /*toastr.info("Lista completada.", "Mensaje", {
         timeOut: 3000,
@@ -134,9 +136,11 @@ export default new Vuex.Store({
       state.toggleBtnGetCurso = false;
     },
     habilitaLoaderCurso(state) {
+      state.msjLoadingCurso = "Cargando lista de cursos...";
       state.showLoaderCurso = true;
     },
     deshabilitaLoaderCurso(state) {
+      state.msjLoadingCurso = "";
       state.showLoaderCurso = false;
     },
 

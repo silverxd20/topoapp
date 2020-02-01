@@ -42,9 +42,6 @@ function createWindow() {
   mainWindow.on("page-title-updated", (event, title)=>{
     event.preventDefault()
   })
-  mainWindow.webContents.on("page-title-updated", (event, title)=>{
-    event.preventDefault()
-  })
 
    // Open dev tools initially when in development mode
   if (process.env.NODE_ENV === "development") {
