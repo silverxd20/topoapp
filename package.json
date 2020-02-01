@@ -50,7 +50,7 @@
       ]
     },
     "win": {
-      "icon": "build/icons/topoicono.png",
+      "icon": "build/icons/icon.ico",
       "target": [
         {
           "target": "nsis",
