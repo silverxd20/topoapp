@@ -383,6 +383,10 @@ export default {
                 }
               });*/
 
+            //En la tarea cuando sale que te pueden banear quita un boton de allí
+            view.webContents.insertCSS(
+              "a:nth-child(2){display: none !important;}"
+            );
             //Estilo de la parte cuando SI tiene tareas
             view.webContents.insertCSS(
               ".full-screen-instructions{display: flex !important; justify-content: center !important;}"
