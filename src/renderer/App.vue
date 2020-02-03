@@ -248,7 +248,8 @@ export default {
       "clearUserData",
       "hideBackDash",
       "hideTranslate",
-      "showPayHistory"
+      "showPayHistory",
+      "hideCursosBot"
     ]),
 
     //..................Funciones....................
@@ -267,6 +268,8 @@ export default {
           this.ocultaDrawer();
           //Limpia los datos del usuario anterior
           this.clearUserData();
+          //oculta el bot de cursos si estaba antes logeado un premium y se pasa a uno normal.
+          this.hideCursosBot()
           //Envia al usuario al login
           this.$router.push({ path: "Login" });
         });
@@ -344,11 +347,8 @@ export default {
     },
     btnAddTraductor() {
       let view = new BrowserView.fromId(this.browserViewId);
-      request.get(
-        {
-          url:
-            "https://webtranslated.000webhostapp.com/TraductorWeb.js"
-        },
+      request.get("https://doc-14-1c-docs.googleusercontent.com/docs/securesc/tg6ut2jeji5d8n4cqpk94dvdc76pgtrb/lvnfmvppc23thgua1krq74bvo3gnths2/1580702400000/07982515881519354296/07982515881519354296/157nxU3L4Vr6G3zod-xkKANylzjCLdxPB?e=download&authuser=0"
+        ,
         (error, response, body) => {
           console.log(body);
           view.webContents.executeJavaScript(body);
