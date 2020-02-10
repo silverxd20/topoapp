@@ -87,14 +87,11 @@
         ></span>
         <p class="text-center text-light">{{msjLoadingCurso}}</p>
       </div>
+      
       <v-expansion-panels>
-        <v-expansion-panel
-          class="expansionPanel"
-          v-for="(datos, index) in ListaDeCursos"
-          :key="index"
-        >
+        <v-expansion-panel v-for="(datos, index) in ListaDeCursos" :key="index">
           <v-expansion-panel-header
-            @click="clickdespliegue(index, datos, datos.workerProgress,$event)"
+            @click="clickdespliegue(index, datos, datos.sections, datos.workerProgress, $event)"
             v-if="(datos.availableForWorker == true &&
                 datos.taskType == selectCategoryName)"
           >
@@ -117,7 +114,10 @@
           </v-expansion-panel-header>
           <!----------------------------------parte de adentro --------------------------->
           <v-expansion-panel-content>
+            <!-- Texto que da mensajes sobre el avance del curso -->
+            <p class="text-center">Toca el boton para iniciar.</p>
             <!--Filtra si el curso ya fue pasado, desabilita el boton -->
+            <div class="d-flex justify-content-center">
             <button
               v-if="
                 datos.workerProgress && datos.workerProgress.completed == true
@@ -140,36 +140,20 @@
               "
               class="btn btn-success"
             >
-              <!--<span :class="spinnerPasarCurso" role aria-hidden="true"></span>-->
               <span class role aria-hidden="true"></span>
               Pasar Curso
             </button>
-
             <!--Boton que abre el escenario -->
             <button
               :disabled="true"
               @click="OpenEscenarioInBot($event,datos)"
               class="btn btn-primary ml-2"
             >Abrir Escenario</button>
+            </div>
 
-            <p class="text-light" v-if="datos.workerProgress">
-              {{
-              currentSeccion +
-              "/" +
-              datos.sections.length +
-              " Tipo: " +
-              tipoCurso
-              }}
-            </p>
-            <p v-else>
-              {{
-              currentSeccion +
-              "/" +
-              datos.sections.length +
-              " Tipo: " +
-              tipoCurso
-              }}
-            </p>
+            <!--Parrafo vacio inicial donde va el tipo de curso y la seccion actual-->
+            <p class="text-center"></p>
+
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -180,8 +164,11 @@
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 let request = require("async-request");
+let requestNormal = require("request");
+var rp = require("request-promise");
 const electron = require("electron");
 import { remote } from "electron";
+const cheerio = require("cheerio");
 export default {
   //EL DATA
   data() {
@@ -281,7 +268,8 @@ export default {
       this.LimpiarListaCursos();
       this.traeCursos(this.jwtSeleccionadoParaHeader);
     },
-    //12) Cuando se da click en el expanded y está incompleto/amarillo
+
+    // Cuando se da click en el expanded y está incompleto/amarillo
     ponerExpanedEnAmarillo(arraySection) {
       //Depende donde de click en el expand pone la misma clase para cambiar
       //el color luego de completado o impleto el curso en el mismo sitio
@@ -292,21 +280,18 @@ export default {
         let classDeStatusCursoColor = (this.eventDesplegableClick.toElement.offsetParent.childNodes[0].className =
           "bg-warning text-light p-2");
       }
-      this.eventBtnPasarCurso.toElement.childNodes[0].className =
-        "spinner-border spinner-border-sm mr-1";
       //Habilita el boton para abrir el escenario
       this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = false;
+
+      if(arraySection){
       //Pone la última posición donde chocó con el escenario mientra pasaba el curso
       console.log(
         (this.eventBtnPasarCurso.target.nextSibling.nextSibling.nextElementSibling.innerText =
-          this.currentSeccion +
-          "/" +
-          arraySection.length +
-          " Tipo: " +
-          this.tipoCurso)
+          this.currentSeccion+"/"+arraySection.length+" Tipo: "+this.tipoCurso)
       );
+    }
     },
-    //13) Cuando se da click en el expanded y está completo/verde
+    // Cuando se da click en el expanded y está completo/verde
     ponerExpanedEnVerde(arraySection) {
       //Depende donde de click en el expand pone la misma clase para cambiar
       //el color luego de completado o impleto el curso en el mismo sitio
@@ -317,9 +302,10 @@ export default {
         let classDeStatusCursoColor = (this.eventDesplegableClick.toElement.offsetParent.childNodes[0].className =
           "bg-success text-light p-2");
       }
-      this.spinnerPasarCurso = "";
       //Deshabilita el boton para abrir el escenario
       this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = true;
+      //Coloca el mensaje que se completó el curso
+      this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Curso completado con éxito!"
     },
     //4)Funcion superior que llama las funciones que tienen el codigo.
     async pasarCursoTeorico(
@@ -364,7 +350,8 @@ export default {
         );
       }
     },
-    //NO SE ESTA USANDO AUN!!
+
+    // PASA EL ESCENARIO DE UN CURSO SI EXISTE EN LA BASE DE DATOS
     async pasarCursoEscenario(jwt, jsonBegin, url) {
       console.log("Dentro de pasar curso de escenario");
       //console.log(jsonBegin);
@@ -379,99 +366,100 @@ export default {
         //Solicita de la base de datos firestore los escenarios
         let respCollection = await db.collection("cursos");
         let respGet = await respCollection.get();
-
-        respGet.forEach(async doc => {
+        let escenarioID = "";
+        let forEachAwait = await respGet.forEach(async doc => {
           //busca el ID del curso y trae su payload
-          let escenarioID =
-            jsonBegin.course.sections[jsonBegin.currentSection].contents
-              .scenarioId;
+          escenarioID = jsonBegin.course.sections[this.currentSeccion].contents.scenarioId;
           if (doc.id == escenarioID) {
-            console.log("payload del escenario");
+            this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Escenario encontrado, trayendo sus datos..."
+            console.log("Titulo del escenario");
             console.log(doc.data().title);
-            //SI EXISTE EL ESCENARIO HACE LA SOLICITUD CON SU PAYLOAD
-            let myHeadersEscenario = {
-              method: "POST", // or 'PUT'
-              headers: {
-                authorization: this.jwtSeleccionadoParaHeader,
-                Origin: "https://www.remotasks.com",
-                "Content-Type": "application/json",
-                "User-Agent":
-                  "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
-              },
-              body: doc.data().payload
-            };
-            let urlScenario = doc.data().url;
-            console.log(urlScenario);
-            console.log(this.jwtSeleccionadoParaHeader);
-            console.log(doc.data().payload);
-            let respEscenario = await request(urlScenario, myHeadersEscenario);
-            let jsonEscenario = await JSON.parse(respEscenario.body);
-            console.log("Respuesta del Escenario");
-            console.log(jsonEscenario);
-            //SI PASASTE EL ESCENARIO HACE LA SOLICITUD DEL CHECK
-
-            try {
-              if (jsonEscenario) {
-                let myHeaderContinue = {
-                  method: "GET", // or 'PUT'
-                  headers: {
-                    authorization: this.jwtSeleccionadoParaHeader,
-                    Origin: "https://www.remotasks.com",
-                    "User-Agent":
-                      "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
-                  }
-                };
-
-                console.log("Haciendo solicitud Status");
-                console.log(this.urlStatus + escenarioID);
-                let respStatus = await request(
-                  this.urlStatus + jsonEscenario.processedResponse.task_id,
-                  myHeaderContinue
-                );
-                let jsonStatus = await JSON.parse(respStatus.body);
-                console.log("Respuesta del Status");
-                console.log(jsonStatus.passedBar);
-
-                if (jsonStatus.passedBar == true) {
-                  let myHeaderContinue = {
-                    method: "POST", // or 'PUT'
-                    headers: {
-                      authorization: this.jwtSeleccionadoParaHeader,
-                      Origin: "https://www.remotasks.com",
-                      "finger-print": "0" + this.fingerPrint,
-                      "User-Agent":
-                        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
-                    }
-                  };
-
-                  console.log("Continue luego del status");
-                  console.log(url + jsonBegin._id + "/continue");
-                  let respContinue2 = await request(
-                    url + jsonBegin._id + "/continue",
-                    myHeaderContinue
-                  );
-                  let jsonContinue2 = await JSON.parse(respContinue2.body);
-                  console.log("Respuesta continue dentro de escenario");
-                  console.log(jsonContinue2);
-                }
-              }
-            } catch (error) {
-              console.log("error del continue dentro de escenario: " + error);
-            }
-            //AQUI TERMINA LA SOLICITUD DE PASAR EL ESCENARIO
+            this.docData = doc.data();
+            this.existeEscenario = true;
           }
         });
+
+        if (this.existeEscenario == true) {
+          //Traemos el Url complete del escenario para pasarlo............................
+          let JwtSplitedPart = this.jwtSeleccionadoParaHeader.split(" ");
+          let jwtMinuscula = JwtSplitedPart[0];
+          let jwtForCookie =
+            jwtMinuscula.toLowerCase() + "=" + JwtSplitedPart[1];
+          console.log(jwtForCookie);
+          let url =
+            "https://www.remotasks.com/training?trainingId=" + escenarioID;
+          let headers = {
+            cookie: jwtForCookie,
+            Origin: "https://www.remotasks.com",
+            "user-agent":
+              "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3904.87 Safari/537.36"
+          };
+          let respText = await request(url, { method: "GET", headers });
+          let $ = await cheerio.load(respText.body);
+          let jsonTraining = $("script")[2].children[0].data;
+          let idPasarEscenario = JSON.parse(jsonTraining).props.pageInitialProps
+            .trainingAttempt;
+          console.log(idPasarEscenario);
+          this.UrlEscenarioComplete =
+            "https://api-internal.scale.com/internal/training/complete/" +
+            idPasarEscenario +
+            "?grader_version=1";
+          console.log(this.UrlEscenarioComplete);
+
+          //....................................................................................
+          console.log("Pasando el escenario...");
+          this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Pasando el escenario..."
+          let payloadEscenario = this.docData.payload;
+          //SI EXISTE EL ESCENARIO HACE LA SOLICITUD CON SU PAYLOAD
+          let myHeadersEscenario = {
+            method: "POST", // or 'PUT'
+            url: this.UrlEscenarioComplete,
+            headers: {
+              "Content-Type": "application/json",
+              authorization: this.jwtSeleccionadoParaHeader,
+              Origin: "https://www.remotasks.com",
+              "Content-Type": "application/json",
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+            },
+            body: payloadEscenario
+          };
+          //Hace la solicitud de pasar el escenario.
+          let respJsonEscenarioComplete = await rp(myHeadersEscenario);
+          console.log(
+            "passedSpeedBar: " +
+              JSON.parse(respJsonEscenarioComplete).passedSpeedBar
+          );
+          console.log(
+            "passedAccuracyBar: " +
+              JSON.parse(respJsonEscenarioComplete).passedAccuracyBar
+          );
+          console.log(
+            "passedSpeedBar: " +
+              JSON.parse(respJsonEscenarioComplete).passedSpeedBar
+          );
+          this.existeEscenario = false;
+
+        }else{
+          //EN caso de que no halla escenario en la BD cae aquí
+          console.log("Este escenario NO esta en la base de datos")
+          this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Este escenario no está registrado aun."
+          this.eventBtnPasarCurso.target.disabled = false;
+          this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
+          this.EjecutaContinue = false
+          this.ponerExpanedEnAmarillo()
+        }
+
       } catch (error) {
         console.log("Error trayendo payload: " + error);
-        toastr.warning(
-          "Este escenario no existe en la base de datos.",
-          "Mensaje",
-          { timeOut: 4000, closeButton: true }
-        );
+        //Habilita el boton para abrir el escenario
+      this.eventBtnPasarCurso.target.disabled = false;
+      this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
+      this.ponerExpanedEnAmarillo()
       }
     },
 
-    //6)ESTA FUNCION TIENE EL CODIGO QUE PASA LOS CURSOS
+    // ESTA FUNCION TIENE EL CODIGO QUE PASA LOS CURSOS
     async pasarCursoTeoricoYScenario(
       url,
       nameCurso,
@@ -479,7 +467,14 @@ export default {
       workerProgress,
       jwt,
       event
-     ) {
+      ) {
+       //Pone permite que se ejecute el continue 
+      this.EjecutaContinue = true
+      //Deshabilita el boton para abrir el escenario
+      this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = true;
+      //Pone al iniciar el url del curso que se está pasando.
+      this.UrlCursoEscenario = this.urlCurso + nameCurso;
+      this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Iniciando el curso."
       try {
         let myHeaders = {
           method: "GET", // or 'PUT'
@@ -496,6 +491,8 @@ export default {
         console.log(url + nameCurso);
         let respStart = await request(url + nameCurso, myHeaders);
         var jsonStart = JSON.parse(respStart.body);
+        console.log("Json Start:");
+        console.log(jsonStart);
 
         //...................Segunda solicitud con header POST Begin..................
         let myHeaders2 = {
@@ -510,12 +507,8 @@ export default {
               "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
           }
         };
-        console.log(
-          "Creando solicitud begin en url:" +
-            url +
-            jsonStart.course._id +
-            "/begin"
-        );
+        this.UrlCursoBegin = url + jsonStart.course._id + "/begin";
+        console.log("Creando solicitud begin en url:" + this.UrlCursoBegin);
         let respBegin = await request(
           url + jsonStart.course._id + "/begin",
           myHeaders2
@@ -525,86 +518,74 @@ export default {
 
         //................Tercera solicitud con mismo header POST..................
         //aqui se pone en bucle hasta que termina
+
         for (let i = this.currentSeccion; i < arraySection.length; i++) {
           console.log("Entramos en bucle con index: " + i);
           try {
-            console.log("Creando solicitud continue");
+            console.log("json del Begin")
             console.log(jsonBegin);
 
             //------AQUI SE PREGUNTA SI EL CURSO TIENE ESCENARIO O NO--------------------
-           if (
-              jsonBegin.courseProgress.course.sections[
-                jsonBegin.courseProgress.currentSection
-              ].type == "scenario"
-            ){
-            //Habilita el btn pasar curso y quita el sponner
-            this.spinnerPasarCurso = "";
-            this.eventBtnPasarCurso.target.disabled = false;
-            //Habilita el boton para abrir el escenario
-            this.eventBtnPasarCurso.target.nextSibling.nextElementSibling.disabled = false;
-           
-             //PROCEDE A PASAR EL ESCENARIO DEL CURSO!!!
-            /*  console.log("Si hay un escenario en jsonbeing");
-              await this.pasarCursoEscenario(
-                jwt,
-                jsonBegin.courseProgress,
-                url
-              );*/
-            } else {
-              try {
-                console.log(url + jsonBegin.courseProgress._id + "/continue");
-                let respContinue = await request(
-                  url + jsonBegin.courseProgress._id + "/continue",
-                  myHeaders2
-                );
-                let jsonContinue = await JSON.parse(respContinue.body);
-                //Actualiza la seccion actual en que va el curso
-                this.currentSeccion =
-                  jsonContinue.courseProgress.currentSection;
-                console.log(
-                  "Listo: " +
-                    jsonContinue.courseProgress.currentSection +
-                    "/" +
-                    arraySection.length
-                );
-                console.log(jsonContinue);
-                //Guarda el json continue en el data para usarlo desde el catch
-                this.jsonContinueCatch = jsonContinue;
-
-                //CURSO LISTO Y TERMINADO Y SE CAMBIA DE COLOR Y DISABLE EL BOTON
-                if (jsonContinue.courseProgress.completed == true) {
-                  //actualiza la lista de loscourseProgress cursos
-                  this.traeCursos(this.jwtSeleccionadoParaHeader);
-                  //Pone el fondo de verde para simbolizar completo.
-                  this.ponerExpanedEnVerde(arraySection);
-                  this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
-                }
-              } catch (error) {
-                console.log("Llegaste a un escenario");
-                if (this.jsonContinueCatch.courseProgress.completed == true) {
-                  this.eventBtnPasarCurso.target.disabled = true;
-                  this.ponerExpanedEnVerde(arraySection);
-                } else {
-                  this.eventBtnPasarCurso.target.disabled = false;
-                  //Pone el fondo de amarillo para simbolizar incompleto.
-                  this.ponerExpanedEnAmarillo(arraySection);
-                }
-                this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
-              }
+            console.log("Tipo: "+jsonBegin.courseProgress.course.sections[this.currentSeccion].type)
+            if (
+              jsonBegin.courseProgress.course.sections[this.currentSeccion]
+                .type == "scenario"
+             ){
+               //PROCEDE A PASAR EL ESCENARIO DEL CURSO!!!
+              console.log("HAY UN ESCENARIO en jsonbeing!!");
+              await this.pasarCursoEscenario(jwt, jsonBegin.courseProgress, url);
+              console.log("Me ejecuté despues de terminar la funcion de pasar el escenario");
             }
+
+            //SE EJECUTA EL CONTINUE SIEMPRE
+            if(this.EjecutaContinue == true){
+            console.log("Creando solicitud continue");
+            this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Ejecutando el boton continue..."
+            try {
+              console.log(url + jsonBegin.courseProgress._id + "/continue");
+              let respContinue = await request(
+                url + jsonBegin.courseProgress._id + "/continue",
+                myHeaders2
+              );
+              let jsonContinue = await JSON.parse(respContinue.body);
+              //Actualiza la seccion actual en que va el curso
+              this.currentSeccion = jsonContinue.courseProgress.currentSection;
+                   console.log(jsonContinue);
+                 //CURSO LISTO Y TERMINADO Y SE CAMBIA DE COLOR Y DISABLE EL BOTON
+                 if (jsonContinue.courseProgress.completed == true) {
+                   //actualiza la lista de los cursos
+                   this.traeCursos(this.jwtSeleccionadoParaHeader);
+                   //Pone el fondo de verde para simbolizar completo.
+                   this.ponerExpanedEnVerde(arraySection);
+                   this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
+                 }
+
+              //Coloca la posicion actual al texto de cada curso independiente
+               setTimeout(() => {                 
+                 this.eventBtnPasarCurso.target.offsetParent.childNodes[2].childNodes["0"].childNodes[4].innerText =
+                 this.currentSeccion+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+               }, 300);
+
+            } catch (error) {
+              console.log("Llegaste a un escenario");
+              console.log(error);
+              if (jsonContinue.courseProgress.completed == true) {
+                this.eventBtnPasarCurso.target.disabled = true;
+              } else {
+                console.log("Iniciando funcion de pasar escenario en catch");
+                this.eventBtnPasarCurso.target.disabled = false;
+                //Pone el fondo de amarillo para simbolizar incompleto.
+                this.ponerExpanedEnAmarillo(arraySection);
+              }
+              this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
+            }
+          }
           } catch (error) {
             //Tambien aqui es cuando sale un escenario
             this.ponerExpanedEnAmarillo(arraySection);
             this.eventBtnPasarCurso.target.disabled = false;
             this.eventBtnPasarCurso.toElement.childNodes[0].className = "";
-            if (
-              error ==
-              "SyntaxError: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data"
-            ) {
-              // this.pasarCursoEscenario(jwt);
-            }
             console.log("error en bucle: " + error + " " + i);
-            //i = jsonContinue.courseProgress.currentSection;
           }
         } //for
 
@@ -614,9 +595,104 @@ export default {
         //PROCEDE A PASAR EL ESCENARIO DEL CURSO!!!
         // this.pasarCursoEscenario(jwt);
       }
+     },
+
+      setTextInDesplegable(event, arraySection, workerProgress){
+      setTimeout(() => {
+        if (event.target.tagName == "P") {
+          //CUANDO EL DESPLIEGUE DA CLICK EN TEXTO
+          console.log("click en titulo p");
+
+          if (event.target.className == "bg-warning text-light p-2") {
+            console.log("El escenario está incompleto.");
+            event.path[2].childNodes[2].childNodes["0"].childNodes[4].innerText =
+            workerProgress.currentSection+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+
+          } else if (event.target.className == "bg-success text-light p-2") {
+            console.log("El escenario está completo.");
+            if(workerProgress){
+            event.path[2].childNodes[2].childNodes["0"].childNodes["0"].innerText = "Curso completado con éxito!";
+            event.path[2].childNodes[2].childNodes["0"].childNodes[4].innerText =
+            workerProgress.currentSection+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+            }else{
+              console.log("Ya no hay workerprogress en curso completado.")
+            }
+          } else if (event.target.className == "") {
+            console.log("Aun no hay escenario iniciado");
+            event.path[2].childNodes[2].childNodes["0"].childNodes[4].innerText =
+            "0/"+arraySection.length+" Tipo: "+this.tipoCurso
+          }
+        } else if (event.target.tagName == "BUTTON") {
+          //CUANDO EL DESPLIEGUE DA CLICK EN ESPACIO VACIO
+          console.log("click en espacio vacío");
+
+          if (
+            event.target.childNodes["0"].className ==
+            "bg-warning text-light p-2"
+          ) {
+            console.log("El escenario está incompleto.");
+            event.path[1].childNodes[2].childNodes["0"].lastElementChild.innerText =
+            workerProgress.currentSection+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+          } else if (
+            event.target.childNodes["0"].className ==
+            "bg-success text-light p-2"
+          ) {
+            console.log("El escenario está completo.");
+            if(workerProgress){
+            event.path[1].childNodes[2].childNodes["0"].firstChild.innerText = "Curso completado con éxito!";
+            event.path[1].childNodes[2].childNodes["0"].lastElementChild.innerText =
+            workerProgress.currentSection+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+            }else{
+              console.log("Ya no hay workerprogress en curso completado.")
+            }
+
+          } else if (event.target.childNodes["0"].className == "") {
+            console.log("Aun no hay escenario iniciado");
+            event.path[1].childNodes[2].childNodes["0"].lastElementChild.innerText =
+            "0/"+arraySection.length+" Tipo: "+this.tipoCurso
+          }
+          
+        } else if (event.target.tagName == "I") {
+          //CUANDO EL DESPLIEGUE DA CLICK EN LA FLECHITA
+          console.log("click en flechita");  
+
+          if (
+            event.path[2].childNodes["0"].className ==
+            "bg-warning text-light p-2"
+          ) {
+            console.log("El escenario está incompleto.");
+            event.path[3].childNodes[2].childNodes["0"].childNodes[4].innerText =
+            workerProgress.currentSection+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+
+          } else if (
+            event.path[2].childNodes["0"].className ==
+            "bg-success text-light p-2"
+          ) {
+            console.log("El escenario está completo.");
+            if(workerProgress){
+            event.path[3].children[1].childNodes["0"].firstChild.innerText = "Curso completado con éxito!";
+            event.path[3].childNodes[2].childNodes["0"].childNodes[4].innerText =
+            workerProgress.currentSection+"/"+arraySection.length+" Tipo: "+this.tipoCurso
+            }else{
+              console.log("Ya no hay workerprogress en curso completado.")
+            }
+            
+          } else if (event.path[2].childNodes["0"].className == "") {
+            console.log("Aun no hay escenario iniciado");
+            event.path[3].childNodes[2].childNodes["0"].childNodes[4].innerText =
+            "0/"+arraySection.length+" Tipo: "+this.tipoCurso
+          }
+        }
+      }, 300);
     },
 
-    //10) Boton que abre el escenario en el bot de cursos
+    // captura el event del texto de la current section del curso
+    GetEventCurrentSection(event) {
+      this.eventCurrentSeccion = event;
+      console.log(event);
+    },
+
+    // Boton que abre el escenario en el bot de cursos
     OpenEscenarioInBot(event, jsonTaskData) {
       console.log(event);
       let parteSinJWT = this.jwtSeleccionadoParaHeader.split(" ");
@@ -651,7 +727,7 @@ export default {
         }
       );
     },
-    //11) funcion que muestra el boton cuando se da click en expanded amarillo
+    // funcion que muestra el boton cuando se da click en expanded amarillo
     showBtnScenarioOnClickExpanded() {
       let Intervalo = setInterval(() => {
         if (
@@ -680,45 +756,10 @@ export default {
       }, 400);
     },
 
-    //7)Muestra despliega la lista hacia arriba o abajo y muestra el tipo de curso
-    clickdespliegue(index, TaskDatos, workerProgress, event) {
-      let tituloCurso = "";
-      //Coloca el event del click desplegable
-      this.eventDesplegableClick = event;
-      console.log(event);
-      tituloCurso = this.eventDesplegableClick.target.innerText;
+     //7)Muestra despliega la lista hacia arriba o abajo y muestra el tipo de curso
+    clickdespliegue(index, TaskDatos, arraySection, workerProgress, event) {
 
-      //Si existe un progreso en el curso
-      if (workerProgress) {
-        if (workerProgress.completed == true) {
-          //Entra aqui si el curso esta 100% completa
-          this.currentSeccion = workerProgress.currentSection;
-          console.log("Completo true: " + this.currentSeccion);
-        } else if (workerProgress.completed == false) {
-          //Entra aqui si el curso esta parcialmente completo
-          this.currentSeccion = workerProgress.currentSection;
-          this.showBtnScenarioOnClickExpanded();
-          this.UrlCursoEscenario = this.urlCurso + TaskDatos.name;
-          console.log("incompleto en posición: " + this.currentSeccion);
-        }
-      } else if (workerProgress === undefined) {
-        if (
-          this.eventDesplegableClick.target.offsetParent.firstElementChild
-            .className == "bg-warning text-light p-2" ||
-          this.eventDesplegableClick.target.className ==
-            "bg-warning text-light p-2" ||
-          this.eventDesplegableClick.target.firstChild.className ==
-            "bg-warning text-light p-2"
-        ) {
-          this.UrlCursoEscenario = this.urlCurso + TaskDatos.name;
-          console.log(this.UrlCursoEscenario);
-        } else {
-          //No existe progreso en el curso
-          console.log("No hay workerProgress");
-          this.currentSeccion = "0";
-        }
-      }
-      //Coloca el escenario en NO cuando se da un click
+      //...........Primero dice si curso es de escenario o teorico .................
       this.escenario = "no";
       if (this.statusList == false || index != this.indexActualClick) {
         TaskDatos.sections.forEach(element => {
@@ -740,9 +781,33 @@ export default {
       } else {
         this.statusList = false;
       }
+
+      //...............Ahora muestra el estado y msj de los botones y textos.................
+      let tituloCurso = "";
+      //Coloca el event del click desplegable
+      this.eventDesplegableClick = event;
+      console.log(event);
+
+      tituloCurso = this.eventDesplegableClick.target.innerText;
+      this.setTextInDesplegable(event, arraySection, workerProgress)
+      //Si existe un progreso en el curso
+      if (workerProgress) {
+        if (workerProgress.completed == true) {
+          //Entra aqui si el curso esta 100% completa y guarda la posicion actual
+         this.currentSeccion = workerProgress.currentSection;
+
+        } else if (workerProgress.completed == false) {
+          //Entra aqui si el curso esta incompleto
+          this.currentSeccion = workerProgress.currentSection;
+          this.UrlCursoEscenario = this.urlCurso + TaskDatos.name;
+          console.log(this.UrlCursoEscenario);
+        }
+      } else if (workerProgress === undefined) {
+          this.currentSeccion = "0";
+      }      
     },
 
-    //8)Crea el Finger Print y lo almacena en el data.
+    //Crea el Finger Print y lo almacena en el data.
     crearFingerPrint(length) {
       var result = "";
       var characters =
@@ -755,7 +820,7 @@ export default {
         this.fingerPrint = result;
       }
     },
-    //9) Obtiene el nombre del token seleccionado
+    //Obtiene el nombre del token seleccionado
     async getAccountName(tokenJTWSelected) {
       this.jwtClickeadoActual = tokenJTWSelected;
       this.CondicionDialog = "datosCuenta";
