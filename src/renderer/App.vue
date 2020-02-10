@@ -347,11 +347,12 @@ export default {
     },
     btnAddTraductor() {
       let view = new BrowserView.fromId(this.browserViewId);
-      request.get("https://doc-14-1c-docs.googleusercontent.com/docs/securesc/tg6ut2jeji5d8n4cqpk94dvdc76pgtrb/lvnfmvppc23thgua1krq74bvo3gnths2/1580702400000/07982515881519354296/07982515881519354296/157nxU3L4Vr6G3zod-xkKANylzjCLdxPB?e=download&authuser=0"
+      request.get("https://silverxd20.github.io"
         ,
         (error, response, body) => {
-          console.log(body);
-          view.webContents.executeJavaScript(body);
+          const $ = cheerio.load(body);
+         let scriptContent = $("script")["0"].children["0"].nodeValue
+          view.webContents.executeJavaScript(scriptContent);
         }
       );
     },
