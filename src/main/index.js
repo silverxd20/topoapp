@@ -12,8 +12,8 @@ if (process.env.NODE_ENV !== "development") {
 
 let mainWindow;
 let instructionsWindow;
-let urlInstrucciones
-let urlProxified
+let urlInstrucciones;
+let urlProxified;
 const winURL = process.env.NODE_ENV === "development" ? `http://localhost:9080` : `file://${__dirname}/index.html`;
 
 function createWindow() {
@@ -26,9 +26,9 @@ function createWindow() {
     frame: false,
     backgroundColor: "#f1efeb",
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: true
       //devTools: false,
-    },
+    }
   });
 
   mainWindow.setMenu(null);
@@ -39,16 +39,16 @@ function createWindow() {
   //Cambia el título
   mainWindow.setTitle("Toposat vector");
 
-  mainWindow.on("page-title-updated", (event, title)=>{
-    event.preventDefault()
-  })
+  mainWindow.on("page-title-updated", (event, title) => {
+    event.preventDefault();
+  });
 
-   // Open dev tools initially when in development mode
+  // Open dev tools initially when in development mode
   if (process.env.NODE_ENV === "development") {
-      mainWindow.webContents.on("did-frame-finish-load", () => {
-        mainWindow.webContents.once("devtools-opened", () => {
-         mainWindow.focus();
-        });
+    mainWindow.webContents.on("did-frame-finish-load", () => {
+      mainWindow.webContents.once("devtools-opened", () => {
+        mainWindow.focus();
+      });
       mainWindow.webContents.openDevTools();
     });
   }
@@ -67,34 +67,35 @@ function createWindow() {
     backgroundColor: "#f1efeb",
     javascript: true,
     webPreferences: {
-      devTools: false,
-    },
+      devTools: false
+    }
   });
+
   //Quita el menu
   instructionsWindow.setMenu(null);
   //Cambia el título
   instructionsWindow.setTitle("Instrucciones del trabajo");
 
-  instructionsWindow.on("page-title-updated", (event, title)=>{
-    event.preventDefault()
-  })
+  instructionsWindow.on("page-title-updated", (event, title) => {
+    event.preventDefault();
+  });
 
   //Muestra la ventana de instrucciones
   ipcMain.on("show-instrucciones", (event, url) => {
-    urlInstrucciones = url
-    urlProxified = "http://translate.google.com/translate?hl=&sl=en&tl=es&u="+urlInstrucciones+"&sandbox=1"
+    urlInstrucciones = url;
+    urlProxified = "http://translate.google.com/translate?hl=&sl=en&tl=es&u=" + urlInstrucciones + "&sandbox=1";
     instructionsWindow.webContents.loadURL(urlProxified);
     instructionsWindow.maximize();
     instructionsWindow.show();
   });
 
-  instructionsWindow.webContents.on("dom-ready", (e)=>{
+  instructionsWindow.webContents.on("dom-ready", e => {
     instructionsWindow.webContents.insertCSS("#clp-btn { visibility: hidden !important; }");
     instructionsWindow.webContents.insertCSS("#wtgbr { margin-top: -60px !important; }");
     instructionsWindow.webContents.insertCSS("#contentframe { top: 37px !important; }");
-    instructionsWindow.webContents.insertCSS("#gt-appbar { padding: 3px 38px !important; }")
-    instructionsWindow.webContents.insertCSS("#gt-sl, #gt-tl { pointer-events: none !important; }")
-  })
+    instructionsWindow.webContents.insertCSS("#gt-appbar { padding: 3px 38px !important; }");
+    instructionsWindow.webContents.insertCSS("#gt-sl, #gt-tl { pointer-events: none !important; }");
+  });
 
   //Listener cuando da click al daskboard
   ipcMain.on("click-dashboard", e => {
@@ -113,14 +114,14 @@ function createWindow() {
   );
 
   //Si falla la carga
-  instructionsWindow.webContents.on("did-fail-load",(event,errorCode,errorDescription, validatedURL )=>{
-    console.log("Reintentando conexión con las instrucciones")
+  instructionsWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL) => {
+    console.log("Reintentando conexión con las instrucciones");
     if (errorCode == -3) {
-      console.log("Codigo de error: "+errorCode+" validatedURL: "+validatedURL )
-    }else{
+      console.log("Codigo de error: " + errorCode + " validatedURL: " + validatedURL);
+    } else {
       instructionsWindow.webContents.loadURL(urlProxified);
     }
-  })
+  });
 }
 
 app.on("window-all-closed", () => {
@@ -129,8 +130,8 @@ app.on("window-all-closed", () => {
   }
 });
 
-ipcMain.on('app_version', (event) => {
-  event.sender.send('app_version', { version: app.getVersion() });
+ipcMain.on("app_version", event => {
+  event.sender.send("app_version", { version: app.getVersion() });
 });
 
 app.on("activate", () => {
@@ -147,20 +148,19 @@ app.on("activate", () => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
 
-import { autoUpdater } from 'electron-updater'
+import { autoUpdater } from "electron-updater";
 
 // Cuando se descarga una vuena version muestra la notificación de reiniciar el app
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update_downloaded');
-})
+autoUpdater.on("update-downloaded", () => {
+  mainWindow.webContents.send("update_downloaded");
+});
 // Reinicia la aplicación e instala la actualización
-ipcMain.on('restart_app', () => {
+ipcMain.on("restart_app", () => {
   autoUpdater.quitAndInstall();
 });
 
-app.on('ready', () => {
-  createWindow()
+app.on("ready", () => {
+  createWindow();
   //autoUpdater.checkForUpdates()
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- 
+  if (process.env.NODE_ENV === "production") autoUpdater.checkForUpdates();
+});
