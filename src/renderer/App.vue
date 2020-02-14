@@ -5,10 +5,15 @@
       <div id="notification" v-show="toggleNotificationUpdated">
         <div class="divTopCardNotif bg-success text-light">
           <v-icon class="pl-3 mb-2 text-light d-inline">mdi-cloud-download-outline</v-icon>
-          <p class="pl-1 d-inline">Nueva actualización!</p>
+          <p class="pl-1 d-inline">El programa se há actualizado: v1.10</p>
         </div>
         <div class="divCardNotifInfo">
-          <p id="message">Para aplicar los cambios se debe reiniciar el app, desea hacerlo ahora?</p>
+          <!-- AQUI SE COLOCAN LAS NOVEDADES DE CADA VERSION -->
+          <h6 class="novedadesText">Novedades:</h6>
+          <p>* Se resolvieron algunos problemas para que se mas estable la applicación.</p>
+          <p>* El traductor en cursos está de nuevo en funcionamiento.</p>
+          <hr>
+          <p id="message">Los cambios se aplicaran al reiniciar el app, desea hacerlo ahora?</p>
           <div class="divBotonesNotif">
             <v-btn @click="btnCerrarNotif()">Luego</v-btn>
             <v-btn @click="btnReiniciarApp()">Reiniciar</v-btn>
@@ -398,5 +403,8 @@ export default {
 }
 .btnMenosMas {
   background-color: rgb(97, 97, 97) (65, 58, 58);
+}
+.novedadesText{
+  font-weight: bold;
 }
 </style>

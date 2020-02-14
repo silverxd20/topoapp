@@ -11,7 +11,7 @@
         <p
           v-if="userAuthData.premium == true"
           class="d-flex justify-content-center texto"
-        >Puede cambiar su contraseña toposat vector</p>
+        >Puede cambiar su contraseña de toposat vector</p>
         <v-layout class="d-flex justify-content-center">
           <v-flex xs6>
             <v-text-field
@@ -322,7 +322,7 @@ export default {
     ...mapState(["firebaseConfig", "userAuthData"])
   },
   methods: {
-    ...mapMutations(["actualizaAuthData"]),
+    ...mapMutations(["actualizaAuthData","listaDeJwtFromListUser"]),
     //1) Ejecuciones al inicio
     initDatos() {
       this.campoContraseña = this.userAuthData.password;
@@ -341,6 +341,7 @@ export default {
       this.showSatisfactorio = false;
       this.showFallido = false;
     },
+
     //3)Permite editar los campos de los tokens LISTO
     editarCampoTokens() {
       this.toggleInputTokens = false;
@@ -524,9 +525,11 @@ export default {
       }
       //Cambia el formato del json al de la lista de la base de datos
       let ListaTokensActualizada = {};
+      let ListaTokenEnArrayParaBotCursos = []
       for (const index in this.tokenlist) {
         console.log(this.tokenlist[index].token);
         ListaTokensActualizada["_"+index] = this.tokenlist[index].token;
+        ListaTokenEnArrayParaBotCursos.push(this.tokenlist[index].token)
       }
       //Envía a la base de datos la nueva lista de tokens
       db = firebase.firestore();
@@ -538,6 +541,7 @@ export default {
           this.showSatisfactorioToken = true;
           this.toggleBtnEditarToken = false;
           this.spinnerStatusToken = "";
+          this.listaDeJwtFromListUser(ListaTokenEnArrayParaBotCursos)
         })
         .catch(error => {
           console.error("Error actualizando campos: ", error);

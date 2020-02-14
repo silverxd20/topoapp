@@ -65,7 +65,7 @@
                 >{{selectViewCuentaName}}</button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
                   <button
-                    v-for="(item, index) in jwtList"
+                    v-for="(item, index) in JwtFromListUserArray"
                     :key="index"
                     class="dropdown-item"
                     type="button"
@@ -133,7 +133,7 @@
                   datos.name,
                   datos.sections,
                   datos.workerProgress,
-                  jwtList,
+                  JwtFromListUserArray,
                   $event,
                   datos.taskType
                 )
@@ -174,11 +174,13 @@ export default {
   data() {
     return {
       items: [
-        "Cuadros 2d",
+        "Cuadros 2D",
         "Polygon",
         "Segmentación",
         "Categorizacion",
-        "Videobox"
+        "Video Box",
+        "Video Polygon",
+        "Point Annotation"
       ],
       selectCategoryName: "",
       selectViewCategoryName: "Categoría",
@@ -215,14 +217,14 @@ export default {
     };
   },
   mounted() {},
-  props: ["jwtList"],
   computed: {
     ...mapState([
       "toggleBtnGetCurso",
       "msjLoadingCurso",
       "showLoaderCurso",
       "ListaDeCursos",
-      "nombreApellido"
+      "nombreApellido",
+      "JwtFromListUserArray"
     ])
   },
   //LOS METODOS DEL COMPONENTE
@@ -249,9 +251,15 @@ export default {
       } else if (item == "Categorizacion") {
         this.selectViewCategoryName = "Categorizacion";
         this.selectCategoryName = "categorization";
-      } else if (item == "Videobox") {
-        this.selectViewCategoryName = "Videobox";
+      } else if (item == "Video Box") {
+        this.selectViewCategoryName = "Video Box";
         this.selectCategoryName = "videoboxannotation";
+      } else if (item == "Point Annotation") {
+        this.selectViewCategoryName = "Point Annotation";
+        this.selectCategoryName = "pointannotation";
+      } else if (item == "Video Polygon") {
+        this.selectViewCategoryName = "Video Polygon";
+        this.selectCategoryName = "videopolygonannotation";
       }
     },
     //2) maneja el click del dropdown de las Cuentas

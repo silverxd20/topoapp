@@ -124,10 +124,6 @@ export default new Vuex.Store({
       state.showLoaderCurso = false;
       state.msjLoadingCurso = "";
       state.toggleBtnGetCurso = false;
-      /*toastr.info("Lista completada.", "Mensaje", {
-        timeOut: 3000,
-        closeButton: true
-      });*/
     },
     disableBtnGetCursoTrue(state) {
       state.toggleBtnGetCurso = true;

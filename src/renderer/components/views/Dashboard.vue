@@ -109,7 +109,7 @@
 <script>
 import barraSuperior from "./../barraSuperior/barraSuperior";
 import cardTasks from "./../miniComponents/cardTasks";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 let { remote } = require("electron");
 const cheerio = require("cheerio");
@@ -153,6 +153,8 @@ export default {
     ...mapState(["firebaseConfig", "userAuthData"])
   },
   methods: {
+
+    ...mapMutations(["listaDeJwtFromListUser"]),
     //......................EVENT LISTENERS.......................................
     async firebaseInit() {
       this.mainSeasson = remote.getCurrentWindow();
@@ -183,6 +185,7 @@ export default {
                         //Transforma el json a Array de las cuentas JWT.
                         console.log("valor de arraySession");
                         console.log(this.arraySession);
+                        this.listaDeJwtFromListUser(this.arraySession)
 
                         // Inicia pidiendo tareas luego de obtener el JWT de la base de datos
                         this.getDatosCuentas(this.arraySession);

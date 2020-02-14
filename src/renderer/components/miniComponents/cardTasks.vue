@@ -423,6 +423,9 @@ export default {
             view.webContents.insertCSS(
               ".jsx-2687182512{display: none !important;}"
             );
+            view.webContents.insertCSS(
+              ".recommended-course.jsx-14946851{display: none !important;}"
+            );
 
             //Estilos del curso atravesado en tasks
             view.webContents.insertCSS(
@@ -461,6 +464,7 @@ export default {
             view.webContents.insertCSS(
               ".remoBlue.jsx-1809695030{color: black !important;}"
             );
+
             //Cambio de posicion del titulo curso
             view.webContents.insertCSS(
               ".course-header.jsx-431219561{display: block !important;}"

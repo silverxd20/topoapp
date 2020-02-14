@@ -157,7 +157,6 @@ export default {
               this.listCursosGuardados.push(doc.id);
             }
           });
-          console.log(this.listCursosGuardados);
         });
     },
 
