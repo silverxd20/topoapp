@@ -5,14 +5,10 @@
       <div id="notification" v-show="toggleNotificationUpdated">
         <div class="divTopCardNotif bg-success text-light">
           <v-icon class="pl-3 mb-2 text-light d-inline">mdi-cloud-download-outline</v-icon>
-          <p class="pl-1 d-inline">El programa se há actualizado: v1.10</p>
+          <p class="pl-1 d-inline">El programa se há actualizado.</p>
         </div>
         <div class="divCardNotifInfo">
           <!-- AQUI SE COLOCAN LAS NOVEDADES DE CADA VERSION -->
-          <h6 class="novedadesText">Novedades:</h6>
-          <p>* Se resolvieron algunos problemas para que se mas estable la applicación.</p>
-          <p>* El traductor en cursos está de nuevo en funcionamiento.</p>
-          <hr>
           <p id="message">Los cambios se aplicaran al reiniciar el app, desea hacerlo ahora?</p>
           <div class="divBotonesNotif">
             <v-btn @click="btnCerrarNotif()">Luego</v-btn>

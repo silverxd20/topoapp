@@ -239,8 +239,8 @@ export default {
     //1) maneja el click del dropdown de categoria
     clickDropdownCategoria(item, index) {
       //Filtra el nombre de la categoría
-      if (item == "Cuadros 2d") {
-        this.selectViewCategoryName = "Cuadros 2d";
+      if (item == "Cuadros 2D") {
+        this.selectViewCategoryName = "Cuadros 2D";
         this.selectCategoryName = "annotation";
       } else if (item == "Polygon") {
         this.selectViewCategoryName = "Polygon";
