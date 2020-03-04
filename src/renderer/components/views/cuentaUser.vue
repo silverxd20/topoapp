@@ -90,10 +90,10 @@
                 <v-icon
                   v-on="on"
                   class="botonListToken"
-                  @click="clickOpenUniversity(tokenlist[index].token)"
+                  @click="clickOpenTaskLog(tokenlist[index].token)"
                 >mdi-dock-window</v-icon>
               </template>
-              <span>Abre el university de esta cuenta</span>
+              <span>Abre el Task Log de esta cuenta</span>
             </v-tooltip>
 
             <!-- Boton de ver la cuenta del token -->
@@ -667,7 +667,7 @@ export default {
       }
     },
     //16) Abre university
-    clickOpenUniversity(tokenJWT) {
+    clickOpenTaskLog(tokenJWT) {
       let parteSinJWT = tokenJWT.split(" ");
       let mainSeasson = electron.remote.getCurrentWindow();
       let sesion = mainSeasson.webContents.session;
@@ -686,7 +686,7 @@ export default {
           });
           win.maximize();         
           //Pone el titulo y no deja que se actualice
-          win.webContents.loadURL("https://www.remotasks.com/university");
+          win.webContents.loadURL("https://www.remotasks.com/activity");
           win.setTitle("Toposat vector");
           win.webContents.on("page-title-updated", (event, title) => {
             event.preventDefault();

@@ -180,7 +180,8 @@ export default {
         "Categorizacion",
         "Video Box",
         "Video Polygon",
-        "Point Annotation"
+        "Point Annotation",
+        "Cuboide 3D"
       ],
       selectCategoryName: "",
       selectViewCategoryName: "Categoría",
@@ -260,6 +261,9 @@ export default {
       } else if (item == "Video Polygon") {
         this.selectViewCategoryName = "Video Polygon";
         this.selectCategoryName = "videopolygonannotation";
+      } else if (item == "Cuboide 3D") {
+        this.selectViewCategoryName = "Cuboide 3D";
+        this.selectCategoryName = "cuboidannotation";
       }
     },
     //2) maneja el click del dropdown de las Cuentas
