@@ -319,7 +319,54 @@ export default {
       }
     },
 
-    //2) Funcion que obtiene el saldo, las tareas aprobadas y pendientes
+    //2) Funcion que obtiene los datos del usuario, saldo, tareas pendientes y aprobadas
+    async getDatosCuentas(cookiejwtParametro) {
+      this.saldoTotal = parseInt("0");
+      this.aprobadasTotal = parseInt("0");
+      this.pendientesTotal = parseInt("0");
+      this.toggleRefresh = false;
+      this.toggleSpinnerRefresh = true;
+
+      for (let indice in await cookiejwtParametro) {
+        //Convierte el JWT fdsb... entrante en jwt=fdsb...
+        let cookiesJWT = cookiejwtParametro[indice];
+        var part1 = cookiesJWT.split(" ");
+        var part2 = part1[0].toString().toLowerCase();
+        var authJWT = part2 + "=" + part1[1];
+        let count = 0;
+        for (let index = 0; index < 1; index++) {
+            //Envia la solicitud para obtener los datos
+            let respuesta = request(
+              "https://www.remotasks.com/dashboard",
+              {
+                method: "GET",
+                headers: {
+                  Cookie: authJWT,
+                  Origin: "https://www.remotasks.com",
+                  "user-agent":
+                    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
+                }
+              }
+            ).then(datos =>{
+
+            //LLama la funcion que calcula y procesa los datos
+            this.CalculaDatos(
+              datos,
+              datos.body,
+              indice,
+              cookiejwtParametro.length,
+              cookiesJWT
+            );
+            }).catch(error =>{
+              console.log("Error en la obtención de datos");
+            index = -1;
+            console.log(error);
+            })
+        }
+      }
+    }, // fin de la function get saldo cuentas
+
+    //2.1) Funcion que calcula el saldo, las tareas aprobadas y pendientes
     async CalculaDatos(response, body, index, cookiejwtParametro, cookiesJWT) {
       try {
         const $ = await cheerio.load(body);
@@ -347,12 +394,20 @@ export default {
             //no se por que razon sale 5 pero resuelve el conflicto y entrega el saldo real
             var part2 = part1[17].split("E");
             var SaldoCuenta = part2[0].split("$");
-            console.log("Saldo: " + SaldoCuenta[1] + " $");
+            if(SaldoCuenta[1] == null || SaldoCuenta == undefined){
+              SaldoCuenta[1] = 0
+            }else{
+              console.log("Saldo: " + SaldoCuenta[1] + " $");
+            }
           } else {
             //Obtiene el saldo $
             var part2 = part1[16].split("E");
             var SaldoCuenta = part2[0].split("$");
-            console.log("Saldo: " + SaldoCuenta[1] + " $");
+            if(SaldoCuenta[1] == null || SaldoCuenta == undefined){
+              SaldoCuenta[1] = 0
+            }else{
+              console.log("Saldo: " + SaldoCuenta[1] + " $");
+            }
           }
 
           //validando el total de tareas aprobadas y pendientes por que el array se mueve.
@@ -524,54 +579,7 @@ export default {
           console.log("El usuario perdio el token de session");
         }
       }
-    },
-
-    //2.1) Funcion que obtiene los datos del usuario, saldo, tareas pendientes y aprobadas
-    async getDatosCuentas(cookiejwtParametro) {
-      this.saldoTotal = parseInt("0");
-      this.aprobadasTotal = parseInt("0");
-      this.pendientesTotal = parseInt("0");
-      this.toggleRefresh = false;
-      this.toggleSpinnerRefresh = true;
-
-      for (let indice in await cookiejwtParametro) {
-        //Convierte el JWT fdsb... entrante en jwt=fdsb...
-        let cookiesJWT = cookiejwtParametro[indice];
-        var part1 = cookiesJWT.split(" ");
-        var part2 = part1[0].toString().toLowerCase();
-        var authJWT = part2 + "=" + part1[1];
-        let count = 0;
-        for (let index = 0; index < 1; index++) {
-            //Envia la solicitud para obtener los datos
-            let respuesta = request(
-              "https://www.remotasks.com/dashboard",
-              {
-                method: "GET",
-                headers: {
-                  Cookie: authJWT,
-                  Origin: "https://www.remotasks.com",
-                  "user-agent":
-                    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.87 Safari/537.36"
-                }
-              }
-            ).then(datos =>{
-
-            //LLama la funcion que calcula y procesa los datos
-            this.CalculaDatos(
-              datos,
-              datos.body,
-              indice,
-              cookiejwtParametro.length,
-              cookiesJWT
-            );
-            }).catch(error =>{
-              console.log("Error en la obtención de datos");
-            index = -1;
-            console.log(error);
-            })
-        }
-      }
-    } // fin de la function get saldo cuentas
+    }
   }
 };
 </script>
