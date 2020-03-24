@@ -187,8 +187,16 @@
 
       <v-card-actions class="d-flex justify-content-center">
         <v-btn
+          v-if="propJsonTask[0] == 'n'"
+          :disabled="true"
+          elevation="2"
+          @click="OpenTask()"
+          color="blue darken-2"
+          text
+        >Iniciar</v-btn>
+        <v-btn
           v-if="propJsonTask[0] == 's'"
-          :disabled="desabilitado"
+          :disabled="false"
           elevation="2"
           @click="OpenTask()"
           color="blue darken-2"

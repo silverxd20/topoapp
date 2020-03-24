@@ -282,8 +282,11 @@ export default {
             } catch (error) {
               console.log("Error dentro de request: " + error);
               console.log("No hay tareas en una cuenta");
-
-              this.jsonTarea.push("s");
+              if(this.userAuthData.premium == true){
+                this.jsonTarea.push("s");
+              }else{
+                this.jsonTarea.push("n");
+              }
               this.arraySessionParaTareasCards.push(arraySession[index]);
             }
           } else {
