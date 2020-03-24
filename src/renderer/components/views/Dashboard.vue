@@ -317,9 +317,11 @@ export default {
       try {
         const $ = await cheerio.load(body);
         //obtiene el array de dnd vienen los datos de tareas normales y saldo
-        var part1 = $(".jsx-2539128144").text().split(" ");
+        var part1 = $(".jsx-877672546").text().split(" ");
+        console.log(part1)
           //obtiene el array de dnd vienen los datos de tareas de revisor
         var part2review = $(".item__content").text();
+        console.log(part2review)
 
         /*Pregunta si part1 viene null pq cuando hay una tarea nueva
         que no tiene ni 1 solo curso no se muestran los datos de tareas
