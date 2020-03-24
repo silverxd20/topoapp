@@ -291,7 +291,11 @@ export default {
             }
           } else {
             console.log("No hay tareas en esta cuenta.");
-            this.jsonTarea.push("s");
+            if(this.userAuthData.premium == true){
+                this.jsonTarea.push("s");
+              }else{
+                this.jsonTarea.push("n");
+              }
             this.arraySessionParaTareasCards.push(arraySession[index]);
             //Cuando termine el bucle quita el loader y el mensaje
             if (index == this.forLengthJWtCuentas) {
