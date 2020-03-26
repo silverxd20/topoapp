@@ -186,6 +186,20 @@
       </v-card-text>
 
       <v-card-actions class="d-flex justify-content-center">
+        <!-- Boton que abre las instrucciones-->
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              v-show="showBtnInstrucciones"
+              class="botonListToken mr-2"
+              @click="OpenInstructions()"
+            >mdi-file-document-outline</v-icon>
+          </template>
+          <span>Abre las Instrucciones.</span>
+        </v-tooltip>
+
+        <!--Boton de iniciar -->
         <v-btn
           v-if="propJsonTask[0] == 'n'"
           :disabled="true"
@@ -209,6 +223,19 @@
           color="blue darken-2"
           text
         >Iniciar</v-btn>
+
+        <!-- Boton que abre la tarea en nueva ventana-->
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-icon
+             v-on="on"
+             v-show="showBtnOpenWindowTaks"
+             class="ml-2"
+             @click="OpenTasksNuevaVentana()"
+             >mdi-dock-window</v-icon>
+          </template>
+          <span>Abre la tarea en nueva ventana.</span>
+        </v-tooltip>
       </v-card-actions>
     </v-card>
   </div>
@@ -216,7 +243,7 @@
 To
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 const https = require("https");
 const fs = require("fs");
 const { ipcRenderer } = require("electron");
@@ -236,16 +263,48 @@ export default {
       UrlImageTask: "",
       nombreTarea: "-",
       TaskIniciada: true,
+      showBtnInstrucciones: true,
+      showBtnOpenWindowTaks: true
     };
   },
   mounted() {
+    this.initGeneral();
+    this.initCompruebaTipoDeUsuarioLogeado();
     this.initTraeNombreDeLTareaDeIntrucciones();
     this.initComprobarDndVieneLaImg();
   },
 
+  computed: {
+    ...mapState(["userAuthData"])
+  },
+
   methods: {
-    ...mapMutations(["browserId", "showBackDash", "ocultaDrawer","showTranslate"]),
+    ...mapMutations([
+      "browserId",
+      "showBackDash",
+      "ocultaDrawer",
+      "showTranslate"
+    ]),
     //metodos aqui
+    initGeneral(){
+      console.log(this.propJsonTask.assignmentType)
+      if(this.propJsonTask.assignmentType == "course"){
+        this.showBtnInstrucciones = false
+      }else{
+        console.log(this.propJsonTask.assignmentType)
+        this.showBtnInstrucciones = true
+      }
+    },
+
+    initCompruebaTipoDeUsuarioLogeado(){
+      if(this.userAuthData.premium == false){
+        this.showBtnInstrucciones = false
+        this.showBtnOpenWindowTaks = false
+      }else if(this.userAuthData.premium == true){
+        this.showBtnInstrucciones = true
+        this.showBtnOpenWindowTaks = true
+      }
+    },
 
     async initTraeNombreDeLTareaDeIntrucciones() {
       //Hace un split para obtener el url de la instrucciones
@@ -266,7 +325,9 @@ export default {
         let respuesta1 = await fetch(linkInstrucciones);
         let textResp = await respuesta1.text();
         const $ = cheerio.load(textResp);
-        let tareaName = $("span").text().split("I");
+        let tareaName = $("span")
+          .text()
+          .split("I");
         this.nombreTarea = tareaName[0];
         console.log(this.nombreTarea);
       }
@@ -320,7 +381,33 @@ export default {
       }
     },
 
-    // 1) Funcion que abre la tarea disponible
+    // 1) Abre las instrucciones en una ventana indpendiente
+  OpenInstructions() {
+    try{
+    let urlPart1;
+    //obtiene el url de las instrucciones
+    if (this.propJsonTask.subtask) {
+      urlPart1 = this.propJsonTask.subtask.instruction.split('"');
+    } else {
+      urlPart1 = this.propJsonTask.instruction.split('"');
+    }
+
+    let urlInstrucciones = urlPart1[1];
+    if (urlInstrucciones == "height:800px; width:100%") {
+      urlInstrucciones = urlPart1[3];
+    }
+    console.log("Instrucciones");
+    console.log(urlInstrucciones);
+    if (urlInstrucciones != null) {
+      //Si hay instrucciones entonces las abre
+      ipcRenderer.send("show-instrucciones", urlInstrucciones);
+    }
+    }catch(e){
+      console.log("No se puede abrir instrucciones en curso.")
+    }
+  },
+
+    // 2) Funcion que abre la tarea disponible
     OpenTask() {
       let parteSinJWT = this.propArraySession[this.indexCard].split(" ");
       let mainSeasson = electron.remote.getCurrentWindow();
@@ -337,59 +424,49 @@ export default {
         error => {
           let boundsJson = mainSeasson.getContentBounds();
           let heightExacto = boundsJson.height - 25;
-          let view
-          
+          let view;
+
           if (this.TaskIniciada == true) {
-            console.log("fue normal: "+ view)
-            view = new BrowserView();            
-            mainSeasson.setBrowserView(view);            
+            console.log("fue normal: " + view);
+            view = new BrowserView();
+            mainSeasson.setBrowserView(view);
             view.webContents.loadURL("https://www.remotasks.com/tasks");
-                  
-          //view.webContents.openDevTools()
-          this.browserId(view.id);
-          this.showBackDash();
-          view.setBounds({
-            x: 0,
-            y: 25,
-            width: boundsJson.width,
-            height: heightExacto
-          });          
-          this.TaskIniciada = false
-          //Si es un curso muestra el boton de traducir
-          if (this.propJsonTask.assignmentType == "course") {
-            this.showTranslate()
+
+            //view.webContents.openDevTools()
+            this.browserId(view.id);
+            this.showBackDash();
+            view.setBounds({
+              x: 0,
+              y: 25,
+              width: boundsJson.width,
+              height: heightExacto
+            });
+            this.TaskIniciada = false;
+            //Si es un curso muestra el boton de traducir
+            if (this.propJsonTask.assignmentType == "course") {
+              this.showTranslate();
+            }
+          } else {
+            console.log("ya no es null entro en else");
+            view.setBounds({
+              x: 0,
+              y: 25,
+              width: boundsJson.width,
+              height: heightExacto
+            });
+            view.webContents.loadURL("https://www.remotasks.com/tasks");
+            //view.webContents.openDevTools()
+            //this.browserId(view.id);
+            console.log("tipo: " + this.propJsonTask.assignmentType);
+            //Si es un curso muestra el boton de traducir
+            if (this.propJsonTask.assignmentType == "course") {
+              this.showTranslate();
+            }
+            this.showBackDash();
           }
-          }else{
-            console.log("ya no es null entro en else")
-          view.setBounds({
-            x: 0,
-            y: 25,
-            width: boundsJson.width,
-            height: heightExacto
-          });
-          view.webContents.loadURL("https://www.remotasks.com/tasks");
-          //view.webContents.openDevTools()
-          //this.browserId(view.id);
-          console.log("tipo: "+this.propJsonTask.assignmentType)
-          //Si es un curso muestra el boton de traducir
-          if (this.propJsonTask.assignmentType == "course") {
-            this.showTranslate()
-          }
-          this.showBackDash();
-          }
-          
 
           //Evento que avisa cuando el dom esta listo
           view.webContents.on("dom-ready", e => {
-            /* fs.readFile(__dirname + "/test.css", "utf-8", function(
-                error,
-                data
-              ) {
-                if (!error) {
-                  var formatedData = data.replace(/\s{2,10}/g, " ").trim();
-                  view.webContents.insertCSS(formatedData);
-                }
-              });*/
 
             //En la tarea cuando sale que te pueden banear quita un boton de allí
             view.webContents.insertCSS(
@@ -522,29 +599,42 @@ export default {
               ".course-summary__actions.jsx-3176796611{visivility: hidden !important;}"
             );
           });
-          
-          let urlPart1;
-          //obtiene el url de ls instrucciones
-          if (this.propJsonTask.subtask) {
-            urlPart1 = this.propJsonTask.subtask.instruction.split('"');
-          } else {
-            urlPart1 = this.propJsonTask.instruction.split('"');
-          }
 
-          let urlInstrucciones = urlPart1[1];
-          if (urlInstrucciones == "height:800px; width:100%") {
-            urlInstrucciones = urlPart1[3];
-          }
-          console.log("Instrucciones");
-          console.log(urlInstrucciones);
-          if (urlInstrucciones != null) {
-            //Si hay instrucciones entonces las abre
-            ipcRenderer.send("show-instrucciones", urlInstrucciones);
-          }
+          this.OpenInstructions();
+        }
+      );
+    },
+
+    // 3) Abre la tarea en una ventana independiente
+    OpenTasksNuevaVentana() {
+      let parteSinJWT = this.propArraySession[this.indexCard].split(" ");
+      let mainSeasson = electron.remote.getCurrentWindow();
+      let sesion = mainSeasson.webContents.session;
+
+      sesion.cookies.set(
+        {
+          url: "https://www.remotasks.com/",
+          name: "jwt",
+          value: parteSinJWT[1]
+        },
+        error => {
+          const remote = require("electron").remote;
+          const BrowserWindow = remote.BrowserWindow;
+          const win = new BrowserWindow({
+            show: false
+          });
+          win.maximize();
+          //Pone el titulo y no deja que se actualice
+          win.webContents.loadURL("https://www.remotasks.com/tasks");
+          win.setTitle("Toposat vector");
+          win.webContents.on("page-title-updated", (event, title) => {
+            event.preventDefault();
+            win.setTitle("Toposat vector");
+          });
         }
       );
     }
-  }
+  },
 };
 </script>
 

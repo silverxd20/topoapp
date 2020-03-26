@@ -61,49 +61,75 @@ function createWindow() {
 
   //.........................segunda ventana instrucciones..............
 
-  instructionsWindow = new BrowserWindow({
-    show: false,
-    useContentSize: true,
-    backgroundColor: "#f1efeb",
-    javascript: true,
-    webPreferences: {
-      devTools: false
-    }
-  });
-
-  //Quita el menu
-  instructionsWindow.setMenu(null);
-  //Cambia el título
-  instructionsWindow.setTitle("Instrucciones del trabajo");
-
-  instructionsWindow.on("page-title-updated", (event, title) => {
-    event.preventDefault();
-  });
-
   //Muestra la ventana de instrucciones
   ipcMain.on("show-instrucciones", (event, url) => {
+    instructionsWindow = new BrowserWindow({
+      show: false,
+      useContentSize: true,
+      backgroundColor: "#f1efeb",
+      javascript: true,
+      webPreferences: {
+        devTools: false
+      }
+    });
+
+    //Quita el menu
+    instructionsWindow.setMenu(null);
+    //Cambia el título
+    instructionsWindow.setTitle("Instrucciones del trabajo");
+
+    instructionsWindow.on("page-title-updated", (event, title) => {
+      event.preventDefault();
+    });
     urlInstrucciones = url;
     urlProxified = "http://translate.google.com/translate?hl=&sl=en&tl=es&u=" + urlInstrucciones + "&sandbox=1";
     instructionsWindow.webContents.loadURL(urlProxified);
     instructionsWindow.maximize();
     instructionsWindow.show();
-  });
 
-  instructionsWindow.webContents.on("dom-ready", e => {
-    instructionsWindow.webContents.insertCSS("#clp-btn { visibility: hidden !important; }");
-    instructionsWindow.webContents.insertCSS("#wtgbr { margin-top: -60px !important; }");
-    instructionsWindow.webContents.insertCSS("#contentframe { top: 37px !important; }");
-    instructionsWindow.webContents.insertCSS("#gt-appbar { padding: 3px 38px !important; }");
-    instructionsWindow.webContents.insertCSS("#gt-sl, #gt-tl { pointer-events: none !important; }");
+    instructionsWindow.webContents.on("dom-ready", e => {
+      instructionsWindow.webContents.insertCSS("#clp-btn { visibility: hidden !important; }");
+      instructionsWindow.webContents.insertCSS("#wtgbr { margin-top: -60px !important; }");
+      instructionsWindow.webContents.insertCSS("#contentframe { top: 37px !important; }");
+      instructionsWindow.webContents.insertCSS("#gt-appbar { padding: 3px 38px !important; }");
+      instructionsWindow.webContents.insertCSS("#gt-sl, #gt-tl { pointer-events: none !important; }");
+    });
+
+    //Instrucciones close
+    instructionsWindow.on("close", event => {
+      instructionsWindow = null;
+    });
+    //Instrucciones closed
+    instructionsWindow.on("closed", event => {
+      instructionsWindow = null;
+    });
+
+    //Listener del evento close de la ventana principal
+    instructionsWindow.on("closed", event => {
+      console.log("Cerrado");
+      event.preventDefault();
+    });
+
+    //Si falla la carga
+    instructionsWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL) => {
+      console.log("Reintentando conexión con las instrucciones");
+      if (errorCode == -3) {
+        console.log("Codigo de error: " + errorCode + " validatedURL: " + validatedURL);
+      } else {
+        instructionsWindow.webContents.loadURL(urlProxified);
+      }
+    });
   });
 
   //Listener cuando da click al daskboard
   ipcMain.on("click-dashboard", e => {
-    instructionsWindow.hide();
+    if (instructionsWindow != null) {
+      instructionsWindow.close()
+    }
   });
 
   //Evita que se cierre la ventana
-  instructionsWindow.on(
+  /* instructionsWindow.on(
     "close",
     (instructionsWindow.onbeforeunload = e => {
       console.log("I do not want to be closed");
@@ -111,17 +137,7 @@ function createWindow() {
       e.preventDefault();
       //e.returnValue = false;
     })
-  );
-
-  //Si falla la carga
-  instructionsWindow.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL) => {
-    console.log("Reintentando conexión con las instrucciones");
-    if (errorCode == -3) {
-      console.log("Codigo de error: " + errorCode + " validatedURL: " + validatedURL);
-    } else {
-      instructionsWindow.webContents.loadURL(urlProxified);
-    }
-  });
+  );*/
 }
 
 app.on("window-all-closed", () => {
