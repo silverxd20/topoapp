@@ -163,7 +163,7 @@
           </v-list-item>
 
           <!-- Link de Preguntas frecuentes-->
-          <v-list-item @click="btnPreguntasFrecuentes()" link>
+          <v-list-item v-show="showPreguntasFrecuentes" @click="btnPreguntasFrecuentes()" link>
             <v-list-item-icon>
               <v-icon>mdi-comment-question-outline</v-icon>
             </v-list-item-icon>
@@ -237,7 +237,8 @@ export default {
       "showHistorialPagos",
       "widthDrawer",
       "showListDrawer",
-      "showBotCursos"
+      "showBotCursos",
+      "showPreguntasFrecuentes"
     ])
   },
   methods: {
@@ -250,7 +251,8 @@ export default {
       "hideBackDash",
       "hideTranslate",
       "showPayHistory",
-      "hideCursosBot"
+      "hideCursosBot",
+      "showPreguntas"
     ]),
 
     //..................Funciones....................
@@ -262,6 +264,9 @@ export default {
         .signOut()
         .then(user => {
           console.log(user);
+          //Muestra el menu preguntas precuentes
+          this.showPreguntas()
+          //Esconde el listDrawer
           this.hidelistDrawer()
           //Pone en true el historial de pagos
           this.showPayHistory()

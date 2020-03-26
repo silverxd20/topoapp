@@ -14,6 +14,7 @@ export default new Vuex.Store({
     widthDrawer: "256px",
     showTraductor: "divBtnback d-inline",
     showHistorialPagos: true,
+    showPreguntasFrecuentes: true,
     userAuthData: "",
     showListDrawer: true,
     ListPagosPaypal: [],
@@ -67,6 +68,12 @@ export default new Vuex.Store({
     },
     hidePayHistory(state){
       state.showHistorialPagos = false;
+    },
+    showPreguntas(state){
+      state.showPreguntasFrecuentes = true;
+    },
+    hidePreguntas(state){
+      state.showPreguntasFrecuentes = false;
     },
     showTranslate(state){
       state.showTraductor = "divBtnbackON d-inline";

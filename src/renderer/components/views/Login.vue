@@ -82,7 +82,7 @@ export default {
   },
   methods: {
     // muestra el panel lateral desde el store vuex
-    ...mapMutations(["muestraDrawer","hidePayHistory","showlistDrawer","showCursosBot"]),
+    ...mapMutations(["hidePreguntas","muestraDrawer","hidePayHistory","showlistDrawer","showCursosBot"]),
     //Traer las funciones de actions en el store
     ...mapActions(["getUserAuthData"]),
 
@@ -122,6 +122,7 @@ getCurrentVersionApp(){
               if(userData.premium == true){
                 this.hidePayHistory()
                 this.showCursosBot()
+                this.hidePreguntas()
               }
               this.showlistDrawer()
               this.muestraDrawer();
