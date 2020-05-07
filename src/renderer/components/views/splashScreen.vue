@@ -84,11 +84,11 @@ export default {
               this.ocultaDrawer();
             }
           } catch (error) {
-            index = -1
-            this.toggleAlert = true
             setTimeout(() =>{  
+            this.toggleAlert = true
             console.log("Error ocurrido de firebase, reintentando...");       
-            },3000)                
+            },1500)                
+            index = -1
           }
         }
       });
