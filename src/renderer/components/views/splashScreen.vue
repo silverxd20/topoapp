@@ -87,7 +87,7 @@ export default {
             setTimeout(() =>{  
             this.toggleAlert = true
             console.log("Error ocurrido de firebase, reintentando...");       
-            },1500)                
+            },2000)                
             index = -1
           }
         }
