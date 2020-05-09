@@ -191,6 +191,7 @@ export default {
       urlCurso: "https://www.remotasks.com/course?id=",
       eventDesplegableClick: "",
       spinnerNameToken: "",
+      showBtnCancelarCurso: true,
       spinnerPasarCurso: "",
       nameAccountSelected: " -",
       cursoPasadoBackground: "",
@@ -378,12 +379,10 @@ export default {
         //Solicita de la base de datos firestore los escenarios
         let respCollection = await db.collection("cursos");
         let respGet = await respCollection.get();
-        console.log(respGet)
         let escenarioID = "";
         let forEachAwait = await respGet.forEach(async doc => {
           //busca el ID del curso y trae su payload
           escenarioID = jsonBegin.course.sections[this.currentSeccion].contents.scenarioId;
-          console.log(escenarioID)
           if (doc.id == escenarioID) {
             this.eventBtnPasarCurso.path[2].childNodes["0"].innerText = "Escenario encontrado, trayendo sus datos..."
             console.log("Titulo del escenario");
@@ -409,16 +408,13 @@ export default {
               "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3904.87 Safari/537.36"
           };
           let respText = await request(url, { method: "GET", headers });
-          console.log(respText.body)
           let $ = await cheerio.load(respText.body);
-          console.log($)
-          let jsonTraining = $("script")[2].children[0].data;
-          console.log(jsonTraining)
+          let jsonTraining = $("script")[1].children[0].data;
           let idPasarEscenario = JSON.parse(jsonTraining).props.pageInitialProps
             .trainingAttempt;
           console.log(idPasarEscenario);
           this.UrlEscenarioComplete =
-            "https://api-internal.scale.com/internal/training/complete/" +
+            "https://api-internal.scale.com/internal/training/complete/annotation/" +
             idPasarEscenario +
             "?grader_version=1";
           console.log(this.UrlEscenarioComplete);
@@ -744,6 +740,7 @@ export default {
         }
       );
     },
+
     // funcion que muestra el boton cuando se da click en expanded amarillo
     showBtnScenarioOnClickExpanded() {
       let Intervalo = setInterval(() => {

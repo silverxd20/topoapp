@@ -16,6 +16,20 @@
           </div>
         </div>
       </div>
+      <!--Notificacion que avisa que hay una actualizacion nueva-->
+      <div id="notification" v-show="toggleNotificationHayNuevaActualizacion">
+        <div class="divTopCardNotif bg-primary text-light">
+          <v-icon class="pl-3 mb-2 text-light d-inline">mdi-cloud-download-outline</v-icon>
+          <p class="pl-1 d-inline">Hay una actualización nueva.</p>
+        </div>
+        <div class="divCardNotifInfo">
+          <!-- AQUI SE COLOCAN LAS NOVEDADES DE CADA VERSION -->
+          <p id="message">Se esta descargando automáticamente, se le avisará una vez esté lista.</p>
+          <div class="divBotonesNotif">
+            <button @click="btnCerrarNotifOk()" class="btn btn-primary">Ok</button>
+          </div>
+        </div>
+      </div>
       <!-- App-bar -->
       <v-app-bar clipped-left height="25" app dark>
         <div :class="toggleBackToDashboard">
@@ -204,6 +218,7 @@ const request = require("request");
 export default {
   mounted() {
     this.firebaseInit();
+    this.HayNuevaActualizacion();
     this.PendienteDeActualizar();
     //this.poneOcultaDrawer = this.toggledrawer;
   },
@@ -213,6 +228,7 @@ export default {
   data() {
     return {
       toggleNotificationUpdated: false,
+      toggleNotificationHayNuevaActualizacion: false,
       toggleBackDash: true,
       zoomActual: 0,
       porcentajeZoom: "",
@@ -303,11 +319,22 @@ export default {
       ipcRenderer.on("update_downloaded", () => {
         ipcRenderer.removeAllListeners("update_downloaded");
         this.toggleNotificationUpdated = true;
+        this.toggleNotificationHayNuevaActualizacion = false;
+      });
+    },
+    //Muestra que hay una nueva actualizacion
+    HayNuevaActualizacion(){
+        ipcRenderer.on("update-available", () => {
+        this.toggleNotificationUpdated = true;
       });
     },
     //Oculta la notificación
     btnCerrarNotif() {
       this.toggleNotificationUpdated = false;
+    },
+    //Oculta notificación de aviso nueva actualización
+    btnCerrarNotifOk(){
+      this.toggleNotificationHayNuevaActualizacion = false;
     },
     //Reinicia el app e instala la actualización
     btnReiniciarApp() {

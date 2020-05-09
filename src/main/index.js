@@ -175,6 +175,11 @@ ipcMain.on("restart_app", () => {
   autoUpdater.quitAndInstall();
 });
 
+//Informa que hay una actualizacion
+autoUpdater.on('update-available', () => {
+  mainWindow.webContents.send('update_available');
+});
+
 app.on("ready", () => {
   createWindow();
   //autoUpdater.checkForUpdates()
