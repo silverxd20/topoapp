@@ -41,19 +41,19 @@
                 >{{selectViewCategoryName}}</button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
                   <button
-                    v-for="(item, index) in items"
+                    v-for="(item, index) in ListaDeCategorias"
                     :key="index"
                     class="dropdown-item"
                     type="button"
                     @click="clickDropdownCategoria(item, index)"
-                  >{{item}}</button>
+                  >{{item.namemio}}</button>
                 </div>
               </div>
             </v-flex>
 
             <!-- Dropdown Token Cuentas-->
             <v-flex md10>
-              <div class="dropdown">
+              <div class="dropdown ml-8">
                 <button
                   :disabled="toggleBtnGetCurso"
                   class="btn btn-secondary dropdown-toggle"
@@ -173,16 +173,6 @@ export default {
   //EL DATA
   data() {
     return {
-      items: [
-        "Cuadros 2D",
-        "Polygon",
-        "Segmentación",
-        "Categorizacion",
-        "Video Box",
-        "Video Polygon",
-        "Point Annotation",
-        "Cuboide 3D"
-      ],
       selectCategoryName: "",
       selectViewCategoryName: "Categoría",
       selectViewCuentaName: "Cuenta Token",
@@ -226,7 +216,8 @@ export default {
       "showLoaderCurso",
       "ListaDeCursos",
       "nombreApellido",
-      "JwtFromListUserArray"
+      "JwtFromListUserArray",
+      "ListaDeCategorias"
     ])
   },
   //LOS METODOS DEL COMPONENTE
@@ -240,32 +231,10 @@ export default {
 
     //1) maneja el click del dropdown de categoria
     clickDropdownCategoria(item, index) {
-      //Filtra el nombre de la categoría
-      if (item == "Cuadros 2D") {
-        this.selectViewCategoryName = "Cuadros 2D";
-        this.selectCategoryName = "annotation";
-      } else if (item == "Polygon") {
-        this.selectViewCategoryName = "Polygon";
-        this.selectCategoryName = "polygonannotation";
-      } else if (item == "Segmentación") {
-        this.selectViewCategoryName = "Segmentación";
-        this.selectCategoryName = "segmentannotation";
-      } else if (item == "Categorizacion") {
-        this.selectViewCategoryName = "Categorizacion";
-        this.selectCategoryName = "categorization";
-      } else if (item == "Video Box") {
-        this.selectViewCategoryName = "Video Box";
-        this.selectCategoryName = "videoboxannotation";
-      } else if (item == "Point Annotation") {
-        this.selectViewCategoryName = "Point Annotation";
-        this.selectCategoryName = "pointannotation";
-      } else if (item == "Video Polygon") {
-        this.selectViewCategoryName = "Video Polygon";
-        this.selectCategoryName = "videopolygonannotation";
-      } else if (item == "Cuboide 3D") {
-        this.selectViewCategoryName = "Cuboide 3D";
-        this.selectCategoryName = "cuboidannotation";
-      }
+     //Filtra el nombre de la categoría
+        this.selectViewCategoryName = item.namemio;
+        this.selectCategoryName = item.nameremo;
+
     },
     //2) maneja el click del dropdown de las Cuentas
     clickDropdownCuenta(item, index) {

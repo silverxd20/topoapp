@@ -19,6 +19,7 @@ export default new Vuex.Store({
     showListDrawer: true,
     ListPagosPaypal: [],
     ListaDeCursos: [],
+    ListaDeCategorias: {},
     jwtList: [],
     toggleBtnGetCurso: false,
     showLoaderCurso: false,
@@ -158,7 +159,11 @@ export default new Vuex.Store({
     listaDeJwtFromListUser(state, payload) {
       state.JwtFromListUserJson = payload;
       state.JwtFromListUserArray = Object.values(payload);
-    }
+    },
+
+    setCategoryList(state, payload){
+      state.ListaDeCategorias = payload
+    } 
   },
 
   actions: {
@@ -258,6 +263,26 @@ export default new Vuex.Store({
         commit("deshabilitaLoaderCurso");
         console.log("Error trayendo cursos: " + error);
       }
+    },
+
+    //Trae la lista de categorías existentes de remotasks guardadas en la base de datos.
+    traerCategoriasDesdeBd({commit}){
+      let db;
+      if (!firebase.apps.length) {
+        // Initialize Firebase
+        firebase.initializeApp(this.firebaseConfig);
+      }
+      db = firebase.firestore();
+      return db.collection("categorias")
+        .doc("todas")
+        .get()
+        .then(function(doc) {
+          console.log(doc.data())
+            //Envia la funcion al mutation y luego la retorna
+          commit("setCategoryList",doc.data())
+           // return doc.data();
+          
+        });
     }
   }
 

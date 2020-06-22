@@ -109,7 +109,7 @@
 <script>
 import barraSuperior from "./../barraSuperior/barraSuperior";
 import cardTasks from "./../miniComponents/cardTasks";
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 
 let { remote } = require("electron");
 const cheerio = require("cheerio");
@@ -120,7 +120,9 @@ export default {
   name: "dashboard",
   created() {
     this.firebaseInit();
+    this.traerCategoriasDesdeBd();
   },
+
   components: { barraSuperior, cardTasks },
   data() {
     return {
@@ -155,6 +157,7 @@ export default {
   methods: {
 
     ...mapMutations(["listaDeJwtFromListUser"]),
+    ...mapActions(["traerCategoriasDesdeBd"]),
     //......................EVENT LISTENERS.......................................
     async firebaseInit() {
       this.mainSeasson = remote.getCurrentWindow();
