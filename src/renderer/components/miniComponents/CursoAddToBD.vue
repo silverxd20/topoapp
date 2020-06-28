@@ -74,12 +74,12 @@
             ></v-text-field> 
           </div>-->
 
-          <div class="d-flex justify-content-center">
+          <!-- <div class="d-flex justify-content-center">
             <p :class="colorMsjCategory">{{mensajeSuccessErrorListCategory}}</p>
-          </div>
+          </div> -->
 
           <!-- boton que agregar la categoría a la BD -->
-          <div class="d-flex justify-content-center">
+          <!-- <div class="d-flex justify-content-center">
             <button
               :disabled="toogleBtnGuardarCategory"
               @click="AddNewCategoryToList()"
@@ -91,7 +91,7 @@
               ></span>
               Guardar
             </button>
-          </div>
+          </div> -->
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
