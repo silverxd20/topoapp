@@ -4,7 +4,7 @@
       <v-expansion-panel>
         <!-- Título del desplegable -->
         <v-expansion-panel-header @click="clickDespligue()">
-          <h5 class="text-center">Añadir nuevo escenario o Categoría</h5>
+          <h5 class="text-center">Añadir nuevo escenario</h5>
         </v-expansion-panel-header>
         <!-- Contenido del desplegable -->
         <v-expansion-panel-content class="pt-2">
@@ -48,14 +48,14 @@
           </div>
 
           <!--AQUI SE AGREGA LAS CATEGORÍAS EN LA BASE DE DATOS -->
-          <hr class="mt-5" />
+          <!-- <hr class="mt-5" />
 
           <div class="d-flex justify-content-center mb-7 mt-7">
             <h5>Agregar Categoria</h5>
-          </div>
+          </div> -->
 
           <!-- Los campos de textos de categorías -->
-          <div class="d-flex justify-content-center">
+          <!-- <div class="d-flex justify-content-center">
             <v-text-field
             @keydown.enter="AddNewCategoryToList()"
             :disabled="toogleCampoCategory"
@@ -71,8 +71,8 @@
               class="ml-5"
               label="Nombre de la categoría oficial"
               outlined
-            ></v-text-field>
-          </div>
+            ></v-text-field> 
+          </div>-->
 
           <div class="d-flex justify-content-center">
             <p :class="colorMsjCategory">{{mensajeSuccessErrorListCategory}}</p>
